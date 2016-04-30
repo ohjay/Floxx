@@ -152,6 +152,7 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback,
                 .setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY)
                 .setInterval(10 * 1000)        // 10 seconds, in milliseconds
                 .setFastestInterval(1 * 1000); // 1 second, in milliseconds
+        setUpMapIfNeeded();
     }
 
 
@@ -160,6 +161,7 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback,
     protected void onResume() {
         super.onResume();
         mGoogleApiClient.connect();
+        setUpMapIfNeeded();
     }
 
     @Override
@@ -172,14 +174,13 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback,
     }
 
     public void handleNewLocation(Location location) {
-        mMap = ((MapFragment) getFragmentManager().findFragmentById(R.id.map)).getMap();
         Log.d(TAG, location.toString());
         double currentLatitude = location.getLatitude();
         double currentLongitude = location.getLongitude();
 
         LatLng latLng = new LatLng(currentLatitude, currentLongitude);
 
-        //mMap.addMarker(new MarkerOptions().position(new LatLng(currentLatitude, currentLongitude)).title("Current Location"));
+        // mMap.addMarker(new MarkerOptions().position(new LatLng(currentLatitude, currentLongitude)).title("Current Location"));
         MarkerOptions options = new MarkerOptions()
                 .position(latLng)
                 .title("You are here!");
@@ -286,8 +287,10 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback,
         // Do a null check to confirm that we have not already instantiated the map.
         if (mMap == null) {
             // Try to obtain the map from the SupportMapFragment.
-            mMap = ((SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map))
-                    .getMap();
+            MapFragment mapFragment = (MapFragment) getFragmentManager()
+                    .findFragmentById(R.id.map);
+            mapFragment.getMapAsync(this);
+
             // Check if we were successful in obtaining the map.
             if (mMap != null) {
                 setUpMap();
@@ -306,6 +309,9 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback,
 
     @Override
     public void onMapReady(GoogleMap googleMap) {
-        
+        mMap = googleMap;
+        if (mMap != null) {
+            setUpMap();
+        }
     }
 }
