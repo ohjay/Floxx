@@ -54,10 +54,11 @@
                 android:text="@string/main_button"
                 android:onClick="switchToMap" />
             <Button
-                android:id="@+id/log_in"
+                android:id="@+id/friends"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Log in" />
+                android:onClick="switchToFriendList"
+                android:text="Friends" />
         </LinearLayout>
         <EditText android:id="@+id/enter_username"
             android:layout_marginTop="380dp"

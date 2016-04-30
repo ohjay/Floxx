@@ -10,6 +10,7 @@
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"></uses-permission>
 
     <application
+        android:name=".FloxxApplication"
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
@@ -38,8 +39,9 @@
             android:configChanges="keyboard|keyboardHidden|screenLayout|screenSize|orientation"
             android:label="@string/app_name"
             android:theme="@android:style/Theme.Translucent.NoTitleBar" />
-        <activity android:name=".SettingActivity">
+        <activity android:name=".SettingActivity"
             android:label="@string/app_name" ></activity>
+        <activity android:name=".ActivityFriendList"></activity>
         <activity
             android:name=".MapActivity"
             android:configChanges="orientation|keyboardHidden|screenSize"

@@ -179,9 +179,13 @@ public class FullscreenActivity extends AppCompatActivity {
         });
     }
 
+    public void switchToFriendList(View view) {
+        Intent intent = new Intent(FullscreenActivity.this, ActivityFriendList.class);
+        FullscreenActivity.this.startActivity(intent);
+    }
 
     public void switchToMap(View view) {
-        Intent myIntent = new Intent(FullscreenActivity.this, MapActivity.class);
-        FullscreenActivity.this.startActivity(myIntent);
+        Intent intent = new Intent(FullscreenActivity.this, MapActivity.class);
+        FullscreenActivity.this.startActivity(intent);
     }
 }
