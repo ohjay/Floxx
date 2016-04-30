@@ -1,22 +1,26 @@
 package co.floxx.floxx;
 
 import android.annotation.SuppressLint;
+import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
-import android.support.v7.app.ActionBar;
-import android.support.v7.app.AppCompatActivity;
+import android.text.method.Touch;
 import android.view.MotionEvent;
 import android.view.View;
 
-import com.facebook.FacebookSdk;
-import com.firebase.client.Firebase;
+import com.google.android.gms.maps.CameraUpdateFactory;
+import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.MapFragment;
+import com.google.android.gms.maps.OnMapReadyCallback;
+import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.MarkerOptions;
 
 /**
  * An example full-screen activity that shows and hides the system UI (i.e.
  * status bar and navigation/system bar) with user interaction.
  */
-public class FullscreenActivity extends AppCompatActivity {
+public class MapActivity extends Activity implements OnMapReadyCallback {
     /**
      * Whether or not the system UI should be auto-hidden after
      * {@link #AUTO_HIDE_DELAY_MILLIS} milliseconds.
@@ -58,10 +62,6 @@ public class FullscreenActivity extends AppCompatActivity {
         @Override
         public void run() {
             // Delayed display of UI elements
-            ActionBar actionBar = getSupportActionBar();
-            if (actionBar != null) {
-                actionBar.show();
-            }
             mControlsView.setVisibility(View.VISIBLE);
         }
     };
@@ -90,10 +90,13 @@ public class FullscreenActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        Firebase.setAndroidContext(this);
-        FacebookSdk.sdkInitialize(getApplicationContext());
+        Intent intent = getIntent();
 
-        setContentView(R.layout.activity_fullscreen);
+        setContentView(R.layout.activity_map);
+
+        MapFragment mapFragment = (MapFragment) getFragmentManager()
+                .findFragmentById(R.id.map);
+        mapFragment.getMapAsync(this);
 
         mVisible = true;
         mControlsView = findViewById(R.id.fullscreen_content_controls);
@@ -108,10 +111,32 @@ public class FullscreenActivity extends AppCompatActivity {
             }
         });
 
+        // =====
+        /* Touch listener guy: create a listener below (Google it if you don't know how)
+         * and set it up so that people can mark meeting points
+         */
+        // =====
+
         // Upon interacting with UI controls, delay any scheduled hide()
         // operations to prevent the jarring behavior of controls going away
         // while interacting with the UI.
         findViewById(R.id.dummy_button).setOnTouchListener(mDelayHideTouchListener);
+    }
+
+    @Override
+    public void onMapReady(GoogleMap map) {
+
+        // =====
+        // Richard; for starters, edit this to load the map at your locn
+        // =====
+
+        map.setMapType(GoogleMap.MAP_TYPE_HYBRID);
+        LatLng sydney = new LatLng(-33.867, 151.206);
+        map.moveCamera(CameraUpdateFactory.newLatLngZoom(sydney, 13));
+        map.addMarker(new MarkerOptions()
+                .title("Sydney")
+                .snippet("The most populous city in Australia.")
+                .position(sydney));
     }
 
     @Override
@@ -134,10 +159,6 @@ public class FullscreenActivity extends AppCompatActivity {
 
     private void hide() {
         // Hide UI first
-        ActionBar actionBar = getSupportActionBar();
-        if (actionBar != null) {
-            actionBar.hide();
-        }
         mControlsView.setVisibility(View.GONE);
         mVisible = false;
 
@@ -165,10 +186,5 @@ public class FullscreenActivity extends AppCompatActivity {
     private void delayedHide(int delayMillis) {
         mHideHandler.removeCallbacks(mHideRunnable);
         mHideHandler.postDelayed(mHideRunnable, delayMillis);
-    }
-
-    public void switchToMap(View view) {
-        Intent myIntent = new Intent(FullscreenActivity.this, MapActivity.class);
-        FullscreenActivity.this.startActivity(myIntent);
     }
 }
