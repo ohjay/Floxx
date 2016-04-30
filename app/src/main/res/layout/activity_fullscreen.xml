@@ -12,6 +12,7 @@
         android:id="@+id/fullscreen_content"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:layout_marginTop="50dp"
         android:gravity="center"
         android:keepScreenOn="true"
         android:text="@string/main_content"
@@ -31,7 +32,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center_horizontal"
-            android:layout_marginTop="30dp"
+            android:layout_marginTop="20dp"
             android:layout_marginBottom="30dp" />
 
         <LinearLayout
@@ -51,8 +52,49 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:text="@string/main_button" />
+            <Button
+                android:id="@+id/log_in"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Log in" />
 
         </LinearLayout>
+        <EditText android:id="@+id/enter_username"
+            android:layout_marginTop="380dp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:hint="Enter your username" />
+        <EditText android:id="@+id/enter_password"
+            android:layout_marginTop="420dp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:hint="Enter your password" />
+
+        <ImageView android:id="@+id/floxx_logo"
+            android:layout_width="298dp"
+            android:layout_height="298dp"
+            android:layout_marginTop="25dp"
+            android:layout_marginLeft="50dp"
+            android:src="@mipmap/ic_launcher"
+            android:scaleType="fitXY" />
+        <ImageButton android:id="@+id/setting_logo"
+            android:src="@drawable/setting_icon"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_marginTop="15dp"
+            android:layout_marginLeft="340dp"
+            android:scaleType="fitXY" />
+
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_gravity="left|top"
+            android:clickable="false"></FrameLayout>
+
+
+
     </FrameLayout>
 
 </FrameLayout>

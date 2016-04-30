@@ -1,12 +1,14 @@
 package co.floxx.floxx;
 
 import android.annotation.SuppressLint;
+import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.view.MotionEvent;
 import android.view.View;
+import android.widget.ImageButton;
 
 import com.facebook.AccessToken;
 import com.facebook.FacebookSdk;
@@ -114,6 +116,7 @@ public class FullscreenActivity extends AppCompatActivity {
         // operations to prevent the jarring behavior of controls going away
         // while interacting with the UI.
         findViewById(R.id.dummy_button).setOnTouchListener(mDelayHideTouchListener);
+        sendingSetting();
     }
 
     @Override
@@ -168,4 +171,14 @@ public class FullscreenActivity extends AppCompatActivity {
         mHideHandler.removeCallbacks(mHideRunnable);
         mHideHandler.postDelayed(mHideRunnable, delayMillis);
     }
+    public void sendingSetting() {
+        ImageButton button = (ImageButton) findViewById(R.id.setting_logo);
+        button.setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View v) {
+                startActivity(new Intent(FullscreenActivity.this, SettingActivity.class));
+            }
+        });
+    }
+
 }
