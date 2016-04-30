@@ -14,7 +14,7 @@
         android:layout_height="match_parent"
         android:gravity="center"
         android:keepScreenOn="true"
-        android:text="@string/dummy_content"
+        android:text="@string/main_content"
         android:textColor="#33b5e5"
         android:textSize="50sp"
         android:textStyle="bold" />
@@ -25,6 +25,14 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:fitsSystemWindows="true">
+
+        <com.facebook.login.widget.LoginButton
+            android:id="@+id/login_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginTop="30dp"
+            android:layout_marginBottom="30dp" />
 
         <LinearLayout
             android:id="@+id/fullscreen_content_controls"
@@ -42,7 +50,7 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:text="@string/dummy_button" />
+                android:text="@string/main_button" />
 
         </LinearLayout>
     </FrameLayout>

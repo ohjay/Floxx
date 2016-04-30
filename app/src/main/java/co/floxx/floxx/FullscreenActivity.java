@@ -1,12 +1,18 @@
 package co.floxx.floxx;
 
 import android.annotation.SuppressLint;
-import android.support.v7.app.ActionBar;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.os.Handler;
+import android.support.v7.app.ActionBar;
+import android.support.v7.app.AppCompatActivity;
 import android.view.MotionEvent;
 import android.view.View;
+
+import com.facebook.AccessToken;
+import com.facebook.FacebookSdk;
+import com.firebase.client.AuthData;
+import com.firebase.client.Firebase;
+import com.firebase.client.FirebaseError;
 
 /**
  * An example full-screen activity that shows and hides the system UI (i.e.
@@ -86,6 +92,8 @@ public class FullscreenActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        Firebase.setAndroidContext(this);
+        FacebookSdk.sdkInitialize(getApplicationContext());
 
         setContentView(R.layout.activity_fullscreen);
 
