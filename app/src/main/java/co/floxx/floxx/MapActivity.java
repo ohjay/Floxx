@@ -172,6 +172,7 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback,
     }
 
     public void handleNewLocation(Location location) {
+        mMap = ((MapFragment) getFragmentManager().findFragmentById(R.id.map)).getMap();
         Log.d(TAG, location.toString());
         double currentLatitude = location.getLatitude();
         double currentLongitude = location.getLongitude();
