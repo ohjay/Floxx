@@ -4,21 +4,30 @@
     android:layout_height="match_parent"
     android:background="#0099cc"
     tools:context="co.floxx.floxx.FullscreenActivity">
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content">
+        <ImageView android:id="@+id/floxx_logo"
+            android:layout_width="120dp"
+            android:layout_height="160dp"
+            android:layout_weight="1"
+            android:src="@mipmap/ic_launcher" />
+    <TextView
+        android:id="@+id/fullscreen_content"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:keepScreenOn="true"
+        android:layout_marginLeft="20dp"
+        android:layout_marginTop="35dp"
+        android:text="@string/main_content"
+        android:textColor="#33b5e5"
+        android:textSize="70sp"
+        android:textStyle="bold" />
+</LinearLayout>
 
     <!-- The primary full-screen view. This can be replaced with whatever view
          is needed to present your content, e.g. VideoView, SurfaceView,
          TextureView, etc. -->
-    <TextView
-        android:id="@+id/fullscreen_content"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_marginTop="50dp"
-        android:gravity="center"
-        android:keepScreenOn="true"
-        android:text="@string/main_content"
-        android:textColor="#33b5e5"
-        android:textSize="50sp"
-        android:textStyle="bold" />
 
     <!-- This FrameLayout insets its children based on system windows using
          android:fitsSystemWindows. -->
@@ -27,90 +36,78 @@
         android:layout_height="match_parent"
         android:fitsSystemWindows="true">
 
-        <com.facebook.login.widget.LoginButton
-            android:id="@+id/login_button"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center_horizontal"
-            android:layout_marginTop="10dp"
-            android:layout_marginBottom="30dp" />
 
         <LinearLayout
-            android:id="@+id/fullscreen_content_controls"
-            style="?metaButtonBarStyle"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_gravity="bottom|center_horizontal"
-            android:background="@color/black_overlay"
-            android:orientation="horizontal"
-            tools:ignore="UselessParent">
+            android:layout_height="match_parent"
+            android:layout_width="match_parent">
 
-            <Button
-                android:id="@+id/dummy_button"
-                style="?metaButtonBarButtonStyle"
+            <FrameLayout
                 android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:text="@string/main_button"
-                android:onClick="switchToMap" />
-            <Button
-                android:id="@+id/friends"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:onClick="switchToFriendList"
-                android:text="Friends" />
+                android:layout_height="match_parent"
+                android:clickable="true"
+                android:layout_weight="1">
+
+                <ImageButton android:id="@+id/setting_logo"
+                    android:src="@drawable/setting_icon"
+                    android:layout_width="62dp"
+                    android:layout_height="62dp"
+                    android:layout_marginTop="5dp"
+                    android:layout_marginLeft="360dp"
+                    android:scaleType="fitXY"
+                    android:layout_gravity="right|top"
+                    android:background="@null"/>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Don't have an account? Register now!"
+                    android:id="@+id/register_button"
+                    android:layout_gravity="center|bottom"
+                    android:layout_marginBottom="175dp"
+                    android:clickable="true"
+                    android:onClick="registerAccount"/>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textAppearance="?android:attr/textAppearanceMedium"
+                    android:text="Now      and      Forever"
+                    android:id="@+id/textView3"
+                    android:layout_marginBottom="170dp"
+                    android:layout_marginLeft="105dp"
+                    android:layout_gravity="left|center_vertical"
+                    android:textSize="25dp" />
+
+
+            </FrameLayout>
+
         </LinearLayout>
         <EditText android:id="@+id/enter_username"
-            android:layout_marginTop="390dp"
+            android:layout_marginTop="220dp"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_gravity="center_horizontal"
+            android:layout_weight="1"
             android:hint="Enter your username" />
         <EditText android:id="@+id/enter_password"
-            android:layout_marginTop="430dp"
+            android:layout_marginTop="270dp"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_gravity="center_horizontal"
+            android:layout_weight="1"
             android:hint="Enter your password" />
 
-        <ImageView android:id="@+id/floxx_logo"
-            android:layout_width="252dp"
-            android:layout_height="252dp"
-            android:layout_gravity = "center_horizontal"
-            android:layout_marginTop="30dp"
-            android:src="@mipmap/ic_launcher"
-            android:scaleType="fitXY" />
-        <ImageButton android:id="@+id/setting_logo"
-            android:src="@drawable/setting_icon"
-            android:layout_width="40dp"
-            android:layout_height="40dp"
-            android:layout_marginTop="5dp"
-            android:layout_marginLeft="360dp"
-            android:scaleType="fitXY" />
+
         <Button
             android:id="@+id/log_in_button"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_width="200dp"
+            android:layout_height="50dp"
             android:layout_gravity="bottom"
-            android:layout_marginBottom="70dp"
-            android:layout_marginLeft="330dp"
-            android:text="Login" />
-
-
-        <FrameLayout
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_gravity="left|top"
-            android:clickable="false">
-
-            <Button
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Register"
-                android:id="@+id/register_button"
-                android:layout_gravity="left|top" />
-        </FrameLayout>
-
+            android:layout_marginBottom="220dp"
+            android:layout_marginLeft="100dp"
+            android:layout_marginRight="250dp"
+            android:text="Sign in"
+            android:backgroundTint="#067036" />
 
 
     </FrameLayout>

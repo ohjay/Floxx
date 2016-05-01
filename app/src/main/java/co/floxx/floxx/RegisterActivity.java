@@ -3,6 +3,7 @@ package co.floxx.floxx;
 import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.text.method.PasswordTransformationMethod;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -18,6 +19,7 @@ public class RegisterActivity extends AppCompatActivity {
         final Bundle extras = new Bundle();
         final EditText username1 = (EditText) findViewById(R.id.register_user);
         final EditText password1 = (EditText) findViewById(R.id.register_password);
+
         button.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View v) {
@@ -27,8 +29,6 @@ public class RegisterActivity extends AppCompatActivity {
                 extras.putString("register_user", username11);
                 extras.putString("register_password", password11);
                 intent.putExtras(extras);
-                Log.i("user", username11);
-                Log.i("pass", password11);
                 RegisterActivity.this.startActivity(intent);
 
 
@@ -38,7 +38,5 @@ public class RegisterActivity extends AppCompatActivity {
             }
         });
     }
-
-
 
 }
