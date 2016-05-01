@@ -7,7 +7,8 @@
     android:paddingLeft="@dimen/activity_horizontal_margin"
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
-    tools:context="co.floxx.floxx.SettingActivity">
+    tools:context="co.floxx.floxx.SettingActivity"
+    android:background="#0099cc">
 
     <TextView
         android:layout_width="match_parent"
@@ -15,15 +16,56 @@
         android:text="SETTINGS"
         android:textSize="35dp"
         android:id="@+id/textView"
-        android:gravity="center" />
+        android:gravity="center"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true" />
     <ScrollView
         android:layout_width="fill_parent"
-        android:layout_height="fill_parent">
-    <LinearLayout
-        android:layout_width="fill_parent"
         android:layout_height="fill_parent"
-        android:orientation="vertical">
-    </LinearLayout>
+        android:layout_below="@+id/textView"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true"
+        android:id="@+id/scrollView2">
+        <LinearLayout
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent"
+            android:orientation="vertical">
+        </LinearLayout>
     </ScrollView>
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Add Friends"
+        android:id="@+id/button11"
+        android:layout_marginTop="50dp"
+        android:layout_alignTop="@+id/scrollView2"
+        android:layout_centerHorizontal="true" />
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Toggle Location Service"
+        android:id="@+id/button12"
+        android:layout_below="@+id/button11"
+        android:layout_centerHorizontal="true" />
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="I&apos;m Feeling Lucky"
+        android:id="@+id/button13"
+        android:layout_below="@+id/button12"
+        android:layout_centerHorizontal="true"
+        android:backgroundTint="#f89b4a" />
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Tea Era"
+        android:id="@+id/button14"
+        android:layout_below="@+id/button13"
+        android:layout_centerHorizontal="true" />
 
 </RelativeLayout>
