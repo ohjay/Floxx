@@ -11,7 +11,6 @@ import android.location.LocationManager;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 import android.support.multidex.MultiDex;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentActivity;
@@ -30,6 +29,7 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapFragment;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 
 /**
@@ -43,6 +43,7 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback,
     private LocationRequest mLocationRequest;
     private GoogleMap mMap;
     private Location mLastLocation;
+    private Marker marker;
     /**
      * Whether or not the system UI should be auto-hidden after
      * {@link #AUTO_HIDE_DELAY_MILLIS} milliseconds.
@@ -195,7 +196,8 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback,
         MarkerOptions options = new MarkerOptions()
                 .position(latLng)
                 .title("You are here!");
-        mMap.addMarker(options);
+        if (marker != null) { marker.remove(); }
+        marker = mMap.addMarker(options);
         mMap.moveCamera(CameraUpdateFactory.newLatLng(latLng));
     }
 
@@ -371,12 +373,14 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback,
 
     private void setUpMap() {
         if (mLastLocation == null) {
-            mMap.addMarker(new MarkerOptions().position(new LatLng(0, 0)).title("Marker"));
+            if (marker != null) { marker.remove(); }
+            marker = mMap.addMarker(new MarkerOptions().position(new LatLng(0, 0)).title("Marker"));
         } else {
             LocationManager locationManager = (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);
             try {
                 Location location = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
-                mMap.addMarker(new MarkerOptions().position(new LatLng(location.getLatitude(), location.getLongitude())).title("Marker"));
+                if (marker != null) { marker.remove(); }
+                marker = mMap.addMarker(new MarkerOptions().position(new LatLng(location.getLatitude(), location.getLongitude())).title("Marker"));
             } catch (SecurityException e) {
                 e.printStackTrace(); // lol
             }
