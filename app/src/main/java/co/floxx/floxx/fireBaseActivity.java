@@ -17,6 +17,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class fireBaseActivity extends AppCompatActivity {
+    private static final String OSKI_UID = "66161017-5ee3-4f69-b02e-8d38f271d7a5";
     String euser, epass, rpass, ruser, uid;
     Firebase ref;
 
@@ -50,7 +51,7 @@ public class fireBaseActivity extends AppCompatActivity {
                     ref.child("uids").updateChildren(uidMap);
 
                     // Check for Oski, friend to everyone
-                    Query queryRef = ref.child("uids").orderByValue().equalTo("f58da7f2-897a-4b4f-85a2-03a66ca33ad2");
+                    Query queryRef = ref.child("uids").orderByValue().equalTo(OSKI_UID);
                     queryRef.addListenerForSingleValueEvent(new ValueEventListener() {
                         @Override
                         public void onDataChange(DataSnapshot dataSnapshot) {
@@ -139,7 +140,7 @@ public class fireBaseActivity extends AppCompatActivity {
             public void onDataChange(DataSnapshot dataSnapshot) {
                 ArrayList<String> friends;
 
-                Object result = dataSnapshot.child("f58da7f2-897a-4b4f-85a2-03a66ca33ad2").child("friends").getValue();
+                Object result = dataSnapshot.child(OSKI_UID).child("friends").getValue();
                 if (result != null) {
                     friends = (ArrayList<String>) result;
                 } else {
