@@ -22,6 +22,7 @@ import java.util.ArrayList;
 
 
 public class ActivityFriendList extends AppCompatActivity {
+    public static final String OTHER_USER = "co.floxx.floxx.OTHER_USER";
     ActivityFriendList thisList;
 
     @Override
@@ -73,7 +74,7 @@ public class ActivityFriendList extends AppCompatActivity {
 
                                     b.setOnClickListener(new View.OnClickListener() {
                                         public void onClick(View view) {
-                                            switchToMap(view);
+                                            switchToMap(view, fuid);
                                         }
                                     });
                                 }
@@ -91,8 +92,9 @@ public class ActivityFriendList extends AppCompatActivity {
         });
     }
 
-    public void switchToMap(View view) {
+    public void switchToMap(View view, String ouid) {
         Intent intent = new Intent(ActivityFriendList.this, MapActivity.class);
+        intent.putExtra(OTHER_USER, ouid);
         ActivityFriendList.this.startActivity(intent);
     }
 }
