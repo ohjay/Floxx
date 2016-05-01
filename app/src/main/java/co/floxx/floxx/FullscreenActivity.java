@@ -8,10 +8,14 @@ import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.view.MotionEvent;
 import android.view.View;
+import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ImageButton;
 
 import com.facebook.FacebookSdk;
 import com.firebase.client.Firebase;
+import com.firebase.client.ValueEventListener;
+
 
 /**
  * An example full-screen activity that shows and hides the system UI (i.e.
@@ -23,6 +27,8 @@ public class FullscreenActivity extends AppCompatActivity {
      * {@link #AUTO_HIDE_DELAY_MILLIS} milliseconds.
      */
     private static final boolean AUTO_HIDE = true;
+
+
 
     /**
      * If {@link #AUTO_HIDE} is set, the number of milliseconds to wait after
@@ -113,7 +119,26 @@ public class FullscreenActivity extends AppCompatActivity {
         // operations to prevent the jarring behavior of controls going away
         // while interacting with the UI.
         findViewById(R.id.dummy_button).setOnTouchListener(mDelayHideTouchListener);
+        Firebase.setAndroidContext(this);
+        Button button = (Button)findViewById(R.id.log_in_button);
+        final Bundle extras = new Bundle();
+        final EditText username1 = (EditText) findViewById(R.id.enter_username);
+        final EditText password1 = (EditText) findViewById(R.id.enter_password);
         sendingSetting();
+        registerAccount();
+        button.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(FullscreenActivity.this, fireBaseActivity.class);
+                String username11 = username1.getText().toString();
+                String password11 = password1.getText().toString();
+                extras.putString("enter_username", username11);
+                extras.putString("enter_password", password11);
+                intent.putExtras(extras);
+                startActivity(intent);
+            }
+        });
+
     }
 
     @Override
@@ -162,7 +187,7 @@ public class FullscreenActivity extends AppCompatActivity {
 
     /**
      * Schedules a call to hide() in [delay] milliseconds, canceling any
-     * previously scheduled calls.
+        * previously scheduled calls.
      */
     private void delayedHide(int delayMillis) {
         mHideHandler.removeCallbacks(mHideRunnable);
@@ -179,6 +204,16 @@ public class FullscreenActivity extends AppCompatActivity {
         });
     }
 
+    public void registerAccount() {
+        Button button = (Button) findViewById(R.id.register_button);
+        button.setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View v) {
+                startActivity(new Intent(FullscreenActivity.this, RegisterActivity.class));
+            }
+        });
+    }
+
     public void switchToFriendList(View view) {
         Intent intent = new Intent(FullscreenActivity.this, ActivityFriendList.class);
         FullscreenActivity.this.startActivity(intent);
@@ -188,4 +223,5 @@ public class FullscreenActivity extends AppCompatActivity {
         Intent intent = new Intent(FullscreenActivity.this, MapActivity.class);
         FullscreenActivity.this.startActivity(intent);
     }
+
 }
