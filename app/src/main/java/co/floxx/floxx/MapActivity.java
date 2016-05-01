@@ -208,8 +208,7 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback,
                 .title("You are here!");
         if (marker != null) { marker.remove(); }
         marker = mMap.addMarker(options);
-        mMap.moveCamera(CameraUpdateFactory.newLatLng(latLng));
-        mMap.animateCamera(CameraUpdateFactory.zoomIn());
+        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, 15));
     }
 
     @Override
