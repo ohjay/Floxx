@@ -2,7 +2,6 @@ package co.floxx.floxx;
 
 import android.app.AlertDialog;
 import android.content.DialogInterface;
-import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -18,7 +17,7 @@ public class SettingActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_setting);
 
-        Button more = (Button) findViewById(R.id.TeaEra);
+        Button more = (Button) findViewById(R.id.button13);
         more.setOnClickListener(new View.OnClickListener() {
             public void onClick(View view) {
 
