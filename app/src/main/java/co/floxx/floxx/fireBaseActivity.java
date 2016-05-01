@@ -18,7 +18,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class fireBaseActivity extends AppCompatActivity {
-    private static final String OSKI_UID = "66161017-5ee3-4f69-b02e-8d38f271d7a5";
+    private static final String OSKI_UID = "07750a2b-0f39-494d-ab19-59a6d3a276cc";
     String euser, epass, rpass, ruser, uid;
     Firebase ref;
 
@@ -43,12 +43,9 @@ public class fireBaseActivity extends AppCompatActivity {
             ref.createUser(email, rpass, new Firebase.ValueResultHandler<Map<String, Object>>() {
                 @Override
                 public void onSuccess(Map<String, Object> result) {
-<<<<<<< HEAD
-                    System.out.println("Successfully created user account with uid: " + result.get("uid"));
-                    Toast.makeText(fireBaseActivity.this, "You were able to register!", Toast.LENGTH_LONG).show();
-=======
                     uid = result.get("uid").toString();
                     System.out.println("Successfully created user account with uid: " + uid);
+                    Toast.makeText(fireBaseActivity.this, "You were able to register!", Toast.LENGTH_LONG).show();
 
                     // Add the username and UID to Firebase
                     Map<String, Object> uidMap = new HashMap<String, Object>();
@@ -78,7 +75,6 @@ public class fireBaseActivity extends AppCompatActivity {
                             // We can do something here if we want
                         }
                     });
->>>>>>> 9b753c4448585a6dd3e1610c8b8199b74f97b629
                 }
 
                 @Override
@@ -100,11 +96,7 @@ public class fireBaseActivity extends AppCompatActivity {
                 @Override
                 public void onAuthenticationError(FirebaseError firebaseError) {
                     Intent intent = new Intent(fireBaseActivity.this, FullscreenActivity.class);
-<<<<<<< HEAD
                     Toast.makeText(fireBaseActivity.this, "You failed to log in. Try again!", Toast.LENGTH_LONG).show();
-=======
-                    Log.i("message", "Login failed!");
->>>>>>> 9b753c4448585a6dd3e1610c8b8199b74f97b629
                     fireBaseActivity.this.startActivity(intent);
                 }
             });

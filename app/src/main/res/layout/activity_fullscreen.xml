@@ -82,11 +82,11 @@
         android:fitsSystemWindows="true">
         <ImageButton android:id="@+id/setting_logo"
             android:src="@drawable/setting_icon"
-            android:layout_width="193dp"
-            android:layout_height="446dp"
-            android:scaleType="fitStart"
+            android:layout_width="150dp"
+            android:layout_height="150dp"
+            android:scaleType="fitXY"
             android:layout_marginLeft="140dp"
-            android:layout_marginTop="85dp"
+            android:layout_marginTop="-10dp"
             android:layout_gravity="center|right"
             android:background="@null"/>
     </FrameLayout>
