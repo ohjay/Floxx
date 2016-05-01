@@ -17,7 +17,7 @@ public class SettingActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_setting);
 
-        Button more = (Button) findViewById(R.id.button13);
+        Button more = (Button) findViewById(R.id.TeaEra);
         more.setOnClickListener(new View.OnClickListener() {
             public void onClick(View view) {
 
