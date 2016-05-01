@@ -85,14 +85,31 @@
             android:layout_width="40dp"
             android:layout_height="40dp"
             android:layout_marginTop="5dp"
-            android:layout_marginLeft="300dp"
+            android:layout_marginLeft="360dp"
             android:scaleType="fitXY" />
+        <Button
+            android:id="@+id/log_in_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom"
+            android:layout_marginBottom="70dp"
+            android:layout_marginLeft="330dp"
+            android:text="Login" />
+
 
         <FrameLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_gravity="left|top"
-            android:clickable="false"></FrameLayout>
+            android:clickable="false">
+
+            <Button
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Register"
+                android:id="@+id/register_button"
+                android:layout_gravity="left|top" />
+        </FrameLayout>
 
 
 

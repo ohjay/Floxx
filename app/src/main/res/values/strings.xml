@@ -4,6 +4,7 @@
     <string name="main_button">Floxx now, Floxx forever</string>
     <string name="main_content">Floxx</string>
     <string name="facebook_app_id">1073428442727666</string>
+    <string name="google_app_id">310379858463</string>
 
     <string name="title_activity_map">MapActivity</string>
     <string name="dummy_button">Dummy Button</string>
