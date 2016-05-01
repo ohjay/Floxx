@@ -19,7 +19,11 @@ import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 
+import com.firebase.client.DataSnapshot;
 import com.firebase.client.Firebase;
+import com.firebase.client.FirebaseError;
+import com.firebase.client.Query;
+import com.firebase.client.ValueEventListener;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationListener;
@@ -57,6 +61,8 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback,
     private GoogleMap mMap;
     private Location mLastLocation;
     private Marker marker;
+    private Marker oMarker;
+    private String ouid;
     /**
      * Whether or not the system UI should be auto-hidden after
      * {@link #AUTO_HIDE_DELAY_MILLIS} milliseconds.
@@ -140,6 +146,7 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback,
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         Intent intent = getIntent();
+        ouid = intent.getStringExtra(ActivityFriendList.OTHER_USER);
 
         setContentView(R.layout.activity_map);
 
@@ -180,6 +187,33 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback,
                 .setInterval(10 * 1000)        // 10 seconds, in milliseconds
                 .setFastestInterval(1 * 1000); // 1 second, in milliseconds
         setUpMapIfNeeded();
+
+        Firebase ref = new Firebase("https://floxx.firebaseio.com/");
+        Query llqRef = ref.child("locns").child(ouid).orderByKey();
+        llqRef.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                double olat = -12345, olon = -67890;
+                for (DataSnapshot child : dataSnapshot.getChildren()) {
+                    switch (child.getKey()) {
+                        case "latitude":
+                            olat = (double) child.getValue();
+                            break;
+                        case "longitude":
+                            olon = (double) child.getValue();
+                            break;
+                    }
+                }
+
+                if (olat > -12345 && olon > -12345) {
+                    if (oMarker != null) { oMarker.remove(); }
+                    oMarker = mMap.addMarker(new MarkerOptions().position(new LatLng(olat, olon)).title("Other guy"));
+                }
+            }
+
+            @Override
+            public void onCancelled(FirebaseError firebaseError) {}
+        });
     }
 
     @Override
@@ -203,7 +237,7 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback,
         Map<String, Double> map = new HashMap<String, Double>();
         map.put("latitude", location.getLatitude());
         map.put("longitude", location.getLongitude());
-        ref.child("users").child(ref.getAuth().getUid().toString()).setValue(map);
+        ref.child("locns").child(ref.getAuth().getUid().toString()).setValue(map);
 
         Log.d(TAG, location.toString());
         double currentLatitude = location.getLatitude();
