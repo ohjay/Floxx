@@ -32,6 +32,16 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.io.BufferedInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.HttpURLConnection;
+import java.net.URL;
+
 /**
  * An example full-screen activity that shows and hides the system UI (i.e.
  * status bar and navigation/system bar) with user interaction.
@@ -199,6 +209,7 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback,
         if (marker != null) { marker.remove(); }
         marker = mMap.addMarker(options);
         mMap.moveCamera(CameraUpdateFactory.newLatLng(latLng));
+        mMap.animateCamera(CameraUpdateFactory.zoomIn());
     }
 
     @Override
@@ -396,9 +407,53 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback,
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
-        mMap.setMapType(GoogleMap.MAP_TYPE_SATELLITE);
+        mMap.setMapType(GoogleMap.MAP_TYPE_HYBRID);
         if (mMap != null) {
             setUpMap();
         }
+    }
+
+    private double getDistanceInfo(double lat1, double lng1, String destinationAddress) {
+        StringBuilder stringBuilder = new StringBuilder();
+        double dist = 0.0;
+        try {
+
+            destinationAddress = destinationAddress.replaceAll(" ","%20");
+            URL url = new URL("http://maps.googleapis.com/maps/api/directions/json?origin=" + lat1 + "," + lng1
+                    + "&destination=" + destinationAddress + "&mode=driving&sensor=false");
+
+            HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
+            try {
+                InputStream in = new BufferedInputStream(urlConnection.getInputStream());
+                stringBuilder = new StringBuilder();
+                int b;
+                while ((b = in.read()) != -1) {
+                    stringBuilder.append((char) b);
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            } finally {
+                urlConnection.disconnect();
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        JSONObject jsonObject;
+        try {
+
+            jsonObject = new JSONObject(stringBuilder.toString());
+            JSONArray array = jsonObject.getJSONArray("routes");
+            JSONObject routes = array.getJSONObject(0);
+            JSONArray legs = routes.getJSONArray("legs");
+            JSONObject steps = legs.getJSONObject(0);
+            JSONObject distance = steps.getJSONObject("distance");
+            Log.i("Distance", distance.toString());
+            dist = Double.parseDouble(distance.getString("text").replaceAll("[^\\.0123456789]","") );
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+        return dist;
     }
 }
