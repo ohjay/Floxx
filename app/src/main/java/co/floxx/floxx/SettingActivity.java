@@ -1,12 +1,18 @@
 package co.floxx.floxx;
 
 import android.app.AlertDialog;
+import android.app.Dialog;
 import android.content.DialogInterface;
+import android.content.Intent;
+import android.location.LocationManager;
+import android.provider.Settings;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.FrameLayout;
+import android.widget.ImageButton;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -16,6 +22,13 @@ public class SettingActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_setting);
+        ImageButton button = (ImageButton) findViewById(R.id.left_arrow);
+        button.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                finish();
+            }
+        });
 
         Button more = (Button) findViewById(R.id.TeaEra);
         more.setOnClickListener(new View.OnClickListener() {
@@ -43,5 +56,6 @@ public class SettingActivity extends AppCompatActivity {
             }
 
         });
+
     }
 }

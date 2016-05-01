@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
+import android.widget.Toast;
 
 import com.firebase.client.AuthData;
 import com.firebase.client.DataSnapshot;
@@ -62,6 +63,7 @@ public class fireBaseActivity extends AppCompatActivity {
                 @Override
                 public void onSuccess(Map<String, Object> result) {
                     System.out.println("Successfully created user account with uid: " + result.get("uid"));
+                    Toast.makeText(fireBaseActivity.this, "You were able to register!", Toast.LENGTH_LONG).show();
                 }
 
                 @Override
@@ -70,7 +72,6 @@ public class fireBaseActivity extends AppCompatActivity {
                 }
             });
             intent = new Intent(fireBaseActivity.this, FullscreenActivity.class);
-            Log.i("message","Register Successful!");
             fireBaseActivity.this.startActivity(intent);
         }
         else {
@@ -80,13 +81,12 @@ public class fireBaseActivity extends AppCompatActivity {
                 public void onAuthenticated(AuthData authData) {
                     System.out.println("User ID: " + authData.getUid() + ", Provider: " + authData.getProvider());
                     Intent intent = new Intent(fireBaseActivity.this, ActivityFriendList.class);
-                    Log.i("message","Login Success!");
                     fireBaseActivity.this.startActivity(intent);
                 }
                 @Override
                 public void onAuthenticationError(FirebaseError firebaseError) {
                     Intent intent = new Intent(fireBaseActivity.this, FullscreenActivity.class);
-                    Log.i("message","Login failed!");
+                    Toast.makeText(fireBaseActivity.this, "You failed to log in. Try again!", Toast.LENGTH_LONG).show();
                     fireBaseActivity.this.startActivity(intent);
                 }
             });
