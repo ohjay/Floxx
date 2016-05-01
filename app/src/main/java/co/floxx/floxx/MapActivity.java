@@ -19,6 +19,7 @@ import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 
+import com.firebase.client.Firebase;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationListener;
@@ -41,6 +42,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * An example full-screen activity that shows and hides the system UI (i.e.
@@ -196,6 +199,12 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback,
     }
 
     public void handleNewLocation(Location location) {
+        Firebase ref = new Firebase("https://floxx.firebaseio.com/");
+        Map<String, Double> map = new HashMap<String, Double>();
+        map.put("latitude", location.getLatitude());
+        map.put("longitude", location.getLongitude());
+        ref.child("users").child(ref.getAuth().getUid().toString()).setValue(map);
+
         Log.d(TAG, location.toString());
         double currentLatitude = location.getLatitude();
         double currentLongitude = location.getLongitude();

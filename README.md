@@ -1,2 +1,2 @@
 # Floxx
-Meet up with old friends (and new enemies)
+A product of LA Hacks. Check out our website [here](http://www.floxx.co); we're hiring!
