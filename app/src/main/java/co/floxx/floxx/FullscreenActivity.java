@@ -112,9 +112,4 @@ public class FullscreenActivity extends AppCompatActivity {
         FullscreenActivity.this.startActivity(intent);
     }
 
-    public void switchToMap(View view) {
-        Intent intent = new Intent(FullscreenActivity.this, MapActivity.class);
-        FullscreenActivity.this.startActivity(intent);
-    }
-
 }
