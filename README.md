@@ -1,2 +1,5 @@
-# Floxx
-A product of LA Hacks. Check out our website [here](http://www.floxx.co); we're hiring!
+![alt text](logo.png)
+
+`Henry Gu, Richard Gao, Patrick Leung, Owen Jow`
+
+A product of LA Hacks. Currently under development; expect an official release sometime this summer!
