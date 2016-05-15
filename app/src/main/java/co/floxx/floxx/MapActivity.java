@@ -33,6 +33,7 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapFragment;
 import com.google.android.gms.maps.OnMapReadyCallback;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
@@ -53,16 +54,20 @@ import java.util.Map;
  * An example full-screen activity that shows and hides the system UI (i.e.
  * status bar and navigation/system bar) with user interaction.
  */
-public class MapActivity extends FragmentActivity implements OnMapReadyCallback, GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener, LocationListener{
+public class MapActivity extends FragmentActivity implements OnMapReadyCallback,
+        GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener,
+        LocationListener {
     private final static int CONNECTION_FAILURE_RESOLUTION_REQUEST = 9000;
     private final static int FINE_REQ_CODE = 13;
     private final static int COARSE_REQ_CODE = 14;
+    private boolean initialZoom = true;
     private LocationRequest mLocationRequest;
     private GoogleMap mMap;
     private Location mLastLocation;
     private Marker marker;
     private Marker oMarker;
-    private String ouid;
+    private String ouid, oName;
+
     /**
      * Whether or not the system UI should be auto-hidden after
      * {@link #AUTO_HIDE_DELAY_MILLIS} milliseconds.
@@ -146,7 +151,8 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback,
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         Intent intent = getIntent();
-        ouid = intent.getStringExtra(ActivityFriendList.OTHER_USER);
+        ouid = intent.getStringExtra(ActivityFriendList.OTHER_UID);
+        oName = intent.getStringExtra(ActivityFriendList.OTHER_NAME);
 
         setContentView(R.layout.activity_map);
 
@@ -207,7 +213,9 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback,
 
                 if (olat > -12345 && olon > -12345) {
                     if (oMarker != null) { oMarker.remove(); }
-                    oMarker = mMap.addMarker(new MarkerOptions().position(new LatLng(olat, olon)).title("Other guy"));
+                    oMarker = mMap.addMarker(new MarkerOptions().position(new LatLng(olat,
+                            olon)).title(oName));
+                    oMarker.showInfoWindow();
                 }
             }
 
@@ -245,13 +253,17 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback,
 
         LatLng latLng = new LatLng(currentLatitude, currentLongitude);
 
-        // mMap.addMarker(new MarkerOptions().position(new LatLng(currentLatitude, currentLongitude)).title("Current Location"));
         MarkerOptions options = new MarkerOptions()
                 .position(latLng)
-                .title("You are here!");
+                .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE));
         if (marker != null) { marker.remove(); }
         marker = mMap.addMarker(options);
-        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, 15));
+        marker.showInfoWindow();
+
+        if (initialZoom) {
+            mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, 13));
+            initialZoom = false;
+        }
     }
 
     @Override
@@ -307,8 +319,10 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback,
     @Override
     public void onConnected(Bundle connectionHint) {
         Log.i(TAG, "Location services connected.");
-        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
-                && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
+                != PackageManager.PERMISSION_GRANTED
+                && ActivityCompat.checkSelfPermission(this,
+                Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             ActivityCompat.requestPermissions(this,
                     new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
                     FINE_REQ_CODE);
@@ -323,7 +337,8 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback,
 
         mLastLocation = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
         if (mLastLocation == null) {
-            LocationServices.FusedLocationApi.requestLocationUpdates(mGoogleApiClient, mLocationRequest, this);
+            LocationServices.FusedLocationApi.requestLocationUpdates(mGoogleApiClient,
+                    mLocationRequest, this);
         } else {
             handleNewLocation(mLastLocation);
         }
@@ -332,8 +347,10 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback,
     @Override
     public void onRequestPermissionsResult(int requestCode,
                                            String permissions[], int[] grantResults) {
-        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
-                && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
+                != PackageManager.PERMISSION_GRANTED
+                && ActivityCompat.checkSelfPermission(this,
+                Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             return;
         }
 
@@ -342,7 +359,8 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback,
                 mMap.setMyLocationEnabled(true);
                 mLastLocation = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
                 if (mLastLocation == null) {
-                    LocationServices.FusedLocationApi.requestLocationUpdates(mGoogleApiClient, mLocationRequest, this);
+                    LocationServices.FusedLocationApi.requestLocationUpdates(mGoogleApiClient,
+                            mLocationRequest, this);
                 } else {
                     handleNewLocation(mLastLocation);
                 }
@@ -353,7 +371,8 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback,
                 mMap.setMyLocationEnabled(true);
                 mLastLocation = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
                 if (mLastLocation == null) {
-                    LocationServices.FusedLocationApi.requestLocationUpdates(mGoogleApiClient, mLocationRequest, this);
+                    LocationServices.FusedLocationApi.requestLocationUpdates(mGoogleApiClient,
+                            mLocationRequest, this);
                 } else {
                     handleNewLocation(mLastLocation);
                 }
@@ -363,7 +382,9 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback,
     }
 
     protected void startLocationUpdates() {
-        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
+                != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this,
+                Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             return;
         }
 
@@ -381,12 +402,14 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback,
         if (connectionResult.hasResolution()) {
             try {
                 // Start an Activity that tries to resolve the error
-                connectionResult.startResolutionForResult(this, CONNECTION_FAILURE_RESOLUTION_REQUEST);
+                connectionResult.startResolutionForResult(this,
+                        CONNECTION_FAILURE_RESOLUTION_REQUEST);
             } catch (IntentSender.SendIntentException e) {
                 e.printStackTrace();
             }
         } else {
-            Log.i(TAG, "Location services connection failed with code " + connectionResult.getErrorCode());
+            Log.i(TAG, "Location services connection failed with code "
+                    + connectionResult.getErrorCode());
         }
     }
 
@@ -404,7 +427,8 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback,
             mapFragment.getMapAsync(this);
             // Check if we were successful in obtaining the map.
             if (mMap != null) {
-                if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
+                if (ContextCompat.checkSelfPermission(this,
+                        Manifest.permission.ACCESS_FINE_LOCATION)
                         == PackageManager.PERMISSION_GRANTED) {
                     mMap.setMyLocationEnabled(true);
                 } else {
@@ -426,13 +450,20 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback,
     private void setUpMap() {
         if (mLastLocation == null) {
             if (marker != null) { marker.remove(); }
-            marker = mMap.addMarker(new MarkerOptions().position(new LatLng(0, 0)).title("Marker"));
+            marker = mMap.addMarker(new MarkerOptions().position(new LatLng(0, 0))
+                    .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE)));
+            marker.showInfoWindow();
         } else {
-            LocationManager locationManager = (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);
+            LocationManager locationManager =
+                    (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);
             try {
-                Location location = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+                Location location =
+                        locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
                 if (marker != null) { marker.remove(); }
-                marker = mMap.addMarker(new MarkerOptions().position(new LatLng(location.getLatitude(), location.getLongitude())).title("Marker"));
+                marker = mMap.addMarker(new MarkerOptions().position(new LatLng(location.getLatitude(),
+                        location.getLongitude()))
+                        .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE)));
+                marker.showInfoWindow();
             } catch (SecurityException e) {
                 e.printStackTrace(); // lol
             }
@@ -461,7 +492,8 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback,
         try {
 
             destinationAddress = destinationAddress.replaceAll(" ","%20");
-            URL url = new URL("http://maps.googleapis.com/maps/api/directions/json?origin=" + lat1 + "," + lng1
+            URL url = new URL("http://maps.googleapis.com/maps/api/directions/json?origin="
+                    + lat1 + "," + lng1
                     + "&destination=" + destinationAddress + "&mode=driving&sensor=false");
 
             HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();

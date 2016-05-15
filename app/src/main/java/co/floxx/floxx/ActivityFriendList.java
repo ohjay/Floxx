@@ -5,10 +5,7 @@ import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.Button;
-
-import android.widget.FrameLayout;
 import android.widget.ImageButton;
-
 import android.widget.LinearLayout;
 import android.widget.LinearLayout.LayoutParams;
 
@@ -22,7 +19,8 @@ import java.util.ArrayList;
 
 
 public class ActivityFriendList extends AppCompatActivity {
-    public static final String OTHER_USER = "co.floxx.floxx.OTHER_USER";
+    public static final String OTHER_UID = "co.floxx.floxx.OTHER_UID";
+    public static final String OTHER_NAME = "co.floxx.floxx.OTHER_NAME";
     ActivityFriendList thisList;
 
     @Override
@@ -65,7 +63,7 @@ public class ActivityFriendList extends AppCompatActivity {
                             @Override
                             public void onDataChange(DataSnapshot dataSnapshot) {
                                 for (DataSnapshot child : dataSnapshot.getChildren()) {
-                                    String name = child.getKey();
+                                    final String name = child.getKey();
                                     b.setText(name);
 
                                     LinearLayout ll = (LinearLayout) findViewById(R.id.button_container);
@@ -74,7 +72,7 @@ public class ActivityFriendList extends AppCompatActivity {
 
                                     b.setOnClickListener(new View.OnClickListener() {
                                         public void onClick(View view) {
-                                            switchToMap(view, fuid);
+                                            switchToMap(view, fuid, name);
                                         }
                                     });
                                 }
@@ -92,9 +90,10 @@ public class ActivityFriendList extends AppCompatActivity {
         });
     }
 
-    public void switchToMap(View view, String ouid) {
+    public void switchToMap(View view, String ouid, String name) {
         Intent intent = new Intent(ActivityFriendList.this, MapActivity.class);
-        intent.putExtra(OTHER_USER, ouid);
+        intent.putExtra(OTHER_UID, ouid);
+        intent.putExtra(OTHER_NAME, name);
         ActivityFriendList.this.startActivity(intent);
     }
 }
