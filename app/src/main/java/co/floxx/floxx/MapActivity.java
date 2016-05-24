@@ -56,7 +56,7 @@ import java.util.Map;
  */
 public class MapActivity extends FragmentActivity implements OnMapReadyCallback,
         GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener,
-        LocationListener {
+        LocationListener, GoogleMap.OnMapClickListener {
     private final static int CONNECTION_FAILURE_RESOLUTION_REQUEST = 9000;
     private final static int FINE_REQ_CODE = 13;
     private final static int COARSE_REQ_CODE = 14;
@@ -120,16 +120,6 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback,
         }
     };
 
-    protected void onStart() {
-        mGoogleApiClient.connect();
-        super.onStart();
-    }
-
-    protected void onStop() {
-        mGoogleApiClient.disconnect();
-        super.onStop();
-    }
-
     /**
      * Touch listener to use for in-layout UI controls to delay hiding the
      * system UI. This is to prevent the jarring behavior of controls going away
@@ -146,6 +136,34 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback,
     };
     GoogleApiClient mGoogleApiClient;
     public static final String TAG = MapActivity.class.getSimpleName();
+
+    //================================================================================
+    // Listener methods
+    //================================================================================
+    // - onStart
+    // - onStop
+    // - onCreate (gets all the initialization stuff started)
+    // - onMapReady (saves the map and launches the setup code)
+    // - onMapClick (places meeting markers)
+    // - onResume
+    // - onPause
+    // - onPostCreate
+    // - onConnected
+    // - onRequestPermissionsResult
+    // - onConnectionSuspended
+    // - onConnectionFailed
+    // - onLocationChanged
+    //================================================================================
+
+    protected void onStart() {
+        mGoogleApiClient.connect();
+        super.onStart();
+    }
+
+    protected void onStop() {
+        mGoogleApiClient.disconnect();
+        super.onStop();
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -164,7 +182,6 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback,
         mControlsView = findViewById(R.id.fullscreen_content_controls);
         mContentView = findViewById(R.id.fullscreen_content);
 
-
         // Set up the user interaction to manually show or hide the system UI.
         mContentView.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -172,12 +189,6 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback,
                 toggle();
             }
         });
-
-        // =====
-        /* Touch listener guy: create a listener below (Google it if you don't know how)
-         * and set it up so that people can mark meeting points
-         */
-        // =====
 
         // Upon interacting with UI controls, delay any scheduled hide()
         // operations to prevent the jarring behavior of controls going away
@@ -225,6 +236,21 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback,
     }
 
     @Override
+    public void onMapReady(GoogleMap googleMap) {
+        mMap = googleMap;
+        mMap.setMapType(GoogleMap.MAP_TYPE_HYBRID);
+        if (mMap != null) {
+            setUpMap();
+            mMap.setOnMapClickListener(this);
+        }
+    }
+
+    @Override
+    public void onMapClick(LatLng point) {
+        mMap.addMarker(new MarkerOptions().position(point).title("touchy touchy"));
+    }
+
+    @Override
     protected void onResume() {
         super.onResume();
         mGoogleApiClient.connect();
@@ -240,32 +266,6 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback,
         }
     }
 
-    public void handleNewLocation(Location location) {
-        Firebase ref = new Firebase("https://floxx.firebaseio.com/");
-        Map<String, Double> map = new HashMap<String, Double>();
-        map.put("latitude", location.getLatitude());
-        map.put("longitude", location.getLongitude());
-        ref.child("locns").child(ref.getAuth().getUid().toString()).setValue(map);
-
-        Log.d(TAG, location.toString());
-        double currentLatitude = location.getLatitude();
-        double currentLongitude = location.getLongitude();
-
-        LatLng latLng = new LatLng(currentLatitude, currentLongitude);
-
-        MarkerOptions options = new MarkerOptions()
-                .position(latLng)
-                .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE));
-        if (marker != null) { marker.remove(); }
-        marker = mMap.addMarker(options);
-        marker.showInfoWindow();
-
-        if (initialZoom) {
-            mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, 13));
-            initialZoom = false;
-        }
-    }
-
     @Override
     protected void onPostCreate(Bundle savedInstanceState) {
         super.onPostCreate(savedInstanceState);
@@ -274,46 +274,6 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback,
         // created, to briefly hint to the user that UI controls
         // are available.
         delayedHide(100);
-    }
-
-
-    private void toggle() {
-        if (mVisible) {
-            hide();
-        } else {
-            show();
-        }
-    }
-
-    private void hide() {
-        // Hide UI first
-        mControlsView.setVisibility(View.GONE);
-        mVisible = false;
-
-        // Schedule a runnable to remove the status and navigation bar after a delay
-        mHideHandler.removeCallbacks(mShowPart2Runnable);
-        mHideHandler.postDelayed(mHidePart2Runnable, UI_ANIMATION_DELAY);
-    }
-
-    @SuppressLint("InlinedApi")
-    private void show() {
-        // Show the system bar
-        mContentView.setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
-                | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION);
-        mVisible = true;
-
-        // Schedule a runnable to display UI elements after a delay
-        mHideHandler.removeCallbacks(mHidePart2Runnable);
-        mHideHandler.postDelayed(mShowPart2Runnable, UI_ANIMATION_DELAY);
-    }
-
-    /**
-     * Schedules a call to hide() in [delay] milliseconds, canceling any
-     * previously scheduled calls.
-     */
-    private void delayedHide(int delayMillis) {
-        mHideHandler.removeCallbacks(mHideRunnable);
-        mHideHandler.postDelayed(mHideRunnable, delayMillis);
     }
 
     @Override
@@ -381,17 +341,6 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback,
         }
     }
 
-    protected void startLocationUpdates() {
-        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
-                != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this,
-                Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            return;
-        }
-
-        LocationServices.FusedLocationApi.requestLocationUpdates(
-                mGoogleApiClient, mLocationRequest, this);
-    }
-
     @Override
     public void onConnectionSuspended(int i) {
         Log.i(TAG, "Location services suspended.");
@@ -416,6 +365,38 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback,
     @Override
     public void onLocationChanged(Location location) {
         handleNewLocation(location);
+    }
+
+    //================================================================================
+    // Setup methods
+    //================================================================================
+    // - setUpMap
+    // - setUpMapIfNeeded
+    // - startLocationUpdates
+    // - attachBaseContext
+    //================================================================================
+
+    private void setUpMap() {
+        if (mLastLocation == null) {
+            if (marker != null) { marker.remove(); }
+            marker = mMap.addMarker(new MarkerOptions().position(new LatLng(0, 0))
+                    .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE)));
+            marker.showInfoWindow();
+        } else {
+            LocationManager locationManager =
+                    (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);
+            try {
+                Location location =
+                        locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+                if (marker != null) { marker.remove(); }
+                marker = mMap.addMarker(new MarkerOptions().position(new LatLng(location.getLatitude(),
+                        location.getLongitude()))
+                        .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE)));
+                marker.showInfoWindow();
+            } catch (SecurityException e) {
+                e.printStackTrace(); // lol
+            }
+        }
     }
 
     private void setUpMapIfNeeded() {
@@ -447,27 +428,15 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback,
         }
     }
 
-    private void setUpMap() {
-        if (mLastLocation == null) {
-            if (marker != null) { marker.remove(); }
-            marker = mMap.addMarker(new MarkerOptions().position(new LatLng(0, 0))
-                    .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE)));
-            marker.showInfoWindow();
-        } else {
-            LocationManager locationManager =
-                    (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);
-            try {
-                Location location =
-                        locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
-                if (marker != null) { marker.remove(); }
-                marker = mMap.addMarker(new MarkerOptions().position(new LatLng(location.getLatitude(),
-                        location.getLongitude()))
-                        .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE)));
-                marker.showInfoWindow();
-            } catch (SecurityException e) {
-                e.printStackTrace(); // lol
-            }
+    protected void startLocationUpdates() {
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
+                != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this,
+                Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            return;
         }
+
+        LocationServices.FusedLocationApi.requestLocationUpdates(
+                mGoogleApiClient, mLocationRequest, this);
     }
 
     @Override
@@ -476,13 +445,40 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback,
         MultiDex.install(this);
     }
 
-    @Override
-    public void onMapReady(GoogleMap googleMap) {
+    //================================================================================
+    // Utility and update methods
+    //================================================================================
+    // - handleNewLocation
+    // - getDistanceInfo
+    // - toggle
+    // - hide
+    // - show
+    // - delayedHide
+    //================================================================================
 
-        mMap = googleMap;
-        mMap.setMapType(GoogleMap.MAP_TYPE_HYBRID);
-        if (mMap != null) {
-            setUpMap();
+    public void handleNewLocation(Location location) {
+        Firebase ref = new Firebase("https://floxx.firebaseio.com/");
+        Map<String, Double> map = new HashMap<String, Double>();
+        map.put("latitude", location.getLatitude());
+        map.put("longitude", location.getLongitude());
+        ref.child("locns").child(ref.getAuth().getUid().toString()).setValue(map);
+
+        Log.d(TAG, location.toString());
+        double currentLatitude = location.getLatitude();
+        double currentLongitude = location.getLongitude();
+
+        LatLng latLng = new LatLng(currentLatitude, currentLongitude);
+
+        MarkerOptions options = new MarkerOptions()
+                .position(latLng)
+                .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE));
+        if (marker != null) { marker.remove(); }
+        marker = mMap.addMarker(options);
+        marker.showInfoWindow();
+
+        if (initialZoom) {
+            mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, 13));
+            initialZoom = false;
         }
     }
 
@@ -529,5 +525,44 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback,
         }
 
         return dist;
+    }
+
+    private void toggle() {
+        if (mVisible) {
+            hide();
+        } else {
+            show();
+        }
+    }
+
+    private void hide() {
+        // Hide UI first
+        mControlsView.setVisibility(View.GONE);
+        mVisible = false;
+
+        // Schedule a runnable to remove the status and navigation bar after a delay
+        mHideHandler.removeCallbacks(mShowPart2Runnable);
+        mHideHandler.postDelayed(mHidePart2Runnable, UI_ANIMATION_DELAY);
+    }
+
+    @SuppressLint("InlinedApi")
+    private void show() {
+        // Show the system bar
+        mContentView.setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
+                | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION);
+        mVisible = true;
+
+        // Schedule a runnable to display UI elements after a delay
+        mHideHandler.removeCallbacks(mHidePart2Runnable);
+        mHideHandler.postDelayed(mShowPart2Runnable, UI_ANIMATION_DELAY);
+    }
+
+    /**
+     * Schedules a call to hide() in [delay] milliseconds, canceling any
+     * previously scheduled calls.
+     */
+    private void delayedHide(int delayMillis) {
+        mHideHandler.removeCallbacks(mHideRunnable);
+        mHideHandler.postDelayed(mHideRunnable, delayMillis);
     }
 }
