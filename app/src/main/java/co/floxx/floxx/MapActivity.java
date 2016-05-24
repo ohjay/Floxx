@@ -512,12 +512,11 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback,
         }
     }
 
-    class DirQueryTask extends AsyncTask<String, Void, Double> {
+    class DirQueryTask extends AsyncTask<String, Void, String> {
         private Exception exception;
 
-        protected Double doInBackground(String... urls) {
+        protected String doInBackground(String... urls) {
             StringBuilder stringBuilder = new StringBuilder();
-            double dist = 0.0;
             try {
                 URL url = new URL(urls[0]);
                 HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
@@ -545,19 +544,16 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback,
                 JSONArray legs = routes.getJSONArray("legs");
                 JSONObject steps = legs.getJSONObject(0);
                 JSONObject distance = steps.getJSONObject("distance");
-                Log.i("Distance", distance.toString());
-                dist = Double.parseDouble(distance.getString("text").replaceAll("[^\\.0123456789]","") );
+                return distance.getString("text");
             } catch (JSONException e) {
                 this.exception = e;
-                e.printStackTrace();
+                return null;
             }
-
-            return dist;
         }
 
-        protected void onPostExecute(Double dist) {
+        protected void onPostExecute(String dist) {
             if (this.exception == null) {
-                oMarker.setTitle(String.valueOf(dist));
+                oMarker.setTitle(dist);
             }
         }
     }
