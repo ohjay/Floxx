@@ -28,7 +28,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textAppearance="?android:attr/textAppearanceMedium"
-            android:text="Now      and      Forever"
+            android:text="Now and Forever"
             android:id="@+id/textView3"
             android:layout_alignBottom="@+id/floxx_logo"
             android:layout_alignStart="@+id/fullscreen_content"
@@ -53,11 +53,10 @@
             android:id="@+id/log_in_button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_toEndOf="@+id/enter_password"
             android:text="Sign in"
             android:backgroundTint="#067036"
             android:layout_below="@+id/enter_password"
-            android:layout_toRightOf="@+id/enter_password" />
+            android:layout_centerHorizontal="true" />
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"

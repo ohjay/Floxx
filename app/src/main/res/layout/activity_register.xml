@@ -12,19 +12,21 @@
         android:id="@+id/register_user"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
         android:hint="Enter a desired username"/>
     <EditText
         android:id="@+id/register_password"
-        android:layout_marginTop="40dp"
+        android:layout_below="@+id/register_user"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
         android:hint="Enter a desired password"/>
     <Button
         android:id="@+id/registering_button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="80dp"
         android:gravity="center_vertical"
-        android:layout_marginLeft="240dp"
+        android:layout_below="@+id/register_password"
+        android:layout_centerHorizontal="true"
         android:text="Register!" />
 </RelativeLayout>

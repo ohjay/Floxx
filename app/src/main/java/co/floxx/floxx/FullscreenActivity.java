@@ -1,15 +1,11 @@
 package co.floxx.floxx;
 
-import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.os.Bundle;
-import android.os.Handler;
-import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
-import android.text.method.HideReturnsTransformationMethod;
 import android.text.method.PasswordTransformationMethod;
-import android.view.MotionEvent;
 import android.view.View;
+import android.view.Window;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
@@ -17,7 +13,6 @@ import android.widget.TextView;
 
 import com.facebook.FacebookSdk;
 import com.firebase.client.Firebase;
-import com.firebase.client.ValueEventListener;
 
 
 /**
@@ -29,7 +24,6 @@ public class FullscreenActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
 
         Firebase.setAndroidContext(this);
         FacebookSdk.sdkInitialize(getApplicationContext());
@@ -111,5 +105,4 @@ public class FullscreenActivity extends AppCompatActivity {
         Intent intent = new Intent(FullscreenActivity.this, ActivityFriendList.class);
         FullscreenActivity.this.startActivity(intent);
     }
-
 }
