@@ -8,6 +8,7 @@ import android.content.IntentSender;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.location.LocationManager;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.annotation.NonNull;
@@ -252,7 +253,12 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback,
     @Override
     public void onMapClick(LatLng point) {
         mMap.addMarker(new MarkerOptions().position(point).title("touchyy touchyy").draggable(true));
-        nullifyClickListener(); // we only want to be adding one marker
+        LatLng oMarkerPos = oMarker.getPosition();
+        new DirQueryTask().execute("http://maps.googleapis.com/maps/api/directions/json?origin="
+                + oMarkerPos.latitude + "," + oMarkerPos.longitude
+                + "&destination=" + point.latitude + "," + point.longitude + "&mode=driving&sensor=false");
+
+        mMap.setOnMapClickListener(null); // we only want to be adding one marker
     }
 
     @Override
@@ -373,7 +379,12 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback,
 
     @Override
     public void onMarkerDrag(Marker marker) {
-        System.out.println("=== DRAG IN PROGRESS ===");
+        LatLng markerPos = marker.getPosition();
+        LatLng oMarkerPos = oMarker.getPosition();
+
+        new DirQueryTask().execute("http://maps.googleapis.com/maps/api/directions/json?origin="
+                + oMarkerPos.latitude + "," + oMarkerPos.longitude
+                + "&destination=" + markerPos.latitude + "," + markerPos.longitude + "&mode=driving&sensor=false");
     }
 
     @Override
@@ -468,7 +479,6 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback,
     // Utility and update methods
     //================================================================================
     // - handleNewLocation
-    // - nullifyClickListener
     // - getDistanceInfo
     // - toggle
     // - hide
@@ -502,52 +512,54 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback,
         }
     }
 
-    protected void nullifyClickListener() {
-        mMap.setOnMapClickListener(null);
-    }
+    class DirQueryTask extends AsyncTask<String, Void, Double> {
+        private Exception exception;
 
-    private double getDistanceInfo(double lat1, double lng1, String destinationAddress) {
-        StringBuilder stringBuilder = new StringBuilder();
-        double dist = 0.0;
-        try {
-
-            destinationAddress = destinationAddress.replaceAll(" ","%20");
-            URL url = new URL("http://maps.googleapis.com/maps/api/directions/json?origin="
-                    + lat1 + "," + lng1
-                    + "&destination=" + destinationAddress + "&mode=driving&sensor=false");
-
-            HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
+        protected Double doInBackground(String... urls) {
+            StringBuilder stringBuilder = new StringBuilder();
+            double dist = 0.0;
             try {
-                InputStream in = new BufferedInputStream(urlConnection.getInputStream());
-                stringBuilder = new StringBuilder();
-                int b;
-                while ((b = in.read()) != -1) {
-                    stringBuilder.append((char) b);
+                URL url = new URL(urls[0]);
+                HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
+                try {
+                    InputStream in = new BufferedInputStream(urlConnection.getInputStream());
+                    stringBuilder = new StringBuilder();
+                    int b;
+                    while ((b = in.read()) != -1) {
+                        stringBuilder.append((char) b);
+                    }
+                } catch (IOException e) {
+                    e.printStackTrace();
+                } finally {
+                    urlConnection.disconnect();
                 }
             } catch (IOException e) {
                 e.printStackTrace();
-            } finally {
-                urlConnection.disconnect();
             }
-        } catch (IOException e) {
-            e.printStackTrace();
+
+            JSONObject jsonObject;
+            try {
+                jsonObject = new JSONObject(stringBuilder.toString());
+                JSONArray array = jsonObject.getJSONArray("routes");
+                JSONObject routes = array.getJSONObject(0);
+                JSONArray legs = routes.getJSONArray("legs");
+                JSONObject steps = legs.getJSONObject(0);
+                JSONObject distance = steps.getJSONObject("distance");
+                Log.i("Distance", distance.toString());
+                dist = Double.parseDouble(distance.getString("text").replaceAll("[^\\.0123456789]","") );
+            } catch (JSONException e) {
+                this.exception = e;
+                e.printStackTrace();
+            }
+
+            return dist;
         }
 
-        JSONObject jsonObject;
-        try {
-            jsonObject = new JSONObject(stringBuilder.toString());
-            JSONArray array = jsonObject.getJSONArray("routes");
-            JSONObject routes = array.getJSONObject(0);
-            JSONArray legs = routes.getJSONArray("legs");
-            JSONObject steps = legs.getJSONObject(0);
-            JSONObject distance = steps.getJSONObject("distance");
-            Log.i("Distance", distance.toString());
-            dist = Double.parseDouble(distance.getString("text").replaceAll("[^\\.0123456789]","") );
-        } catch (JSONException e) {
-            e.printStackTrace();
+        protected void onPostExecute(Double dist) {
+            if (this.exception == null) {
+                oMarker.setTitle(String.valueOf(dist));
+            }
         }
-
-        return dist;
     }
 
     private void toggle() {
