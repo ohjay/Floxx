@@ -382,6 +382,7 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback,
         LatLng markerPos = marker.getPosition();
         LatLng oMarkerPos = oMarker.getPosition();
 
+        // TODO (Owen): add API key and request "Maps-official" travel time
         new DirQueryTask().execute("http://maps.googleapis.com/maps/api/directions/json?origin="
                 + oMarkerPos.latitude + "," + oMarkerPos.longitude
                 + "&destination=" + markerPos.latitude + "," + markerPos.longitude + "&mode=driving&sensor=false");
@@ -430,20 +431,20 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback,
     }
 
     private void setUpMapIfNeeded() {
-        // Do a null check to confirm that we have not already instantiated the map.
+        // Do a null check to confirm that we have not already instantiated the map
         if (mMap == null) {
-            // Try to obtain the map from the SupportMapFragment.
+            // Try to obtain the map from the SupportMapFragment
             MapFragment mapFragment = (MapFragment) getFragmentManager()
                     .findFragmentById(R.id.map);
             mapFragment.getMapAsync(this);
-            // Check if we were successful in obtaining the map.
+            // Check if we were successful in obtaining the map
             if (mMap != null) {
                 if (ContextCompat.checkSelfPermission(this,
                         Manifest.permission.ACCESS_FINE_LOCATION)
                         == PackageManager.PERMISSION_GRANTED) {
                     mMap.setMyLocationEnabled(true);
                 } else {
-                    // Show rationale and request permission.
+                    // Show rationale and request permission
                     ActivityCompat.requestPermissions(this,
                             new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
                             FINE_REQ_CODE);
@@ -476,10 +477,10 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback,
     }
 
     //================================================================================
-    // Utility and update methods
+    // Utility/update classes and methods
     //================================================================================
-    // - handleNewLocation
-    // - getDistanceInfo
+    // - handleNewLocation (what to do when we have a location update for the user)
+    // - DirQueryTask (asynchronous task that queries the Directions API)
     // - toggle
     // - hide
     // - show
@@ -551,9 +552,11 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback,
             }
         }
 
-        protected void onPostExecute(String dist) {
+        protected void onPostExecute(String queryRes) {
             if (this.exception == null) {
-                oMarker.setTitle(dist);
+                double miDist = Double.parseDouble(queryRes.replaceAll("[^0-9\\.]", ""));
+                oMarker.setSnippet(String.valueOf((int) (miDist / 0.45)) + " min (" + miDist + " mi)");
+                // ^TODO: fix this. Currently saving API calls by assuming everyone travels @ 27 mph
             }
         }
     }
