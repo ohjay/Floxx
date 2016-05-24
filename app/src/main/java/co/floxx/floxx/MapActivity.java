@@ -56,7 +56,7 @@ import java.util.Map;
  */
 public class MapActivity extends FragmentActivity implements OnMapReadyCallback,
         GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener,
-        LocationListener, GoogleMap.OnMapClickListener {
+        LocationListener, GoogleMap.OnMapClickListener, GoogleMap.OnMarkerDragListener {
     private final static int CONNECTION_FAILURE_RESOLUTION_REQUEST = 9000;
     private final static int FINE_REQ_CODE = 13;
     private final static int COARSE_REQ_CODE = 14;
@@ -153,6 +153,9 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback,
     // - onConnectionSuspended
     // - onConnectionFailed
     // - onLocationChanged
+    // - onMarkerDrag
+    // - onMarkerDragEnd
+    // - onMarkerDragStart
     //================================================================================
 
     protected void onStart() {
@@ -242,12 +245,14 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback,
         if (mMap != null) {
             setUpMap();
             mMap.setOnMapClickListener(this);
+            mMap.setOnMarkerDragListener(this);
         }
     }
 
     @Override
     public void onMapClick(LatLng point) {
-        mMap.addMarker(new MarkerOptions().position(point).title("touchy touchy"));
+        mMap.addMarker(new MarkerOptions().position(point).title("touchyy touchyy").draggable(true));
+        nullifyClickListener(); // we only want to be adding one marker
     }
 
     @Override
@@ -305,8 +310,7 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback,
     }
 
     @Override
-    public void onRequestPermissionsResult(int requestCode,
-                                           String permissions[], int[] grantResults) {
+    public void onRequestPermissionsResult(int requestCode, String permissions[], int[] grantResults) {
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
                 != PackageManager.PERMISSION_GRANTED
                 && ActivityCompat.checkSelfPermission(this,
@@ -365,6 +369,21 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback,
     @Override
     public void onLocationChanged(Location location) {
         handleNewLocation(location);
+    }
+
+    @Override
+    public void onMarkerDrag(Marker marker) {
+        System.out.println("=== DRAG IN PROGRESS ===");
+    }
+
+    @Override
+    public void onMarkerDragEnd(Marker marker) {
+        // Do something?
+    }
+
+    @Override
+    public void onMarkerDragStart(Marker marker) {
+        // Do something?
     }
 
     //================================================================================
@@ -449,6 +468,7 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback,
     // Utility and update methods
     //================================================================================
     // - handleNewLocation
+    // - nullifyClickListener
     // - getDistanceInfo
     // - toggle
     // - hide
@@ -482,6 +502,10 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback,
         }
     }
 
+    protected void nullifyClickListener() {
+        mMap.setOnMapClickListener(null);
+    }
+
     private double getDistanceInfo(double lat1, double lng1, String destinationAddress) {
         StringBuilder stringBuilder = new StringBuilder();
         double dist = 0.0;
@@ -511,7 +535,6 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback,
 
         JSONObject jsonObject;
         try {
-
             jsonObject = new JSONObject(stringBuilder.toString());
             JSONArray array = jsonObject.getJSONArray("routes");
             JSONObject routes = array.getJSONObject(0);
