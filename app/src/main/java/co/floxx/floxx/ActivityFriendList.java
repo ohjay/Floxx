@@ -24,7 +24,7 @@ import java.util.HashSet;
 
 public class ActivityFriendList extends AppCompatActivity {
     ActivityFriendList thisList;
-    public static HashSet<String> selected = new HashSet<String>();
+    private HashSet<String> selected = new HashSet<String>();
     public static HashMap<String, String> names = new HashMap<String, String>();
 
     @Override
@@ -110,6 +110,9 @@ public class ActivityFriendList extends AppCompatActivity {
 
     public void switchToMap(View view) {
         Intent intent = new Intent(ActivityFriendList.this, MapActivity.class);
+        for (String ouid : selected) {
+            intent.putExtra(ouid, 0);
+        }
         ActivityFriendList.this.startActivity(intent);
     }
 }

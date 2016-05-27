@@ -174,7 +174,7 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback,
         super.onCreate(savedInstanceState);
         Intent intent = getIntent();
 
-        for (String ouid : ActivityFriendList.selected) {
+        for (String ouid : intent.getExtras().keySet()) {
             others.put(ouid, null);
         }
 
