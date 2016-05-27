@@ -39,7 +39,7 @@ public class SettingActivity extends AppCompatActivity {
                     alertDialog.setMessage("Nope :(");
                 else
                     alertDialog.setMessage("Yup!");
-                alertDialog.setButton("Continue..", new DialogInterface.OnClickListener() {
+                alertDialog.setButton("Continue", new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int which) {
                         // here you can add functions
                     }

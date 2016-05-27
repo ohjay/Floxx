@@ -2,84 +2,97 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#0099cc"
     tools:context="co.floxx.floxx.FullscreenActivity">
-    <RelativeLayout
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content">
-        <ImageView android:id="@+id/floxx_logo"
-            android:layout_width="120dp"
-            android:layout_height="160dp"
-            android:src="@mipmap/ic_launcher" />
 
-        <TextView
-            android:id="@+id/fullscreen_content"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:keepScreenOn="true"
-            android:layout_alignLeft="@+id/floxx_logo"
-            android:layout_marginTop="35dp"
-            android:text="@string/main_content"
-            android:layout_marginLeft="120dp"
-            android:textColor="#33b5e5"
-            android:textSize="70sp"
-            android:textStyle="bold" />
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textAppearance="?android:attr/textAppearanceMedium"
-            android:text="Now and Forever"
-            android:id="@+id/textView3"
-            android:layout_alignBottom="@+id/floxx_logo"
-            android:layout_alignStart="@+id/fullscreen_content"
-            android:gravity="left"
-            android:textSize="25dp"
-            android:layout_alignLeft="@+id/fullscreen_content" />
-    </RelativeLayout>
-    <RelativeLayout
-        android:layout_width="match_parent"
-        android:layout_height="match_parent">
-        <EditText android:id="@+id/enter_username"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_centerVertical="true"
-            android:hint="Enter your username" />
-        <EditText android:id="@+id/enter_password"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_below="@+id/enter_username"
-            android:hint="Enter your password" />
-        <Button
-            android:id="@+id/log_in_button"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Sign in"
-            android:backgroundTint="#067036"
-            android:layout_below="@+id/enter_password"
-            android:layout_centerHorizontal="true" />
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Don't have an account? Register now!"
-            android:id="@+id/register_button"
-            android:layout_centerInParent="true"
-            android:layout_below="@+id/log_in_button"
-            android:clickable="true"
-            android:onClick="registerAccount" />
-    </RelativeLayout>
-
-    <FrameLayout
+    <ImageView
+        android:id="@+id/background"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:fitsSystemWindows="true">
-        <ImageButton android:id="@+id/setting_logo"
-            android:src="@drawable/setting_icon"
-            android:layout_width="150dp"
-            android:layout_height="150dp"
-            android:scaleType="fitXY"
-            android:layout_marginLeft="140dp"
-            android:layout_marginTop="-10dp"
-            android:layout_gravity="center|right"
-            android:background="@null"/>
-    </FrameLayout>
+        android:scaleType="centerCrop"
+        android:src="@drawable/hologradient" />
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:layout_centerInParent="true">
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <ImageView android:id="@+id/floxx_logo"
+                android:layout_width="200dp"
+                android:layout_height="300dp"
+                android:layout_centerHorizontal="true"
+                android:src="@drawable/logo_reduced"
+                android:layout_marginBottom="20dp" />
+
+            <EditText android:id="@+id/enter_username"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/floxx_logo"
+                android:background="@drawable/textbox"
+                android:layout_centerHorizontal="true"
+                android:hint="Enter your username"
+                android:layout_marginBottom="5dp"
+                android:paddingLeft="20dp"
+                android:paddingRight="20dp"
+                android:paddingTop="5dp"
+                android:paddingBottom="5dp"
+                android:textCursorDrawable="@null" />
+
+            <EditText android:id="@+id/enter_password"
+                android:layout_width="0px"
+                android:layout_alignLeft="@+id/enter_username"
+                android:layout_alignRight="@+id/enter_username"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/enter_username"
+                android:background="@drawable/textbox"
+                android:layout_centerHorizontal="true"
+                android:hint="Enter your password"
+                android:layout_marginBottom="10dp"
+                android:paddingLeft="20dp"
+                android:paddingRight="20dp"
+                android:paddingTop="5dp"
+                android:paddingBottom="5dp"
+                android:textCursorDrawable="@null" />
+
+            <Button
+                android:id="@+id/log_in_button"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Sign in"
+                android:backgroundTint="#000"
+                android:layout_below="@+id/enter_password"
+                android:layout_centerHorizontal="true"
+                android:textColor="#fff" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Don't have an account? Register now!"
+                android:id="@+id/register_button"
+                android:layout_centerInParent="true"
+                android:layout_below="@+id/log_in_button"
+                android:clickable="true"
+                android:onClick="registerAccount"
+                android:textColor="#fff" />
+        </RelativeLayout>
+    </LinearLayout>
+
+    <!--<FrameLayout-->
+        <!--android:layout_width="match_parent"-->
+        <!--android:layout_height="match_parent"-->
+        <!--android:fitsSystemWindows="true">-->
+        <!--<ImageButton android:id="@+id/setting_logo"-->
+            <!--android:src="@drawable/setting_icon"-->
+            <!--android:layout_width="150dp"-->
+            <!--android:layout_height="150dp"-->
+            <!--android:scaleType="fitXY"-->
+            <!--android:layout_marginLeft="140dp"-->
+            <!--android:layout_marginTop="-10dp"-->
+            <!--android:layout_gravity="center|right"-->
+            <!--android:background="@null"/>-->
+    <!--</FrameLayout>-->
 </RelativeLayout>

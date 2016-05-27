@@ -1,11 +1,11 @@
 package co.floxx.floxx;
 
 import android.content.Intent;
+import android.graphics.Typeface;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.text.method.PasswordTransformationMethod;
 import android.view.View;
-import android.view.Window;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
@@ -33,6 +33,12 @@ public class FullscreenActivity extends AppCompatActivity {
         final EditText password1 = (EditText) findViewById(R.id.enter_password);
         password.setTransformationMethod(new AsteriskPasswordTransformationMethod());
 
+        // Cool fonts let's go!
+        Typeface montserrat = Typeface.createFromAsset(getAssets(), "Montserrat-Regular.otf");
+        EditText unameText = (EditText) findViewById(R.id.enter_username);
+        EditText pwText = (EditText) findViewById(R.id.enter_password);
+        unameText.setTypeface(montserrat);
+        pwText.setTypeface(montserrat);
 
         // Upon interacting with UI controls, delay any scheduled hide()
         // operations to prevent the jarring behavior of controls going away
@@ -42,7 +48,7 @@ public class FullscreenActivity extends AppCompatActivity {
         Button button = (Button)findViewById(R.id.log_in_button);
         final Bundle extras = new Bundle();
         final EditText username1 = (EditText) findViewById(R.id.enter_username);
-        sendingSetting();
+        // sendingSetting();
         registerAccount();
         button.setOnClickListener(new View.OnClickListener() {
             @Override
