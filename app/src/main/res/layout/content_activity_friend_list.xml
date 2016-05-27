@@ -58,5 +58,6 @@
         android:text="Go to map"
         android:id="@+id/mapgo"
         android:layout_below="@+id/scrollView"
-        android:layout_centerHorizontal="true" />
+        android:layout_centerHorizontal="true"
+        android:backgroundTint="#f89b4a" />
 </RelativeLayout>

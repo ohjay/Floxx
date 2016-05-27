@@ -1,17 +1,12 @@
 package co.floxx.floxx;
 
 import android.app.AlertDialog;
-import android.app.Dialog;
 import android.content.DialogInterface;
-import android.content.Intent;
-import android.location.LocationManager;
-import android.provider.Settings;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
-import android.widget.FrameLayout;
 import android.widget.ImageButton;
 
 import java.text.SimpleDateFormat;
@@ -33,9 +28,7 @@ public class SettingActivity extends AppCompatActivity {
         Button more = (Button) findViewById(R.id.TeaEra);
         more.setOnClickListener(new View.OnClickListener() {
             public void onClick(View view) {
-
-
-                AlertDialog alertDialog = new AlertDialog.Builder(SettingActivity.this).create(); //Read Update
+                AlertDialog alertDialog = new AlertDialog.Builder(SettingActivity.this).create();
                 alertDialog.setTitle("Is Tea Era open today?");
 
                 SimpleDateFormat sdf = new SimpleDateFormat("EEEE");
@@ -52,7 +45,7 @@ public class SettingActivity extends AppCompatActivity {
                     }
                 });
 
-                alertDialog.show();  //<-- See This!
+                alertDialog.show(); // see this!
             }
 
         });

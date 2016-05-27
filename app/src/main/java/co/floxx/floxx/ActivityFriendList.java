@@ -72,7 +72,8 @@ public class ActivityFriendList extends AppCompatActivity {
                                     b.setText(name);
 
                                     LinearLayout ll = (LinearLayout) findViewById(R.id.button_container);
-                                    LayoutParams lp = new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT);
+                                    LayoutParams lp = new LayoutParams(LayoutParams.MATCH_PARENT,
+                                            LayoutParams.WRAP_CONTENT);
                                     ll.addView(b, lp);
 
                                     b.setOnClickListener(new View.OnClickListener() {
@@ -82,7 +83,8 @@ public class ActivityFriendList extends AppCompatActivity {
                                                 b.getBackground().clearColorFilter();
                                             } else {
                                                 selected.add(fuid);
-                                                b.getBackground().setColorFilter(Color.parseColor("#ffde00"), PorterDuff.Mode.DARKEN);
+                                                b.getBackground().setColorFilter(Color.parseColor("#ffde00"),
+                                                        PorterDuff.Mode.DARKEN);
                                             }
                                         }
                                     });
