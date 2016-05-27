@@ -14,7 +14,7 @@ Floxx is the Android app that will give you this information. Cohesively, it's a
 - select a place on the map to meet,
 - and then view constantly changing ETA descriptions for everyone else.
 
-(Generally in that order.) Its collection of features also includes a Tea Era button, the ability to toggle location services, and a "login with Facebook" option.
+(Generally in that order.) Its vast array of features also includes a Tea Era button, the ability to toggle location services, and a "login with Facebook" option.
 
 ## Installation
 You can install Floxx by downloading our unsigned APK file [here](this is not legit yet, don't sue me).
