@@ -2,6 +2,7 @@ package co.floxx.floxx;
 
 import android.app.AlertDialog;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
@@ -50,5 +51,12 @@ public class SettingActivity extends AppCompatActivity {
 
         });
 
+        Button addFriends = (Button) findViewById(R.id.add_friends);
+        addFriends.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View view) {
+                Intent intent = new Intent(SettingActivity.this, RequestsActivity.class);
+                startActivity(intent);
+            }
+        });
     }
 }
