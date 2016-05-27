@@ -49,6 +49,7 @@ import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 
 /**
@@ -66,8 +67,7 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback,
     private GoogleMap mMap;
     private Location mLastLocation;
     private Marker marker;
-    private Marker oMarker;
-    private String ouid, oName;
+    private static HashMap<String, Marker> others = new HashMap<String, Marker>(); // ouid -> oMarker
 
     /**
      * Whether or not the system UI should be auto-hidden after
@@ -173,8 +173,10 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback,
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         Intent intent = getIntent();
-        ouid = intent.getStringExtra(ActivityFriendList.OTHER_UID);
-        oName = intent.getStringExtra(ActivityFriendList.OTHER_NAME);
+
+        for (String ouid : ActivityFriendList.selected) {
+            others.put(ouid, null);
+        }
 
         setContentView(R.layout.activity_map);
 
@@ -210,33 +212,39 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback,
         setUpMapIfNeeded();
 
         Firebase ref = new Firebase("https://floxx.firebaseio.com/");
-        Query llqRef = ref.child("locns").child(ouid).orderByKey();
-        llqRef.addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                double olat = -12345, olon = -67890;
-                for (DataSnapshot child : dataSnapshot.getChildren()) {
-                    switch (child.getKey()) {
-                        case "latitude":
-                            olat = (double) child.getValue();
-                            break;
-                        case "longitude":
-                            olon = (double) child.getValue();
-                            break;
+        for (final String ouid : others.keySet()) {
+            Query llqRef = ref.child("locns").child(ouid).orderByKey();
+            llqRef.addListenerForSingleValueEvent(new ValueEventListener() {
+                @Override
+                public void onDataChange(DataSnapshot dataSnapshot) {
+                    double olat = -12345, olon = -67890;
+                    for (DataSnapshot child : dataSnapshot.getChildren()) {
+                        switch (child.getKey()) {
+                            case "latitude":
+                                olat = (double) child.getValue();
+                                break;
+                            case "longitude":
+                                olon = (double) child.getValue();
+                                break;
+                        }
+                    }
+
+                    if (olat > -12345 && olon > -12345) {
+                        String oName = ActivityFriendList.names.get(ouid);
+                        Marker oMarker = others.get(ouid);
+
+                        if (oMarker != null) { oMarker.remove(); }
+                        oMarker = mMap.addMarker(new MarkerOptions().position(new LatLng(olat,
+                                olon)).title(oName));
+                        oMarker.showInfoWindow();
+                        others.put(ouid, oMarker);
                     }
                 }
 
-                if (olat > -12345 && olon > -12345) {
-                    if (oMarker != null) { oMarker.remove(); }
-                    oMarker = mMap.addMarker(new MarkerOptions().position(new LatLng(olat,
-                            olon)).title(oName));
-                    oMarker.showInfoWindow();
-                }
-            }
-
-            @Override
-            public void onCancelled(FirebaseError firebaseError) {}
-        });
+                @Override
+                public void onCancelled(FirebaseError firebaseError) {}
+            });
+        }
     }
 
     @Override
@@ -252,11 +260,22 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback,
 
     @Override
     public void onMapClick(LatLng point) {
-        mMap.addMarker(new MarkerOptions().position(point).title("touchyy touchyy").draggable(true));
-        LatLng oMarkerPos = oMarker.getPosition();
-        new DirQueryTask().execute("http://maps.googleapis.com/maps/api/directions/json?origin="
-                + oMarkerPos.latitude + "," + oMarkerPos.longitude
-                + "&destination=" + point.latitude + "," + point.longitude + "&mode=driving&sensor=false");
+        mMap.addMarker(new MarkerOptions().position(point).title("touchy touchy").draggable(true));
+
+        Iterator it = others.entrySet().iterator();
+        while (it.hasNext()) {
+            Map.Entry pair = (Map.Entry) it.next();
+            String ouid = (String) pair.getKey();
+            Marker oMarker = (Marker) pair.getValue();
+
+            if (oMarker != null) {
+                LatLng oMarkerPos = oMarker.getPosition();
+                new DirQueryTask().execute("http://maps.googleapis.com/maps/api/directions/json?origin="
+                        + oMarkerPos.latitude + "," + oMarkerPos.longitude + "&destination="
+                        + point.latitude + "," + point.longitude + "&mode=driving&sensor=false",
+                        ouid);
+            }
+        }
 
         mMap.setOnMapClickListener(null); // we only want to be adding one marker
     }
@@ -379,18 +398,29 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback,
 
     @Override
     public void onMarkerDrag(Marker marker) {
-        LatLng markerPos = marker.getPosition();
-        LatLng oMarkerPos = oMarker.getPosition();
-
-        // TODO (Owen): add API key and request "Maps-official" travel time
-        new DirQueryTask().execute("http://maps.googleapis.com/maps/api/directions/json?origin="
-                + oMarkerPos.latitude + "," + oMarkerPos.longitude
-                + "&destination=" + markerPos.latitude + "," + markerPos.longitude + "&mode=driving&sensor=false");
+        // Do something? Live ETA update when dragging?
     }
 
     @Override
     public void onMarkerDragEnd(Marker marker) {
-        // Do something?
+        LatLng markerPos = marker.getPosition();
+
+        Iterator it = others.entrySet().iterator();
+        while (it.hasNext()) {
+            Map.Entry pair = (Map.Entry) it.next();
+            String ouid = (String) pair.getKey();
+            Marker oMarker = (Marker) pair.getValue();
+
+            if (oMarker != null) {
+                LatLng oMarkerPos = oMarker.getPosition();
+
+                // TODO (Owen): add API key and request "Maps-official" travel time
+                new DirQueryTask().execute("http://maps.googleapis.com/maps/api/directions/json?origin="
+                        + oMarkerPos.latitude + "," + oMarkerPos.longitude + "&destination="
+                        + markerPos.latitude + "," + markerPos.longitude + "&mode=driving&sensor=false",
+                        ouid);
+            }
+        }
     }
 
     @Override
@@ -480,6 +510,7 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback,
     // Utility/update classes and methods
     //================================================================================
     // - handleNewLocation (what to do when we have a location update for the user)
+    // - Pair (POJO that serves as a ouid/queryRes data bundle)
     // - DirQueryTask (asynchronous task that queries the Directions API)
     // - toggle
     // - hide
@@ -513,10 +544,19 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback,
         }
     }
 
-    class DirQueryTask extends AsyncTask<String, Void, String> {
+    class Pair {
+        String ouid, queryRes;
+
+        public Pair(String ouid, String queryRes) {
+            this.ouid = ouid;
+            this.queryRes = queryRes;
+        }
+    }
+
+    class DirQueryTask extends AsyncTask<String, Void, Pair> {
         private Exception exception;
 
-        protected String doInBackground(String... urls) {
+        protected Pair doInBackground(String... urls) {
             StringBuilder stringBuilder = new StringBuilder();
             try {
                 URL url = new URL(urls[0]);
@@ -545,16 +585,19 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback,
                 JSONArray legs = routes.getJSONArray("legs");
                 JSONObject steps = legs.getJSONObject(0);
                 JSONObject distance = steps.getJSONObject("distance");
-                return distance.getString("text");
+                return new Pair(urls[1], distance.getString("text"));
             } catch (JSONException e) {
                 this.exception = e;
                 return null;
             }
         }
 
-        protected void onPostExecute(String queryRes) {
+        protected void onPostExecute(Pair p) {
             if (this.exception == null) {
-                double miDist = Double.parseDouble(queryRes.replaceAll("[^0-9\\.]", ""));
+                double miDist = Double.parseDouble(p.queryRes.replaceAll("[^0-9\\.]", ""));
+                Marker oMarker = others.get(p.ouid);
+                if (oMarker == null) { return; }
+
                 oMarker.setSnippet(String.valueOf((int) (miDist / 0.45)) + " min (" + miDist + " mi)");
                 // ^TODO: fix this. Currently saving API calls by assuming everyone travels @ 27 mph
             }

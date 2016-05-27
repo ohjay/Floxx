@@ -1,6 +1,8 @@
 package co.floxx.floxx;
 
 import android.content.Intent;
+import android.graphics.Color;
+import android.graphics.PorterDuff;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
@@ -16,12 +18,14 @@ import com.firebase.client.Query;
 import com.firebase.client.ValueEventListener;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
 
 
 public class ActivityFriendList extends AppCompatActivity {
-    public static final String OTHER_UID = "co.floxx.floxx.OTHER_UID";
-    public static final String OTHER_NAME = "co.floxx.floxx.OTHER_NAME";
     ActivityFriendList thisList;
+    public static HashSet<String> selected = new HashSet<String>();
+    public static HashMap<String, String> names = new HashMap<String, String>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -64,6 +68,7 @@ public class ActivityFriendList extends AppCompatActivity {
                             public void onDataChange(DataSnapshot dataSnapshot) {
                                 for (DataSnapshot child : dataSnapshot.getChildren()) {
                                     final String name = child.getKey();
+                                    names.put(fuid, name);
                                     b.setText(name);
 
                                     LinearLayout ll = (LinearLayout) findViewById(R.id.button_container);
@@ -72,7 +77,13 @@ public class ActivityFriendList extends AppCompatActivity {
 
                                     b.setOnClickListener(new View.OnClickListener() {
                                         public void onClick(View view) {
-                                            switchToMap(view, fuid, name);
+                                            if (selected.contains(fuid)) {
+                                                selected.remove(fuid);
+                                                b.getBackground().clearColorFilter();
+                                            } else {
+                                                selected.add(fuid);
+                                                b.getBackground().setColorFilter(Color.parseColor("#ffde00"), PorterDuff.Mode.DARKEN);
+                                            }
                                         }
                                     });
                                 }
@@ -88,12 +99,17 @@ public class ActivityFriendList extends AppCompatActivity {
             @Override
             public void onCancelled(FirebaseError firebaseError) {}
         });
+
+        Button mapButton = (Button) findViewById(R.id.mapgo);
+        mapButton.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View view) {
+                switchToMap(view);
+            }
+        });
     }
 
-    public void switchToMap(View view, String ouid, String name) {
+    public void switchToMap(View view) {
         Intent intent = new Intent(ActivityFriendList.this, MapActivity.class);
-        intent.putExtra(OTHER_UID, ouid);
-        intent.putExtra(OTHER_NAME, name);
         ActivityFriendList.this.startActivity(intent);
     }
 }

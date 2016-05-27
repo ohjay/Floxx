@@ -31,7 +31,7 @@
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Pick a Friend"
+        android:text="Add friends"
         android:id="@+id/textView"
         android:textSize="35sp"
         android:layout_alignParentTop="true"
@@ -44,11 +44,19 @@
         android:layout_marginTop="20dp"
         android:id="@+id/scrollView">
 
-    <LinearLayout
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:id="@+id/button_container">
-    </LinearLayout>
+        <LinearLayout
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:id="@+id/button_container">
+        </LinearLayout>
     </ScrollView>
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Go to map"
+        android:id="@+id/mapgo"
+        android:layout_below="@+id/scrollView"
+        android:layout_centerHorizontal="true" />
 </RelativeLayout>
