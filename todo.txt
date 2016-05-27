@@ -1,0 +1,7 @@
+1. Allow users to search for and request friends, then only show those people on the Friends page.
+2. Set up background location check. Alternatively, factor in time (when the locn was noted) and extrapolate.
+3. Enable users to turn off location services.
+4. Improve the authentication flow; either enter email during registration or login with FB. Also fix error messages (e.g. when a username is taken).
+5. Make users stay logged in. Allow them to sign out, too.
+6. Fix the app UI/layout...!
+7. Add face icons to other people's map markers.
