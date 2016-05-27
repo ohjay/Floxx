@@ -8,12 +8,27 @@
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
     tools:context="co.floxx.floxx.RegisterActivity">
+
+    <TextView
+        android:id="@+id/register_welcome"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="35dp"
+        android:layout_marginBottom="35dp"
+        android:text="@string/register_header"
+        android:textColor="#242424"
+        android:textSize="30sp"
+        android:textStyle="bold" />
+
     <EditText
+        android:layout_below="@id/register_welcome"
         android:id="@+id/register_user"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_centerHorizontal="true"
         android:hint="Enter a desired username"/>
+
     <EditText
         android:id="@+id/register_password"
         android:layout_below="@+id/register_user"
@@ -21,6 +36,7 @@
         android:layout_height="wrap_content"
         android:layout_centerHorizontal="true"
         android:hint="Enter a desired password"/>
+
     <Button
         android:id="@+id/registering_button"
         android:layout_width="wrap_content"
@@ -28,5 +44,5 @@
         android:gravity="center_vertical"
         android:layout_below="@+id/register_password"
         android:layout_centerHorizontal="true"
-        android:text="Register!" />
+        android:text="Register" />
 </RelativeLayout>

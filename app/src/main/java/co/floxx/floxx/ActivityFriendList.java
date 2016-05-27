@@ -48,6 +48,7 @@ public class ActivityFriendList extends AppCompatActivity {
             }
         });
 
+        // TODO: find some way to clear the SELECTED set every time the view loads
 
         Firebase.setAndroidContext(this);
         final Firebase ref = new Firebase("https://floxx.firebaseio.com/");
