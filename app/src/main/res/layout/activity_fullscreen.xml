@@ -56,7 +56,8 @@
                 android:paddingRight="20dp"
                 android:paddingTop="5dp"
                 android:paddingBottom="5dp"
-                android:textCursorDrawable="@null" />
+                android:textCursorDrawable="@null"
+                android:inputType="textPassword" />
 
             <Button
                 android:id="@+id/log_in_button"

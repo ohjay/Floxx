@@ -9,6 +9,61 @@
     android:paddingTop="@dimen/activity_vertical_margin"
     tools:context="co.floxx.floxx.RequestsActivity">
 
-    
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="== Requests =="
+        android:textSize="35dp"
+        android:id="@+id/reqs_header"
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="10dp" />
+
+    <ScrollView
+        android:layout_width="fill_parent"
+        android:layout_height="150dp"
+        android:layout_below="@id/reqs_header"
+        android:layout_marginTop="20dp"
+        android:id="@+id/search_scrollview">
+
+        <LinearLayout
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:id="@+id/search_container">
+        </LinearLayout>
+    </ScrollView>
+
+    <View
+        android:id="@+id/separator"
+        android:background="#000"
+        android:layout_below="@id/search_scrollview"
+        android:layout_width="fill_parent"
+        android:layout_height="1dp"
+        android:layout_marginTop="10dp"
+        android:layout_margin="10dp" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="[Received]"
+        android:textSize="25dp"
+        android:id="@+id/received_header"
+        android:layout_centerHorizontal="true"
+        android:layout_below="@id/separator" />
+
+    <ScrollView
+        android:layout_width="fill_parent"
+        android:layout_height="150dp"
+        android:layout_below="@id/received_header"
+        android:layout_marginTop="20dp"
+        android:id="@+id/received_scrollview">
+
+        <LinearLayout
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:id="@+id/received_container">
+        </LinearLayout>
+    </ScrollView>
 
 </RelativeLayout>

@@ -4,7 +4,6 @@ import android.content.Intent;
 import android.graphics.Typeface;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
-import android.text.method.PasswordTransformationMethod;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -31,7 +30,6 @@ public class FullscreenActivity extends AppCompatActivity {
         setContentView(R.layout.activity_fullscreen);
         EditText password =(EditText)findViewById(R.id.enter_password);
         final EditText password1 = (EditText) findViewById(R.id.enter_password);
-        password.setTransformationMethod(new AsteriskPasswordTransformationMethod());
 
         // Cool fonts let's go!
         Typeface montserrat = Typeface.createFromAsset(getAssets(), "Montserrat-Regular.otf");
@@ -63,28 +61,6 @@ public class FullscreenActivity extends AppCompatActivity {
             }
         });
 
-    }
-    public class AsteriskPasswordTransformationMethod extends PasswordTransformationMethod {
-        @Override
-        public CharSequence getTransformation(CharSequence source, View view) {
-            return new PasswordCharSequence(source);
-        }
-
-        private class PasswordCharSequence implements CharSequence {
-            private CharSequence mSource;
-            public PasswordCharSequence(CharSequence source) {
-                mSource = source; // Store char sequence
-            }
-            public char charAt(int index) {
-                return '*'; // This is the important part
-            }
-            public int length() {
-                return mSource.length(); // Return default
-            }
-            public CharSequence subSequence(int start, int end) {
-                return mSource.subSequence(start, end); // Return default
-            }
-        }
     }
 
     public void sendingSetting() {
