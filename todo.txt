@@ -1,18 +1,32 @@
-1. Allow users to search for and request friends, then only show those people on the Friends page. [5 hrs]
+----------------
+TODO (ESSENTIAL)
+----------------
+1. Allow users to search for and request friends, then only show THOSE people on the group creation page. [4 hrs]
 2. Set up background location check. Alternatively, factor in time (when the locn was noted) and extrapolate. [6 hrs]
 3. Enable users to turn off location services. [3 hrs]
 4. Improve the authentication flow; have users enter email during registration. Also fix error messages (e.g. when a username is taken). [4 hrs]
 5. Make users stay logged in. Allow them to sign out, too. [3 hrs]
-6. Fix the app UI/layout...! [15 hrs]
+6. Fix the app UI/layout...! [14 hrs]
 7. Let people personalize their map markers (e.g. color). [4 hrs]
 8. Add password confirmation to registration. [1 hr]
-9. Test and debug; have people try out the app and attempt to break it. [9 hrs]
+9. Test and debug; have people try out the app and attempt to break it. [6 hrs]
 
-// Total: 50 hrs
+// Total: 45 hrs
 * Time estimates = (Owen's original call) x 2
 
----
-Layouts/UXs to upgrade:
+----------------------------
+TODO (MINOR and/or OPTIONAL)
+----------------------------
+1. Let users specify their mode of transportation.
+2. Log users' location/hangout history somewhere and allow them to view it.
+3. Authentication integration with Facebook.
+4. If authentication with Facebook, add profile pictures to map markers.
+5. Put some kind of instructions somewhere, or add an "About" page.
+6. Upon startup, have map zoom in at an appropriate level (scaled to minimally fit all of the people in the group).
+
+---------------------
+LAYOUTS/UX TO UPGRADE
+---------------------
 1. Registration interface
 2. Requests interface
 3. Group creation interface

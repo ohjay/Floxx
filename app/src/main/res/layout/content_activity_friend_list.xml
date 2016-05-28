@@ -9,16 +9,6 @@
     android:paddingTop="@dimen/activity_vertical_margin"
     tools:context="co.floxx.floxx.ActivityFriendList"
     tools:showIn="@layout/activity_activity_friend_list">
-    <Button
-        style="?android:attr/buttonStyleSmall"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Back"
-        android:id="@+id/button"
-        android:onClick=""
-        android:layout_above="@+id/scrollView"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true" />
     <ImageButton
         android:id="@+id/setting_logo"
         android:src="@drawable/setting_icon"
@@ -31,7 +21,7 @@
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Add friends"
+        android:text="@string/group_creation_header"
         android:id="@+id/textView"
         android:textSize="35sp"
         android:layout_alignParentTop="true"
@@ -60,4 +50,13 @@
         android:layout_below="@+id/scrollView"
         android:layout_centerHorizontal="true"
         android:backgroundTint="#f89b4a" />
+    <Button
+        style="?android:attr/buttonStyleSmall"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Sign out"
+        android:id="@+id/button"
+        android:onClick=""
+        android:layout_below="@id/mapgo"
+        android:layout_centerHorizontal="true" />
 </RelativeLayout>
