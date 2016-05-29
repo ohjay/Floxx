@@ -37,7 +37,7 @@ public class SearchableUsers extends Activity {
     private int progressIndex = -1, numFriends;
     private boolean isDownloading;
     private ProgressDialog dialog;
-    private static final int PROGRESS_DELAY = 500; // this is in ms!
+    private static final int PROGRESS_DELAY = 1000; // this is in ms!
 
     @Override
     public void onCreate(Bundle savedInstanceState) {

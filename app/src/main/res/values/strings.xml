@@ -13,4 +13,6 @@
     <string name="group_creation_header">Create a group</string>
     <string name="search_users">Search for friends</string>
     <string name="reqs_header">== Requests ==</string>
+    <string name="search_header">[Search and request]</string>
+    <string name="received_header">[Received]</string>
 </resources>
