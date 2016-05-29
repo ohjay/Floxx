@@ -140,6 +140,7 @@ public class FirebaseActivity extends AppCompatActivity {
             public void onDataChange(DataSnapshot dataSnapshot) {
                 ArrayList<String> friends;
 
+                // Owen 5/29: is this correct? Should OSKI_UID maybe be uid?
                 Object result = dataSnapshot.child(OSKI_UID).child("friends").getValue();
                 if (result != null) {
                     friends = (ArrayList<String>) result;

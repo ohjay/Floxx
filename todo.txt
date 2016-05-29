@@ -32,3 +32,4 @@ LAYOUTS/UX TO UPGRADE
 3. Group creation interface
 4. Map interface
 5. Features (formerly "Settings") interface. Convert to user portal (!?)
+6. Transition screens

@@ -8,7 +8,7 @@ import android.widget.SearchView;
 
 /**
  * Official activity for the Requests page.
- * Most of the logic you'd expect to see here is actually part of the SearchableUsers class.
+ * User search logic can be found in the SearchableUsers class.
  * @author owenjow
  */
 public class RequestsActivity extends AppCompatActivity {
