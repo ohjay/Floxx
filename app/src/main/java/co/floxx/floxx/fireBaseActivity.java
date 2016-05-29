@@ -90,7 +90,7 @@ public class FirebaseActivity extends AppCompatActivity {
                 @Override
                 public void onAuthenticated(AuthData authData) {
                     System.out.println("User ID: " + authData.getUid() + ", Provider: " + authData.getProvider());
-                    Intent intent = new Intent(FirebaseActivity.this, ActivityFriendList.class);
+                    Intent intent = new Intent(FirebaseActivity.this, FriendListActivity.class);
                     FirebaseActivity.this.startActivity(intent);
                 }
                 @Override

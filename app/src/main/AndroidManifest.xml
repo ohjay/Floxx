@@ -31,7 +31,6 @@
             android:theme="@style/FullscreenTheme">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
@@ -43,7 +42,7 @@
         <activity
             android:name=".SettingActivity"
             android:label="@string/app_name" />
-        <activity android:name=".ActivityFriendList" />
+        <activity android:name=".FriendListActivity" />
         <activity
             android:name=".MapActivity"
             android:configChanges="orientation|keyboardHidden|screenSize"
@@ -53,7 +52,22 @@
         <activity
             android:name=".FirebaseActivity"
             android:noHistory="true" />
-        <activity android:name=".RequestsActivity"></activity>
+        <activity android:name=".RequestsActivity">
+            <meta-data
+                android:name="android.app.default_searchable"
+                android:value=".SearchableUsers" />
+            <intent-filter>
+                <action android:name="android.intent.action.SEARCH" />
+            </intent-filter>
+        </activity>
+        <activity android:name=".SearchableUsers">
+            <intent-filter>
+                <action android:name="android.intent.action.SEARCH" />
+            </intent-filter>
+            <meta-data
+                android:name="android.app.searchable"
+                android:resource="@xml/searchable" />
+        </activity>
     </application>
 
 </manifest>

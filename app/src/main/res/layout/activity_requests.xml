@@ -12,31 +12,29 @@
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="== Requests =="
-        android:textSize="35dp"
+        android:text="@string/reqs_header"
+        android:textSize="35sp"
         android:id="@+id/reqs_header"
         android:layout_centerHorizontal="true"
         android:layout_marginBottom="10dp" />
 
-    <ScrollView
+    <SearchView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/user_search_bar"
+        android:layout_below="@id/reqs_header" />
+
+    <ListView
+        android:id="@+id/search_list"
         android:layout_width="fill_parent"
         android:layout_height="150dp"
-        android:layout_below="@id/reqs_header"
         android:layout_marginTop="20dp"
-        android:id="@+id/search_scrollview">
-
-        <LinearLayout
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:id="@+id/search_container">
-        </LinearLayout>
-    </ScrollView>
+        android:layout_below="@id/user_search_bar" />
 
     <View
         android:id="@+id/separator"
         android:background="#000"
-        android:layout_below="@id/search_scrollview"
+        android:layout_below="@id/search_list"
         android:layout_width="fill_parent"
         android:layout_height="1dp"
         android:layout_marginTop="10dp"
@@ -46,7 +44,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="[Received]"
-        android:textSize="25dp"
+        android:textSize="25sp"
         android:id="@+id/received_header"
         android:layout_centerHorizontal="true"
         android:layout_below="@id/separator" />

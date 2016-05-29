@@ -11,4 +11,6 @@
     <string name="dummy_button">Dummy Button</string>
     <string name="dummy_content">PLEASE\nSTAND BY...</string>
     <string name="group_creation_header">Create a group</string>
+    <string name="search_users">Search for friends</string>
+    <string name="reqs_header">== Requests ==</string>
 </resources>

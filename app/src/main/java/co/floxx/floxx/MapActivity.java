@@ -230,7 +230,7 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback,
                     }
 
                     if (olat > -12345 && olon > -12345) {
-                        String oName = ActivityFriendList.names.get(ouid);
+                        String oName = FriendListActivity.names.get(ouid);
                         Marker oMarker = others.get(ouid);
 
                         if (oMarker != null) { oMarker.remove(); }

@@ -22,8 +22,8 @@ import java.util.HashMap;
 import java.util.HashSet;
 
 
-public class ActivityFriendList extends AppCompatActivity {
-    ActivityFriendList thisList;
+public class FriendListActivity extends AppCompatActivity {
+    FriendListActivity thisList;
     private HashSet<String> selected = new HashSet<String>();
     public static HashMap<String, String> names = new HashMap<String, String>();
 
@@ -36,7 +36,7 @@ public class ActivityFriendList extends AppCompatActivity {
         button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                startActivity(new Intent(ActivityFriendList.this, FullscreenActivity.class));
+                startActivity(new Intent(FriendListActivity.this, FullscreenActivity.class));
             }
         });
 
@@ -44,7 +44,7 @@ public class ActivityFriendList extends AppCompatActivity {
         button1.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                startActivity(new Intent(ActivityFriendList.this, SettingActivity.class));
+                startActivity(new Intent(FriendListActivity.this, SettingActivity.class));
             }
         });
 
@@ -112,10 +112,10 @@ public class ActivityFriendList extends AppCompatActivity {
     }
 
     public void switchToMap(View view) {
-        Intent intent = new Intent(ActivityFriendList.this, MapActivity.class);
+        Intent intent = new Intent(FriendListActivity.this, MapActivity.class);
         for (String ouid : selected) {
             intent.putExtra(ouid, 0);
         }
-        ActivityFriendList.this.startActivity(intent);
+        FriendListActivity.this.startActivity(intent);
     }
 }
