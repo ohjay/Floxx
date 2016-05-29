@@ -1,6 +1,7 @@
 package co.floxx.floxx;
 
 import android.app.Activity;
+import android.app.ProgressDialog;
 import android.app.SearchManager;
 import android.content.Context;
 import android.content.Intent;
@@ -13,6 +14,7 @@ import android.widget.BaseAdapter;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.os.Handler;
 
 import com.firebase.client.DataSnapshot;
 import com.firebase.client.Firebase;
@@ -32,6 +34,10 @@ import java.util.regex.Pattern;
 public class SearchableUsers extends Activity {
     static HashMap<String, String> allUsers = new HashMap<String, String>();
     private ListView listView; // where we'll put the search output
+    private int progressIndex = -1, numFriends;
+    private boolean isDownloading;
+    private ProgressDialog dialog;
+    private static final int PROGRESS_DELAY = 500; // this is in ms!
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -42,6 +48,11 @@ public class SearchableUsers extends Activity {
 
         // Download all usernames and UIDs (uname -> uid)
         if (allUsers.isEmpty()) {
+            isDownloading = true;
+            dialog = new ProgressDialog(this);
+            dialog.setMessage("Retrieving user data...");
+            dialog.show();
+
             final Firebase ref = new Firebase("https://floxx.firebaseio.com/");
             Query queryRef = ref.child("users").orderByKey().equalTo(FirebaseActivity.OSKI_UID);
             queryRef.addListenerForSingleValueEvent(new ValueEventListener() {
@@ -51,6 +62,8 @@ public class SearchableUsers extends Activity {
                             .child("friends").getValue();
                     if (result != null) {
                         ArrayList<String> friends = (ArrayList<String>) result;
+                        progressIndex = 0;
+                        numFriends = friends.size();
 
                         for (final String fuid : friends) {
                             Query nameQRef = ref.child("uids").orderByValue().equalTo(fuid);
@@ -61,6 +74,9 @@ public class SearchableUsers extends Activity {
                                         final String name = child.getKey();
                                         allUsers.put(name, fuid);
                                     }
+
+                                    ++progressIndex;
+                                    dialog.setProgress(progressIndex * 100 / numFriends);
                                 }
 
                                 @Override
@@ -71,11 +87,31 @@ public class SearchableUsers extends Activity {
                 }
 
                 @Override
-                public void onCancelled(FirebaseError firebaseError) {}
+                public void onCancelled(FirebaseError firebaseError) {
+                    dialog.dismiss();
+                }
             });
         }
 
-        handleIntent(getIntent());
+        if (isDownloading) {
+            runProgressHandler();
+        } else {
+            handleIntent(getIntent());
+        }
+    }
+
+    private void runProgressHandler() {
+        new Handler().postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                if (progressIndex == numFriends) {
+                    dialog.dismiss();
+                    handleIntent(getIntent());
+                } else {
+                    runProgressHandler();
+                }
+            }
+        }, PROGRESS_DELAY);
     }
 
     @Override
