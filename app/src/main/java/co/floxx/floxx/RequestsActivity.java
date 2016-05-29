@@ -59,10 +59,23 @@ public class RequestsActivity extends AppCompatActivity {
 
                 for (final String senderID : requests) {
                     // Setting up the view for the name text
-                    TextView senderName = new TextView(context);
-                    senderName.setText(FriendListActivity.names.get(senderID));
+                    final TextView senderName = new TextView(context);
                     senderName.setTextSize(19);
                     senderName.setTypeface(Typeface.SANS_SERIF);
+
+                    // Grab the sender's actual username
+                    Query nameQRef = ref.child("uids").orderByValue().equalTo(senderID);
+                    nameQRef.addListenerForSingleValueEvent(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(DataSnapshot dataSnapshot) {
+                            for (DataSnapshot child : dataSnapshot.getChildren()) {
+                                senderName.setText(child.getKey());
+                            }
+                        }
+
+                        @Override
+                        public void onCancelled(FirebaseError firebaseError) {}
+                    });
 
                     // Setting up the accept button
                     ImageButton acceptButton = new ImageButton(context);
@@ -77,7 +90,7 @@ public class RequestsActivity extends AppCompatActivity {
 
                     // Setting up the decline button
                     ImageButton declineButton = new ImageButton(context);
-                    declineButton.setImageResource(R.drawable.ic_cast_disabled_light);
+                    declineButton.setImageResource(R.drawable.com_facebook_close);
                     declineButton.setOnClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(View v) {
