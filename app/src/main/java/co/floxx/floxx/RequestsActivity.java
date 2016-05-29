@@ -151,6 +151,30 @@ public class RequestsActivity extends AppCompatActivity {
     }
 
     private void destroyRequest(final String senderID, final String recipientID) {
-        // Add destruction logic here
+        Query queryRef = ref.child("users").orderByKey().equalTo(recipientID);
+        queryRef.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                ArrayList<String> friends, requests;
+
+                Object result = dataSnapshot.child(recipientID).child("friends").getValue();
+                friends = (result == null) ? new ArrayList<String>() : (ArrayList<String>) result;
+                result = dataSnapshot.child(recipientID).child("requests").getValue();
+                requests = (result == null) ? new ArrayList<String>() : (ArrayList<String>) result;
+
+                int senderIndex = requests.indexOf(senderID);
+                if (senderIndex >= 0) {
+                    requests.remove(senderIndex);
+
+                    Map<String, Object> map = new HashMap<String, Object>();
+                    map.put("friends", friends);
+                    map.put("requests", requests);
+                    ref.child("users").child(recipientID).setValue(map);
+                }
+            }
+
+            @Override
+            public void onCancelled(FirebaseError firebaseError) {}
+        });
     }
 }
