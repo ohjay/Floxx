@@ -131,6 +131,7 @@ public class FirebaseActivity extends AppCompatActivity {
 
     /**
      * Adds the user with NEW_UID to user UID's friend list.
+     * IMPORTANT: ONLY USE THIS METHOD FOR NEW USERS, OR IT MAY ERASE FRIEND REQUESTS (- Owen 5/29).
      */
     protected void addToFriends(final String newUID, final String uid, final Firebase ref) {
         // Get the user's current friend list

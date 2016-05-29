@@ -226,7 +226,7 @@ public class SearchableUsers extends Activity {
                 result = dataSnapshot.child(recipientID).child("requests").getValue();
                 requests = (result == null) ? new ArrayList<String>() : (ArrayList<String>) result;
 
-                if (!requests.contains(senderID)) {
+                if (!requests.contains(senderID)) { // no duplicates, man
                     requests.add(senderID);
                     Map<String, Object> map = new HashMap<String, Object>();
                     map.put("friends", friends);
