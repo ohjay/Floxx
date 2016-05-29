@@ -8,13 +8,15 @@ import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.Typeface;
 import android.os.Bundle;
+import android.os.Handler;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.LinearLayout;
 import android.widget.ListView;
+import android.widget.SearchView;
+import android.widget.SearchView.OnQueryTextListener;
 import android.widget.TextView;
-import android.os.Handler;
 
 import com.firebase.client.DataSnapshot;
 import com.firebase.client.Firebase;
@@ -98,6 +100,21 @@ public class SearchableUsers extends Activity {
         } else {
             handleIntent(getIntent());
         }
+
+        final SearchView searchView = (SearchView) findViewById(R.id.user_search_bar);
+        searchView.setOnQueryTextListener(new OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String query) {
+                executeSearch(query);
+                return true;
+            }
+
+            @Override
+            public boolean onQueryTextChange(String newText) {
+                executeSearch(newText);
+                return true;
+            }
+        });
     }
 
     private void runProgressHandler() {
@@ -137,16 +154,13 @@ public class SearchableUsers extends Activity {
     private void executeSearch(String query) {
         ArrayList<String> results = new ArrayList<String>();
 
-        for (String username : allUsers.keySet()) {
-            if (Pattern.compile(Pattern.quote(query),
-                    Pattern.CASE_INSENSITIVE).matcher(username).find()) {
-                results.add(username);
+        if (!query.isEmpty()) { // alternatively, maybe > 2 chars or so?
+            for (String username : allUsers.keySet()) {
+                if (Pattern.compile(Pattern.quote(query),
+                        Pattern.CASE_INSENSITIVE).matcher(username).find()) {
+                    results.add(username);
+                }
             }
-        }
-
-        System.out.println("===== RESULTS ======");
-        for (String result : allUsers.keySet()) {
-            System.out.println("- " + result);
         }
 
         UsersAdapter adapter = new UsersAdapter(this, results);
