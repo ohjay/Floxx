@@ -51,7 +51,7 @@
             android:theme="@style/FullscreenTheme" />
         <activity android:name=".RegisterActivity" />
         <activity
-            android:name=".fireBaseActivity"
+            android:name=".FirebaseActivity"
             android:noHistory="true" />
         <activity android:name=".RequestsActivity"></activity>
     </application>

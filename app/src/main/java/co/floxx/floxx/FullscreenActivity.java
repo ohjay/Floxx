@@ -51,7 +51,7 @@ public class FullscreenActivity extends AppCompatActivity {
         button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(FullscreenActivity.this, fireBaseActivity.class);
+                Intent intent = new Intent(FullscreenActivity.this, FirebaseActivity.class);
                 String username11 = username1.getText().toString();
                 String password11 = password1.getText().toString();
                 extras.putString("enter_username", username11);

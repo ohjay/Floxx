@@ -3,8 +3,6 @@ package co.floxx.floxx;
 import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.text.method.PasswordTransformationMethod;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -23,7 +21,7 @@ public class RegisterActivity extends AppCompatActivity {
         button.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(RegisterActivity.this, fireBaseActivity.class);
+                Intent intent = new Intent(RegisterActivity.this, FirebaseActivity.class);
                 String username11 = username1.getText().toString();
                 String password11 = password1.getText().toString();
                 extras.putString("register_user", username11);

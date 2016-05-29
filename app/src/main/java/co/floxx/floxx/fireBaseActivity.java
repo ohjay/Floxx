@@ -17,8 +17,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
-public class fireBaseActivity extends AppCompatActivity {
-    private static final String OSKI_UID = "07750a2b-0f39-494d-ab19-59a6d3a276cc";
+public class FirebaseActivity extends AppCompatActivity {
+    public static final String OSKI_UID = "07750a2b-0f39-494d-ab19-59a6d3a276cc";
     String euser, epass, rpass, ruser, uid;
     Firebase ref;
 
@@ -28,7 +28,7 @@ public class fireBaseActivity extends AppCompatActivity {
         Firebase.setAndroidContext(this);
         ref = new Firebase("https://floxx.firebaseio.com/");
 
-        setContentView(R.layout.activity_fire_base);
+        setContentView(R.layout.activity_firebase);
         Intent intent = getIntent();
         Bundle extras = intent.getExtras();
 
@@ -45,7 +45,7 @@ public class fireBaseActivity extends AppCompatActivity {
                 public void onSuccess(Map<String, Object> result) {
                     uid = result.get("uid").toString();
                     System.out.println("Successfully created user account with uid: " + uid);
-                    Toast.makeText(fireBaseActivity.this, "You were able to register!", Toast.LENGTH_LONG).show();
+                    Toast.makeText(FirebaseActivity.this, "You were able to register!", Toast.LENGTH_LONG).show();
 
                     // Add the username and UID to Firebase
                     Map<String, Object> uidMap = new HashMap<String, Object>();
@@ -82,22 +82,22 @@ public class fireBaseActivity extends AppCompatActivity {
                     // there was an error
                 }
             });
-            intent = new Intent(fireBaseActivity.this, FullscreenActivity.class);
-            fireBaseActivity.this.startActivity(intent);
+            intent = new Intent(FirebaseActivity.this, FullscreenActivity.class);
+            FirebaseActivity.this.startActivity(intent);
         } else {
             String email1 = euser + "@gmail.com";
             ref.authWithPassword(email1, epass, new Firebase.AuthResultHandler() {
                 @Override
                 public void onAuthenticated(AuthData authData) {
                     System.out.println("User ID: " + authData.getUid() + ", Provider: " + authData.getProvider());
-                    Intent intent = new Intent(fireBaseActivity.this, ActivityFriendList.class);
-                    fireBaseActivity.this.startActivity(intent);
+                    Intent intent = new Intent(FirebaseActivity.this, ActivityFriendList.class);
+                    FirebaseActivity.this.startActivity(intent);
                 }
                 @Override
                 public void onAuthenticationError(FirebaseError firebaseError) {
-                    Intent intent = new Intent(fireBaseActivity.this, FullscreenActivity.class);
-                    Toast.makeText(fireBaseActivity.this, "You failed to log in. Try again!", Toast.LENGTH_LONG).show();
-                    fireBaseActivity.this.startActivity(intent);
+                    Intent intent = new Intent(FirebaseActivity.this, FullscreenActivity.class);
+                    Toast.makeText(FirebaseActivity.this, "You failed to log in. Try again!", Toast.LENGTH_LONG).show();
+                    FirebaseActivity.this.startActivity(intent);
                 }
             });
         }
