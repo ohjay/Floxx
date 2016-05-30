@@ -15,4 +15,10 @@
     <string name="reqs_header">== Requests ==</string>
     <string name="search_header">[Search and request]</string>
     <string name="received_header">[Received]</string>
+
+    <string name="register_username_prompt">Enter a desired username</string>
+    <string name="register_email_prompt">E-mail address</string>
+    <string name="register_password_prompt">Enter a desired password</string>
+    <string name="confirm_pw_prompt">Confirm your password</string>
+    <string name="register_button">Register</string>
 </resources>

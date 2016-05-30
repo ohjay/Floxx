@@ -19,7 +19,7 @@ import java.util.Map;
 
 public class FirebaseActivity extends AppCompatActivity {
     public static final String OSKI_UID = "07750a2b-0f39-494d-ab19-59a6d3a276cc";
-    String euser, epass, rpass, ruser, uid;
+    String euser, epass, rpass, ruser, remail, uid; // "e" for sign in. "r" for registration
     Firebase ref;
 
     @Override
@@ -35,10 +35,15 @@ public class FirebaseActivity extends AppCompatActivity {
         euser = extras.getString("enter_username");
         epass = extras.getString("enter_password");
         ruser = extras.getString("register_user");
+        remail = extras.getString("register_email");
         rpass = extras.getString("register_password");
 
         if (euser == null) {
-            String email = ruser + "@gmail.com";
+            // User registration
+            // TODO: Check if REMAIL is unique. Used as a deterrent for account creation spam
+            // TODO: Send confirmation email to REMAIL
+            // TODO: Save REMAIL to Firebase, along with associated UID
+            String email = ruser + "@gmail.com"; // this doesn't need to change (- Owen 5/30)
             Log.i(email, "should be registering this");
             ref.createUser(email, rpass, new Firebase.ValueResultHandler<Map<String, Object>>() {
                 @Override
@@ -85,6 +90,7 @@ public class FirebaseActivity extends AppCompatActivity {
             intent = new Intent(FirebaseActivity.this, FullscreenActivity.class);
             FirebaseActivity.this.startActivity(intent);
         } else {
+            // Login with an existing account
             String email1 = euser + "@gmail.com";
             ref.authWithPassword(email1, epass, new Firebase.AuthResultHandler() {
                 @Override
