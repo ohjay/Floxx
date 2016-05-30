@@ -65,9 +65,17 @@
     <Button
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:text="Personalize Marker"
+        android:id="@+id/personalize_marker"
+        android:layout_below="@+id/locn_permissions_button"
+        android:layout_centerHorizontal="true" />
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         android:text="Tea Era"
         android:id="@+id/TeaEra"
-        android:layout_below="@id/locn_permissions_button"
+        android:layout_below="@id/personalize_marker"
         android:layout_centerHorizontal="true" />
 
 </RelativeLayout>

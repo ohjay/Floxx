@@ -40,9 +40,33 @@ public class FirebaseActivity extends AppCompatActivity {
 
         if (euser == null) {
             // User registration
-            // TODO: Check if REMAIL is unique. Used as a deterrent for account creation spam
+            // To start: check if REMAIL is unique. Used as a deterrent for account creation spam
+            // TODO (important): test this!
+            ref.child("emails").addListenerForSingleValueEvent(new ValueEventListener() {
+                @Override
+                public void onDataChange(DataSnapshot snapshot) {
+                    for (DataSnapshot child : snapshot.getChildren()) {
+                        final String storedEmail = child.getKey();
+                        if (storedEmail.equals(remail)) {
+                            // Exit; we can't have duplicates
+                            Intent intent = new Intent(FirebaseActivity.this, RegisterActivity.class);
+                            Toast.makeText(FirebaseActivity.this, "Email already in use. :(",
+                                    Toast.LENGTH_LONG).show();
+                            FirebaseActivity.this.startActivity(intent);
+                            return;
+                        }
+                    }
+                }
+
+                @Override
+                public void onCancelled(FirebaseError firebaseError) {
+                    Log.e("Read failed: ", firebaseError.getMessage());
+                }
+            });
+
             // TODO: Send confirmation email to REMAIL
-            // TODO: Save REMAIL to Firebase, along with associated UID
+            // User should not be fully registered until he/she confirms
+
             String email = ruser + "@gmail.com"; // this doesn't need to change (- Owen 5/30)
             Log.i(email, "should be registering this");
             ref.createUser(email, rpass, new Firebase.ValueResultHandler<Map<String, Object>>() {
@@ -80,6 +104,11 @@ public class FirebaseActivity extends AppCompatActivity {
                             // We can do something here if we want
                         }
                     });
+
+                    // Save REMAIL to Firebase along with associated UID
+                    Map<String, Object> emailMap = new HashMap<String, Object>();
+                    emailMap.put(remail, uid);
+                    ref.child("emails").updateChildren(emailMap);
                 }
 
                 @Override

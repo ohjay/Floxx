@@ -68,6 +68,13 @@ public class SettingActivity extends AppCompatActivity {
             }
         });
 
+        Button personalizationButton = (Button) findViewById(R.id.personalize_marker);
+        personalizationButton.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View view) {
+                // Open a dialog/activity and let users choose colors or images?
+            }
+        });
+
         Firebase.setAndroidContext(this);
         ref = new Firebase("https://floxx.firebaseio.com/");
         final String currentUser = ref.getAuth().getUid().toString();
