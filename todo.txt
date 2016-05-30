@@ -1,14 +1,14 @@
 ----------------
 TODO (ESSENTIAL)
 ----------------
-1. Set up background location check. Alternatively, factor in time (when the locn was noted) and extrapolate. [6 hrs]
-2. Enable users to turn off location services. [3 hrs]
-3. Improve the authentication flow; have users enter email during registration. Also fix error messages (e.g. when a username is taken). [4 hrs]
-4. Make users stay logged in. Allow them to sign out, too. [3 hrs]
-5. Fix the app UI/layout...! [14 hrs]
-6. Make changes take effect immediately (e.g. if a friend request is accepted, I want to see updates NOW). [4 hrs]
-7. Let people personalize their map markers (e.g. color). [4 hrs]
-8. Add password confirmation to registration. [1 hr]
+1. Set up real-time location updates for all users on map. [6 hrs]
+2. Improve the authentication flow; have users enter email during registration. Also fix error messages (e.g. when a username is taken). [4 hrs]
+3. Make users stay logged in. Allow them to sign out, too. [3 hrs]
+4. Fix the app UI/layout...! [14 hrs]
+5. Make changes take effect immediately (e.g. if a friend request is accepted, I want to see updates NOW). [4 hrs]
+6. Let people personalize their map markers (e.g. color). [4 hrs]
+7. Add password confirmation to registration. [1 hr]
+8. Hide users with location permissions set to "off". List hidden users somewhere on the map. Display their ETAs (just not distances or precise locations) anyway. [3 hrs]
 9. Test and debug; have people try out the app and attempt to break it. [6 hrs]
 
 // Total: 45 hrs

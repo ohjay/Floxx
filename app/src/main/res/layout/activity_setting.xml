@@ -58,7 +58,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Toggle Location Service"
-        android:id="@+id/button12"
+        android:id="@+id/locn_permissions_button"
         android:layout_below="@+id/add_friends"
         android:layout_centerHorizontal="true" />
 
@@ -67,7 +67,7 @@
         android:layout_height="wrap_content"
         android:text="Tea Era"
         android:id="@+id/TeaEra"
-        android:layout_below="@+id/button12"
+        android:layout_below="@id/locn_permissions_button"
         android:layout_centerHorizontal="true" />
 
 </RelativeLayout>
