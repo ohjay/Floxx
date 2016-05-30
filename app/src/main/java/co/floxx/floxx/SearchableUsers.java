@@ -196,6 +196,7 @@ public class SearchableUsers extends Activity {
     private void executeSearch(String query) {
         ArrayList<String> results = new ArrayList<String>();
 
+        // TODO (Owen): exclude users whom you've already requested
         if (!query.isEmpty()) { // alternatively, maybe > 2 chars or so?
             for (String username : allUsers.keySet()) {
                 if (username.equals(currentUsername) || currentFriends.contains(username)) {

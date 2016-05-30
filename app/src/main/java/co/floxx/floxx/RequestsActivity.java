@@ -4,6 +4,7 @@ import android.app.SearchManager;
 import android.content.Context;
 import android.graphics.Typeface;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.ImageButton;
@@ -27,8 +28,10 @@ import java.util.Map;
  * @author owenjow
  */
 public class RequestsActivity extends AppCompatActivity {
-    Firebase ref;
-    Context context;
+    private static final int DELAY = 500; // 500 ms
+    private int numFriendsAdded;
+    private Firebase ref;
+    private Context context;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -120,11 +123,25 @@ public class RequestsActivity extends AppCompatActivity {
     }
 
     private void acceptRequest(String senderID, String recipientID) {
+        numFriendsAdded = 0; // so we know when the request has been entirely fulfilled
+
         addFriend(senderID, recipientID);
         addFriend(recipientID, senderID);
+        delayedDestroyRequest(senderID, recipientID);
+    }
 
-        // The request has been accepted, so we don't need it anymore
-        destroyRequest(senderID, recipientID);
+    private void delayedDestroyRequest(final String senderID, final String recipientID) {
+        new Handler().postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                if (numFriendsAdded >= 2) {
+                    // The request has been fully accepted, so we don't need it anymore
+                    destroyRequest(senderID, recipientID);
+                } else {
+                    delayedDestroyRequest(senderID, recipientID);
+                }
+            }
+        }, DELAY);
     }
 
     /**
@@ -152,6 +169,8 @@ public class RequestsActivity extends AppCompatActivity {
 
                     ref.child("users").child(uid).setValue(map); // our job here is done :)
                 }
+
+                ++numFriendsAdded;
             }
 
             @Override
