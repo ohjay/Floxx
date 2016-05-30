@@ -2,16 +2,15 @@
 TODO (ESSENTIAL)
 ----------------
 1. Set up real-time location updates for all users on map. [6 hrs]
-2. Improve the authentication flow; have users enter email during registration. Also fix error messages (e.g. when a username is taken). [4 hrs]
+2. Send email confirmations during registration and check for duplicate emails. [3 hrs]
 3. Make users stay logged in. Allow them to sign out, too. [3 hrs]
 4. Fix the app UI/layout...! [14 hrs]
 5. Make changes take effect immediately (e.g. if a friend request is accepted, I want to see updates NOW). [4 hrs]
 6. Let people personalize their map markers (e.g. color). [4 hrs]
-7. Add password confirmation to registration. [1 hr]
-8. Hide users with location permissions set to "off". List hidden users somewhere on the map. Display their ETAs (just not distances or precise locations) anyway. [3 hrs]
-9. Test and debug; have people try out the app and attempt to break it. [6 hrs]
+7. Hide users who have location permissions set to "off". List hidden users somewhere on the map. Display their ETAs (just not distances or precise locations) anyway. [3 hrs]
+8. Test and debug; have people try out the app and attempt to break it. [6 hrs]
 
-// Total: 45 hrs
+// Total: 43 hrs
 * Time estimates = (Owen's original call) x 2
 
 ----------------------------
@@ -19,10 +18,8 @@ TODO (MINOR and/or OPTIONAL)
 ----------------------------
 1. Let users specify their mode of transportation.
 2. Log users' location/hangout history somewhere and allow them to view it.
-3. Authentication integration with Facebook.
-4. If authentication with Facebook, add profile pictures to map markers.
-5. Put some kind of instructions somewhere, or add an "About" page.
-6. Upon startup, have map zoom in at an appropriate level (scaled to minimally fit all of the people in the group).
+3. Put some kind of instructions somewhere, or add an "About" page.
+4. Upon startup, have map zoom in at an appropriate level (scaled to minimally fit all of the people in the group).
 
 ---------------------
 LAYOUTS/UX TO UPGRADE

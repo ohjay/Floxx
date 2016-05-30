@@ -84,7 +84,11 @@ public class FirebaseActivity extends AppCompatActivity {
 
                 @Override
                 public void onError(FirebaseError firebaseError) {
-                    // there was an error
+                    String message = firebaseError.getMessage();
+                    if (message.startsWith("The specified email address is already in use")) {
+                        message = "The specified username is already in use.";
+                    }
+                    Toast.makeText(FirebaseActivity.this, message, Toast.LENGTH_LONG).show();
                 }
             });
             intent = new Intent(FirebaseActivity.this, FullscreenActivity.class);
@@ -102,7 +106,7 @@ public class FirebaseActivity extends AppCompatActivity {
                 @Override
                 public void onAuthenticationError(FirebaseError firebaseError) {
                     Intent intent = new Intent(FirebaseActivity.this, FullscreenActivity.class);
-                    Toast.makeText(FirebaseActivity.this, "You failed to log in. Try again!", Toast.LENGTH_LONG).show();
+                    Toast.makeText(FirebaseActivity.this, firebaseError.getMessage(), Toast.LENGTH_LONG).show();
                     FirebaseActivity.this.startActivity(intent);
                 }
             });
