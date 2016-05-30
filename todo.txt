@@ -1,16 +1,15 @@
 ----------------
 TODO (ESSENTIAL)
 ----------------
-1. Set up real-time location updates for all users on map. [6 hrs]
+1. Set up real-time location updates for all users on map. [4 hrs]
 2. Send email confirmations during registration and check for duplicate emails. [3 hrs]
-3. Make users stay logged in. Allow them to sign out, too. [3 hrs]
-4. Fix the app UI/layout...! [14 hrs]
-5. Make changes take effect immediately (e.g. if a friend request is accepted, I want to see updates NOW). [4 hrs]
-6. Let people personalize their map markers (e.g. color). [4 hrs]
-7. Hide users who have location permissions set to "off". List hidden users somewhere on the map. Display their ETAs (just not distances or precise locations) anyway. [3 hrs]
-8. Test and debug; have people try out the app and attempt to break it. [6 hrs]
+3. Fix the app UI/layout...! [14 hrs]
+4. Make changes take effect immediately (e.g. if a friend request is accepted, I want to see updates NOW). Figure out how to reload things when you press the back button. [4 hrs]
+5. Let people personalize their map markers (e.g. color). [4 hrs]
+6. Hide users who have location permissions set to "off". List hidden users somewhere on the map. Display their ETAs (just not distances or precise locations) anyway. [3 hrs]
+7. Test and debug. Have people try out the app and attempt to break it. [6 hrs]
 
-// Total: 43 hrs
+// Total: 38 hrs
 * Time estimates = (Owen's original call) x 2
 
 ----------------------------
