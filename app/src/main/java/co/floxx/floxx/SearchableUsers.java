@@ -27,6 +27,7 @@ import com.firebase.client.ValueEventListener;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.regex.Pattern;
 
@@ -39,9 +40,10 @@ public class SearchableUsers extends Activity {
     static HashMap<String, String> allUsers = new HashMap<String, String>();
     private ListView listView; // where we'll put the search output
     private int progressIndex = -1, numFriends;
-    private boolean isDownloading;
     private ProgressDialog dialog;
     private static final int PROGRESS_DELAY = 1000; // this is in ms!
+    private HashSet<String> currentFriends;
+    private String currentUsername;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -50,14 +52,16 @@ public class SearchableUsers extends Activity {
 
         listView = (ListView) findViewById(R.id.search_list);
 
+        // Launching the progress dialog
+        dialog = new ProgressDialog(this);
+        dialog.setMessage("Retrieving user data...");
+        dialog.show();
+
+        final Firebase ref = new Firebase("https://floxx.firebaseio.com/");
+        final String currUser = ref.getAuth().getUid().toString();
+
         // Download all usernames and UIDs (uname -> uid)
         if (allUsers.isEmpty()) {
-            isDownloading = true;
-            dialog = new ProgressDialog(this);
-            dialog.setMessage("Retrieving user data...");
-            dialog.show();
-
-            final Firebase ref = new Firebase("https://floxx.firebaseio.com/");
             Query queryRef = ref.child("users").orderByKey().equalTo(FirebaseActivity.OSKI_UID);
             queryRef.addListenerForSingleValueEvent(new ValueEventListener() {
                 @Override
@@ -77,6 +81,11 @@ public class SearchableUsers extends Activity {
                                     for (DataSnapshot child : dataSnapshot.getChildren()) {
                                         final String name = child.getKey();
                                         allUsers.put(name, fuid);
+
+                                        if (fuid.equals(currUser)) {
+                                            // This is the current user's username
+                                            currentUsername = name;
+                                        }
                                     }
 
                                     ++progressIndex;
@@ -97,11 +106,42 @@ public class SearchableUsers extends Activity {
             });
         }
 
-        if (isDownloading) {
-            runProgressHandler();
-        } else {
-            handleIntent(getIntent());
-        }
+        // Grab all of the user's current friends
+        currentFriends = new HashSet<String>(); // clear the set to start with
+        Query queryRef = ref.child("users").orderByKey().equalTo(currUser);
+        queryRef.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                Object result = dataSnapshot.child(currUser).child("friends").getValue();
+                if (result != null) {
+                    ArrayList<String> friends = (ArrayList<String>) result;
+                    numFriends += friends.size();
+
+                    for (final String fuid : friends) {
+                        Query nameQRef = ref.child("uids").orderByValue().equalTo(fuid);
+                        nameQRef.addListenerForSingleValueEvent(new ValueEventListener() {
+                            @Override
+                            public void onDataChange(DataSnapshot dataSnapshot) {
+                                for (DataSnapshot child : dataSnapshot.getChildren()) {
+                                    currentFriends.add(child.getKey()); // add the friend's name
+                                }
+
+                                ++progressIndex;
+                                dialog.setProgress(progressIndex * 100 / numFriends);
+                            }
+
+                            @Override
+                            public void onCancelled(FirebaseError firebaseError) {}
+                        });
+                    }
+                }
+            }
+
+            @Override
+            public void onCancelled(FirebaseError firebaseError) { dialog.dismiss(); }
+        });
+
+        runProgressHandler();
 
         final SearchView searchView = (SearchView) findViewById(R.id.user_search_bar);
         searchView.setOnQueryTextListener(new OnQueryTextListener() {
@@ -156,10 +196,11 @@ public class SearchableUsers extends Activity {
     private void executeSearch(String query) {
         ArrayList<String> results = new ArrayList<String>();
 
-        // TODO (Owen): don't include current friends or the user himself
         if (!query.isEmpty()) { // alternatively, maybe > 2 chars or so?
             for (String username : allUsers.keySet()) {
-                if (Pattern.compile(Pattern.quote(query),
+                if (username.equals(currentUsername) || currentFriends.contains(username)) {
+                    continue; // we don't want to be able to add our curr. friends... or ourselves
+                } else if (Pattern.compile(Pattern.quote(query),
                         Pattern.CASE_INSENSITIVE).matcher(username).find()) {
                     results.add(username);
                 }
