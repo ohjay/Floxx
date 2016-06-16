@@ -1,15 +1,15 @@
 ----------------
 TODO (ESSENTIAL)
 ----------------
-1. Allow the meetup creator to "conclude" the meetup, and allow individual users to leave. Otherwise, if all users are close enough together we'll also consider the meetup concluded. At this point, freeze the map and display a prompt allowing users to exit. [2 hrs] /OWEN
+1. Allow the meetup creator to "conclude" the meetup. Otherwise, if all users are close enough together we'll also consider the meetup concluded. At this point, freeze the map and display a prompt allowing users to exit. [2 hrs] /OWEN
 2. Send email confirmations during registration. [2 hrs] /RICHARD
 3. Fix the app UI/layout...! [14 hrs]
 4. Make changes take effect immediately (e.g. if a friend request is accepted, I want to see updates NOW). Figure out how to reload things when you press the back button. [4 hrs]
 5. Let people personalize their map markers (e.g. color). [4 hrs]
 6. Hide users who have location permissions set to "off". List hidden users somewhere on the map. Display their ETAs (just not distances or precise locations) anyway. [2 hrs]
-7. Test and debug. Have people try out the app and attempt to break it. [6 hrs]
+7. Test and debug. Have people try out the app and attempt to break it.
 
-// Total: 34 hrs
+// Total: 28 hrs
 * Time estimates = (Owen's original call) x 2
 
 ----------------------------

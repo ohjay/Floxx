@@ -25,4 +25,13 @@
         android:layout_below="@id/meetup_portal_header">
     </LinearLayout>
 
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Leave meetup"
+        android:id="@+id/leave_button"
+        android:layout_below="@+id/meetup_container"
+        android:layout_centerHorizontal="true"
+        android:backgroundTint="#04f048" />
+
 </RelativeLayout>

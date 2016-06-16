@@ -28,12 +28,13 @@ import java.util.HashSet;
 
 public class FriendListActivity extends AppCompatActivity {
     FriendListActivity thisList;
-    Firebase ref;
+    static Firebase ref;
     String uid; // the ID for the user in control of the device
     private HashSet<String> selected = new HashSet<String>();
     public static HashMap<String, String> names = new HashMap<String, String>();
     private HashSet<String> meetupParticipants = new HashSet<String>();
     private boolean participantsUpdated;
+    private static final int GOLD = Color.parseColor("#ffde00");
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -56,12 +57,15 @@ public class FriendListActivity extends AppCompatActivity {
             }
         });
 
+        names.put(FirebaseActivity.OSKI_UID, "oski"); // just to be comprehensive
+
         // TODO: find some way to clear the SELECTED set every time the view loads
 
         Firebase.setAndroidContext(this);
         ref = new Firebase("https://floxx.firebaseio.com/");
         uid = ref.getAuth().getUid().toString();
 
+        initializeNames();
         updateMeetupParticipants();
 
         Query queryRef = ref.child("users").orderByKey().equalTo(uid);
@@ -84,9 +88,7 @@ public class FriendListActivity extends AppCompatActivity {
                             @Override
                             public void onDataChange(DataSnapshot dataSnapshot) {
                                 for (DataSnapshot child : dataSnapshot.getChildren()) {
-                                    final String name = child.getKey();
-                                    names.put(fuid, name);
-                                    b.setText(name);
+                                    b.setText(child.getKey());
 
                                     LinearLayout ll = (LinearLayout) findViewById(R.id.button_container);
                                     LayoutParams lp = new LayoutParams(LayoutParams.MATCH_PARENT,
@@ -100,7 +102,7 @@ public class FriendListActivity extends AppCompatActivity {
                                                 b.getBackground().clearColorFilter();
                                             } else {
                                                 selected.add(fuid);
-                                                b.getBackground().setColorFilter(Color.parseColor("#ffde00"),
+                                                b.getBackground().setColorFilter(GOLD,
                                                         PorterDuff.Mode.DARKEN);
                                             }
                                         }
@@ -281,5 +283,22 @@ public class FriendListActivity extends AppCompatActivity {
 
         intent.putExtra("meetup id", uid + date);
         FriendListActivity.this.startActivity(intent);
+    }
+
+    public static void initializeNames() {
+        ref = new Firebase("https://floxx.firebaseio.com/");
+        ref.child("uids").addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                for (DataSnapshot child : dataSnapshot.getChildren()) {
+                    names.put(child.getValue().toString(), child.getKey());
+                }
+            }
+
+            @Override
+            public void onCancelled(FirebaseError error) {
+                System.out.println("[FriendListActivity] Read error: " + error.getMessage());
+            }
+        });
     }
 }
