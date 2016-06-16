@@ -6,10 +6,10 @@ TODO (ESSENTIAL)
 3. Fix the app UI/layout...! [14 hrs]
 4. Make changes take effect immediately (e.g. if a friend request is accepted, I want to see updates NOW). Figure out how to reload things when you press the back button. [4 hrs]
 5. Let people personalize their map markers (e.g. color). [4 hrs]
-6. Hide users who have location permissions set to "off". List hidden users somewhere on the map. Display their ETAs (just not distances or precise locations) anyway. [3 hrs]
+6. Hide users who have location permissions set to "off". List hidden users somewhere on the map. Display their ETAs (just not distances or precise locations) anyway. [2 hrs]
 7. Test and debug. Have people try out the app and attempt to break it. [6 hrs]
 
-// Total: 35 hrs
+// Total: 34 hrs
 * Time estimates = (Owen's original call) x 2
 
 ----------------------------
@@ -18,6 +18,7 @@ TODO (MINOR and/or OPTIONAL)
 1. Let users specify their mode of transportation.
 2. Put some kind of instructions somewhere, or add an "About" page.
 3. Upon startup, have map zoom in at an appropriate level (scaled to minimally fit all of the people in the group).
+4. Implement a "good friends" feature, in which the meetup invitation stage is bypassed for certain users (the idea is that they meet up so often, they shouldn't have to waste time confirming things anymore).
 
 ---------------------
 LAYOUTS/UX TO UPGRADE
