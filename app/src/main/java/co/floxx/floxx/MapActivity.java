@@ -48,9 +48,11 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * An example full-screen activity that shows and hides the system UI (i.e.
@@ -66,8 +68,9 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback,
     private LocationRequest mLocationRequest;
     private GoogleMap mMap;
     private Location mLastLocation;
-    private Marker marker;
+    private Marker marker, meetingMarker;
     private static HashMap<String, Marker> others = new HashMap<String, Marker>(); // ouid -> oMarker
+    private String meetupId = "";
 
     /**
      * Whether or not the system UI should be auto-hidden after
@@ -174,9 +177,13 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback,
         super.onCreate(savedInstanceState);
         Intent intent = getIntent();
 
+        // Unpack intent extras (user collection + meetup ID)
         for (String ouid : intent.getExtras().keySet()) {
-            others.put(ouid, null);
+            if (ouid != "meetup id") {
+                others.put(ouid, null);
+            }
         }
+        meetupId = intent.getStringExtra("meetup id");
 
         setContentView(R.layout.activity_map);
 
@@ -211,40 +218,58 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback,
                 .setFastestInterval(1 * 1000); // 1 second, in milliseconds
         setUpMapIfNeeded();
 
-        Firebase ref = new Firebase("https://floxx.firebaseio.com/");
+        final Firebase ref = new Firebase("https://floxx.firebaseio.com/");
         for (final String ouid : others.keySet()) {
-            Query llqRef = ref.child("locns").child(ouid).orderByKey();
-            llqRef.addListenerForSingleValueEvent(new ValueEventListener() {
-                @Override
-                public void onDataChange(DataSnapshot dataSnapshot) {
-                    double olat = -12345, olon = -67890;
-                    for (DataSnapshot child : dataSnapshot.getChildren()) {
-                        switch (child.getKey()) {
-                            case "latitude":
-                                olat = (double) child.getValue();
-                                break;
-                            case "longitude":
-                                olon = (double) child.getValue();
-                                break;
-                        }
-                    }
+            setOtherMarkerFull(ouid, ref);
+        }
 
-                    if (olat > -12345 && olon > -12345) {
-                        String oName = FriendListActivity.names.get(ouid);
-                        Marker oMarker = others.get(ouid);
+        // Setting a data listener on the meeting point
+        Firebase locnRef = new Firebase("https://floxx.firebaseio.com/meetups/" + meetupId + "/location");
+        locnRef.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot snapshot) {
+                if (snapshot.exists()) {
+                    double latitude = (double) snapshot.child("latitude").getValue();
+                    double longitude = (double) snapshot.child("longitude").getValue();
 
-                        if (oMarker != null) { oMarker.remove(); }
-                        oMarker = mMap.addMarker(new MarkerOptions().position(new LatLng(olat,
-                                olon)).title(oName));
-                        oMarker.showInfoWindow();
-                        others.put(ouid, oMarker);
+                    updateMeetingMarker(latitude, longitude);
+                }
+            }
+
+            @Override
+            public void onCancelled(FirebaseError e) {
+                System.out.println("Read failed: " + e.getMessage());
+            }
+        });
+
+        final String uid = ref.getAuth().getUid().toString();
+
+        // Setting a data listener on the confirmed meetup users
+        Firebase confRef = new Firebase("https://floxx.firebaseio.com/meetups/" + meetupId + "/confirmed");
+        confRef.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot snapshot) {
+                if (!snapshot.exists()) { return; }
+
+                ArrayList<String> confirmed = (ArrayList<String>) snapshot.getValue();
+                Set<String> veterans = others.keySet();
+
+                for (String ouid : confirmed) {
+                    if (!ouid.equals(uid) && !veterans.contains(ouid)) {
+                        others.put(ouid, null);
+                        setOtherMarkerFull(ouid, ref);
                     }
                 }
+            }
 
-                @Override
-                public void onCancelled(FirebaseError firebaseError) {}
-            });
-        }
+            @Override
+            public void onCancelled(FirebaseError e) {
+                System.out.println("Read failed: " + e.getMessage());
+            }
+        });
+
+        // TODO (OJ?): If this works, we should probably migrate all locn updates to this service
+        LocationUpdateService.startUpdates(this, uid, mGoogleApiClient, mLocationRequest);
     }
 
     @Override
@@ -260,24 +285,14 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback,
 
     @Override
     public void onMapClick(LatLng point) {
-        mMap.addMarker(new MarkerOptions().position(point).title("touchy touchy").draggable(true));
+        if (meetingMarker != null) { return; } // only ONE of these on the map!!
+        MarkerOptions mmo = new MarkerOptions().position(point).title("meet here!").draggable(true);
+        meetingMarker = mMap.addMarker(mmo); // create the almighty meeting marker
 
-        Iterator it = others.entrySet().iterator();
-        while (it.hasNext()) {
-            Map.Entry pair = (Map.Entry) it.next();
-            String ouid = (String) pair.getKey();
-            Marker oMarker = (Marker) pair.getValue();
-
-            if (oMarker != null) {
-                LatLng oMarkerPos = oMarker.getPosition();
-                new DirQueryTask().execute("http://maps.googleapis.com/maps/api/directions/json?origin="
-                        + oMarkerPos.latitude + "," + oMarkerPos.longitude + "&destination="
-                        + point.latitude + "," + point.longitude + "&mode=driving&sensor=false",
-                        ouid);
-            }
-        }
+        computeETAs();
 
         mMap.setOnMapClickListener(null); // we only want to be adding one marker
+        saveMeetupLocation(point.latitude, point.longitude);
     }
 
     @Override
@@ -404,23 +419,7 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback,
     @Override
     public void onMarkerDragEnd(Marker marker) {
         LatLng markerPos = marker.getPosition();
-
-        Iterator it = others.entrySet().iterator();
-        while (it.hasNext()) {
-            Map.Entry pair = (Map.Entry) it.next();
-            String ouid = (String) pair.getKey();
-            Marker oMarker = (Marker) pair.getValue();
-
-            if (oMarker != null) {
-                LatLng oMarkerPos = oMarker.getPosition();
-
-                // TODO (Owen): add API key and request "Maps-official" travel time
-                new DirQueryTask().execute("http://maps.googleapis.com/maps/api/directions/json?origin="
-                        + oMarkerPos.latitude + "," + oMarkerPos.longitude + "&destination="
-                        + markerPos.latitude + "," + markerPos.longitude + "&mode=driving&sensor=false",
-                        ouid);
-            }
-        }
+        saveMeetupLocation(markerPos.latitude, markerPos.longitude);
     }
 
     @Override
@@ -510,6 +509,11 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback,
     // Utility/update classes and methods
     //================================================================================
     // - handleNewLocation (what to do when we have a location update for the user)
+    // - saveMeetupLocation (saves location to Firebase so other users can access it)
+    // - updateMeetingMarker (updates the meeting marker position)
+    // - computeETAs (computes ETA and distance information for other users)
+    // - setOtherMarkerFull (creates a listener whose callback = setOtherMarker)
+    // - setOtherMarker (places a marker for a user that isn't on the map already)
     // - Pair (POJO that serves as a ouid/queryRes data bundle)
     // - DirQueryTask (asynchronous task that queries the Directions API)
     // - toggle
@@ -541,6 +545,100 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback,
         if (initialZoom) {
             mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, 13));
             initialZoom = false;
+        }
+    }
+
+    public void saveMeetupLocation(double latitude, double longitude) {
+        Map<String, Double> map = new HashMap<String, Double>();
+        map.put("latitude", latitude);
+        map.put("longitude", longitude);
+
+        Firebase ref = new Firebase("https://floxx.firebaseio.com/");
+        ref.child("meetups").child(meetupId).child("location").setValue(map);
+    }
+
+    private void updateMeetingMarker(double latitude, double longitude) {
+        if (meetingMarker == null) {
+            MarkerOptions mmo = new MarkerOptions().position(new LatLng(latitude, longitude))
+                    .title("meet here!").draggable(true);
+            meetingMarker = mMap.addMarker(mmo); // create the meeting marker
+        } else {
+            meetingMarker.setPosition(new LatLng(latitude, longitude));
+        }
+
+        computeETAs();
+    }
+
+    private void computeETAs() {
+        LatLng meetingPos = meetingMarker.getPosition();
+        Iterator it = others.entrySet().iterator();
+        while (it.hasNext()) {
+            Map.Entry pair = (Map.Entry) it.next();
+            String ouid = (String) pair.getKey();
+            Marker oMarker = (Marker) pair.getValue();
+
+            if (oMarker != null) {
+                LatLng oMarkerPos = oMarker.getPosition();
+
+                // TODO (Owen): add API key and request "Maps-official" travel time
+                new DirQueryTask().execute("http://maps.googleapis.com/maps/api/directions/json?origin="
+                        + oMarkerPos.latitude + "," + oMarkerPos.longitude + "&destination="
+                        + meetingPos.latitude + "," + meetingPos.longitude + "&mode=driving&sensor=false",
+                        ouid);
+            }
+        }
+    }
+
+    private void setOtherMarkerFull(final String ouid, Firebase ref) {
+        Query llqRef = ref.child("locns").child(ouid).orderByKey();
+        llqRef.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                setOtherMarker(ouid, dataSnapshot);
+            }
+
+            @Override
+            public void onCancelled(FirebaseError firebaseError) {}
+        });
+
+        // Set a listener on the other guy, so we can see when his location changes
+        Query constLLQRef = ref.child("locns").child(ouid).orderByKey();
+        constLLQRef.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                setOtherMarker(ouid, dataSnapshot);
+                computeETAs();
+            }
+
+            @Override
+            public void onCancelled(FirebaseError firebaseError) {
+                System.out.println("[Map Activity] Read failed: " + firebaseError.getMessage());
+            }
+        });
+    }
+
+    private void setOtherMarker(final String ouid, DataSnapshot dataSnapshot) {
+        double olat = -12345, olon = -67890;
+        for (DataSnapshot child : dataSnapshot.getChildren()) {
+            switch (child.getKey()) {
+                case "latitude":
+                    olat = (double) child.getValue();
+                    break;
+                case "longitude":
+                    olon = (double) child.getValue();
+                    break;
+            }
+        }
+
+        if (olat > -12345 && olon > -12345) {
+            String oName = FriendListActivity.names.get(ouid);
+            Marker oMarker = others.get(ouid);
+
+            if (oMarker != null) { oMarker.remove(); }
+            oMarker = mMap.addMarker(new MarkerOptions().position(new LatLng(olat,
+                    olon)).title(oName));
+            oMarker.showInfoWindow();
+            others.put(ouid, oMarker);
         }
     }
 

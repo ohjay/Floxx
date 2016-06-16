@@ -128,9 +128,9 @@ public class FirebaseActivity extends AppCompatActivity {
             ref.authWithPassword(email1, epass, new Firebase.AuthResultHandler() {
                 @Override
                 public void onAuthenticated(AuthData authData) {
-                    System.out.println("User ID: " + authData.getUid() + ", Provider: " + authData.getProvider());
-                    Intent intent = new Intent(FirebaseActivity.this, FriendListActivity.class);
-                    FirebaseActivity.this.startActivity(intent);
+                    uid = authData.getUid();
+                    System.out.println("User ID: " + uid + ", Provider: " + authData.getProvider());
+                    redirectAuthenticatedUser();
                 }
                 @Override
                 public void onAuthenticationError(FirebaseError firebaseError) {
@@ -140,6 +140,52 @@ public class FirebaseActivity extends AppCompatActivity {
                 }
             });
         }
+    }
+
+    /**
+     * Starts either the map activity or the friend list activity,
+     * depending on whether the user is already in a meetup.
+     */
+    private void redirectAuthenticatedUser() {
+        Query ongoingRef = ref.child("ongoing");
+        ongoingRef.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot snapshot) {
+                if (snapshot.hasChild(uid)) {
+                    enterMeetupPortal(snapshot.child(uid).getValue().toString());
+                } else {
+                    // Go to the friend list
+                    Intent intent = new Intent(FirebaseActivity.this, FriendListActivity.class);
+                    FirebaseActivity.this.startActivity(intent);
+                }
+            }
+
+            @Override
+            public void onCancelled(FirebaseError firebaseError) {}
+        });
+    }
+
+    private void enterMeetupPortal(final String meetupId) {
+        // Get the users who are currently in the meetup
+        Query meetupsRef = ref.child("meetups").child(meetupId).child("confirmed");
+        meetupsRef.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot snapshot) {
+                Intent intent = new Intent(FirebaseActivity.this, MeetupPortalActivity.class);
+                ArrayList<String> confirmed = (ArrayList<String>) snapshot.getValue();
+                for (String ouid : confirmed) {
+                    if (!ouid.equals(uid)) {
+                        intent.putExtra(ouid, 0);
+                    }
+                }
+
+                intent.putExtra("meetup id", meetupId);
+                FirebaseActivity.this.startActivity(intent);
+            }
+
+            @Override
+            public void onCancelled(FirebaseError firebaseError) {}
+        });
     }
 
     /**
