@@ -55,20 +55,20 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Sign out"
-        android:id="@+id/button"
+        android:id="@+id/sign_out_button"
         android:onClick=""
         android:layout_below="@id/mapgo"
         android:layout_centerHorizontal="true" />
 
     <ScrollView
-        android:layout_width="fill_parent"
+        android:layout_width="wrap_content"
         android:layout_height="300dp"
-        android:layout_below="@+id/textView"
+        android:layout_below="@+id/sign_out_button"
         android:layout_marginTop="20dp"
         android:id="@+id/meetup_scroll">
 
         <LinearLayout
-            android:layout_width="fill_parent"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:orientation="vertical"
             android:id="@+id/meetup_container">

@@ -61,8 +61,24 @@ public class LocationUpdateService extends IntentService implements LocationList
                     return;
                 }
 
-                LocationServices.FusedLocationApi.requestLocationUpdates(
-                        mGoogleApiClient, mLocationRequest, this);
+                // Try to connect mGoogleApiClient
+                for (int i = 0; i < 3; i++) {
+                    try {
+                        mGoogleApiClient.connect();
+                        if (mGoogleApiClient.isConnected()) {
+                            break;
+                        }
+
+                        Thread.sleep(3500);
+                    } catch (InterruptedException e) {
+                        Thread.currentThread().interrupt();
+                    }
+                }
+
+                if (mGoogleApiClient.isConnected()) {
+                    LocationServices.FusedLocationApi.requestLocationUpdates(
+                            mGoogleApiClient, mLocationRequest, this);
+                }
             }
         }
     }

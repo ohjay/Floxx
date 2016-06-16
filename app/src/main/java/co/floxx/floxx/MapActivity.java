@@ -570,6 +570,8 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback,
     }
 
     private void computeETAs() {
+        if (meetingMarker == null) { return; }
+
         LatLng meetingPos = meetingMarker.getPosition();
         Iterator it = others.entrySet().iterator();
         while (it.hasNext()) {

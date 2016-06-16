@@ -40,7 +40,7 @@ public class FriendListActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         thisList = this;
         setContentView(R.layout.activity_activity_friend_list);
-        Button button = (Button) findViewById(R.id.button);
+        Button button = (Button) findViewById(R.id.sign_out_button);
         button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -239,6 +239,10 @@ public class FriendListActivity extends AppCompatActivity {
         }, 350);
     }
 
+    /**
+     * Assumes that the user is STARTING the meetup
+     * (i.e. no other users have had time to confirm their invitations yet).
+     */
     public void switchToMap(View view) {
         Intent intent = new Intent(FriendListActivity.this, MapActivity.class);
 
@@ -251,9 +255,8 @@ public class FriendListActivity extends AppCompatActivity {
         // Add the meetup to the user's ongoing meetup list
         ref.child("ongoing").child(uid).setValue(uid + date);
 
+        // Send out meetup invitations
         for (final String ouid : selected) {
-            intent.putExtra(ouid, 0);
-
             Query inviteRef = ref.child("invitations");
             inviteRef.addListenerForSingleValueEvent(new ValueEventListener() {
                 @Override
@@ -275,6 +278,7 @@ public class FriendListActivity extends AppCompatActivity {
                 }
             });
         }
+
         intent.putExtra("meetup id", uid + date);
         FriendListActivity.this.startActivity(intent);
     }
