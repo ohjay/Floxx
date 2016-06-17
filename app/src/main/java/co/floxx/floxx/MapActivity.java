@@ -6,6 +6,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentSender;
 import android.content.pm.PackageManager;
+import android.graphics.Color;
 import android.location.Location;
 import android.location.LocationManager;
 import android.os.AsyncTask;
@@ -34,6 +35,7 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapFragment;
 import com.google.android.gms.maps.OnMapReadyCallback;
+import com.google.android.gms.maps.model.BitmapDescriptor;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
@@ -71,6 +73,7 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback,
     private Marker marker, meetingMarker;
     private static HashMap<String, Marker> others = new HashMap<String, Marker>(); // ouid -> oMarker
     private String meetupId = "";
+    private String markerColor = Utility.BLUE_HEX;
 
     /**
      * Whether or not the system UI should be auto-hidden after
@@ -268,6 +271,23 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback,
             }
         });
 
+        // Try and get the user's marker color
+        Query queryRef = ref.child("locns").child(uid);
+        queryRef.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot snapshot) {
+                Double color = (Double) snapshot.child("color").getValue();
+                if (color != null) {
+                    markerColor = "#" + Integer.toHexString(color.intValue());
+                }
+            }
+
+            @Override
+            public void onCancelled(FirebaseError firebaseError) {
+                System.out.println("[getMarkerColor] Read failed: " + firebaseError.getMessage());
+            }
+        });
+
         // TODO (OJ?): If this works, we should probably migrate all locn updates to this service
         LocationUpdateService.startUpdates(this, uid, mGoogleApiClient, mLocationRequest);
     }
@@ -440,7 +460,7 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback,
         if (mLastLocation == null) {
             if (marker != null) { marker.remove(); }
             marker = mMap.addMarker(new MarkerOptions().position(new LatLng(0, 0))
-                    .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE)));
+                    .icon(getBitmapDescriptor(markerColor)));
             marker.showInfoWindow();
         } else {
             LocationManager locationManager =
@@ -450,8 +470,7 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback,
                         locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
                 if (marker != null) { marker.remove(); }
                 marker = mMap.addMarker(new MarkerOptions().position(new LatLng(location.getLatitude(),
-                        location.getLongitude()))
-                        .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE)));
+                        location.getLongitude())).icon(getBitmapDescriptor(markerColor)));
                 marker.showInfoWindow();
             } catch (SecurityException e) {
                 e.printStackTrace(); // lol
@@ -520,14 +539,13 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback,
     // - hide
     // - show
     // - delayedHide
+    // - getBitmapDescriptor (gets a color from a hex string)
     //================================================================================
 
     public void handleNewLocation(Location location) {
         Firebase ref = new Firebase("https://floxx.firebaseio.com/");
-        Map<String, Double> map = new HashMap<String, Double>();
-        map.put("latitude", location.getLatitude());
-        map.put("longitude", location.getLongitude());
-        ref.child("locns").child(ref.getAuth().getUid().toString()).setValue(map);
+        Utility.saveLatLng(ref, ref.getAuth().getUid().toString(),
+                location.getLatitude(), location.getLongitude());
 
         Log.d(TAG, location.toString());
         double currentLatitude = location.getLatitude();
@@ -536,8 +554,7 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback,
         LatLng latLng = new LatLng(currentLatitude, currentLongitude);
 
         MarkerOptions options = new MarkerOptions()
-                .position(latLng)
-                .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE));
+                .position(latLng).icon(getBitmapDescriptor(markerColor));
         if (marker != null) { marker.remove(); }
         marker = mMap.addMarker(options);
         marker.showInfoWindow();
@@ -620,7 +637,7 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback,
     }
 
     private void setOtherMarker(final String ouid, DataSnapshot dataSnapshot) {
-        double olat = -12345, olon = -67890;
+        double olat = -Utility.LAT_INF, olon = -Utility.LON_INF, color = -1.0;
         for (DataSnapshot child : dataSnapshot.getChildren()) {
             switch (child.getKey()) {
                 case "latitude":
@@ -629,16 +646,21 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback,
                 case "longitude":
                     olon = (double) child.getValue();
                     break;
+                case "color":
+                    color = (double) child.getValue();
+                    break;
             }
         }
 
-        if (olat > -12345 && olon > -12345) {
+        if (olat > -Utility.LAT_INF && olon > -Utility.LON_INF) {
             String oName = FriendListActivity.names.get(ouid);
             Marker oMarker = others.get(ouid);
+            String hexStr = (color >= 0.0) ?
+                    "#" + Integer.toHexString((int) color) : Utility.BURGUNDY_HEX;
 
             if (oMarker != null) { oMarker.remove(); }
             oMarker = mMap.addMarker(new MarkerOptions().position(new LatLng(olat,
-                    olon)).title(oName));
+                    olon)).title(oName).icon(getBitmapDescriptor(hexStr)));
             oMarker.showInfoWindow();
             others.put(ouid, oMarker);
         }
@@ -741,5 +763,11 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback,
     private void delayedHide(int delayMillis) {
         mHideHandler.removeCallbacks(mHideRunnable);
         mHideHandler.postDelayed(mHideRunnable, delayMillis);
+    }
+
+    private BitmapDescriptor getBitmapDescriptor(String hexStr) {
+        float[] hsv = new float[3];
+        Color.colorToHSV(Color.parseColor(hexStr), hsv);
+        return BitmapDescriptorFactory.defaultMarker(hsv[0]);
     }
 }

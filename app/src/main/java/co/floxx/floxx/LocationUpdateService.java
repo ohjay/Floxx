@@ -14,9 +14,6 @@ import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
 
-import java.util.HashMap;
-import java.util.Map;
-
 /**
  * An IntentService subclass for sending asynchronous location updates to Firebase
  * on a separate handler thread.
@@ -89,10 +86,6 @@ public class LocationUpdateService extends IntentService implements LocationList
      */
     @Override
     public void onLocationChanged(Location location) {
-        Map<String, Double> map = new HashMap<String, Double>();
-        map.put("latitude", location.getLatitude());
-        map.put("longitude", location.getLongitude());
-
-        ref.child("locns").child(uid).setValue(map);
+        Utility.saveLatLng(ref, uid, location.getLatitude(), location.getLongitude());
     }
 }

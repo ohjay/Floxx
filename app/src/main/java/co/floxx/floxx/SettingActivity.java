@@ -5,14 +5,23 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.annotation.ColorInt;
+import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageButton;
+import android.widget.Toast;
 
+import com.firebase.client.DataSnapshot;
 import com.firebase.client.Firebase;
+import com.firebase.client.FirebaseError;
+import com.firebase.client.Query;
+import com.firebase.client.ValueEventListener;
+import com.thebluealliance.spectrum.SpectrumDialog;
+import com.thebluealliance.spectrum.SpectrumDialog.OnColorSelectedListener;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -22,6 +31,8 @@ import java.util.Map;
 public class SettingActivity extends AppCompatActivity {
     final Context context = this;
     private Firebase ref;
+    private String currentUser;
+    private int selectedColorRes = R.color.md_blue_500;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -71,13 +82,36 @@ public class SettingActivity extends AppCompatActivity {
         Button personalizationButton = (Button) findViewById(R.id.personalize_marker);
         personalizationButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View view) {
-                // Open a dialog/activity and let users choose colors or images?
+                // Open a dialog and let users choose colors for their markers
+                makeColorDialog();
             }
         });
 
         Firebase.setAndroidContext(this);
         ref = new Firebase("https://floxx.firebaseio.com/");
-        final String currentUser = ref.getAuth().getUid().toString();
+        currentUser = ref.getAuth().getUid().toString();
+
+        // Set SELECTED_COLOR_RES if applicable
+        Query queryRef = ref.child("locns").child(currentUser);
+        queryRef.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot snapshot) {
+                Double color = (Double) snapshot.child("color").getValue();
+                if (color != null) {
+                    Utility.initializeResColors();
+                    String hexStr = "#" + Integer.toHexString(color.intValue()).toUpperCase();
+
+                    if (Utility.RES_COLORS.containsKey(hexStr)) {
+                        selectedColorRes = Utility.RES_COLORS.get(hexStr);
+                    }
+                }
+            }
+
+            @Override
+            public void onCancelled(FirebaseError error) {
+                System.out.println("[SettingActivity] Read failed: " + error.getMessage());
+            }
+        });
 
         Button permissionsButton = (Button) findViewById(R.id.locn_permissions_button);
         permissionsButton.setOnClickListener(new View.OnClickListener() {
@@ -114,5 +148,28 @@ public class SettingActivity extends AppCompatActivity {
         Map<String, String> map = new HashMap<String, String>();
         map.put("location", permissionValue);
         ref.child("permissions").child(uid).setValue(map);
+    }
+
+    private void makeColorDialog() {
+        OnColorSelectedListener ocsl = new OnColorSelectedListener() {
+            @Override
+            public void onColorSelected(boolean positiveResult, @ColorInt int color) {
+                if (positiveResult) {
+                    // Save the user's marker color to Firebase
+                    String hexStr = Integer.toHexString(color);
+                    hexStr = "#" + hexStr.substring(hexStr.length() - 6);
+                    Utility.saveColor(ref, currentUser, Integer.parseInt(hexStr.substring(1), 16));
+
+                    Toast.makeText(context, "Color selected: " + hexStr.toUpperCase(),
+                            Toast.LENGTH_SHORT).show();
+                }
+            }
+        };
+
+        FragmentManager fm = getSupportFragmentManager();
+        new SpectrumDialog.Builder(context).setColors(R.array.md_colors)
+                .setSelectedColorRes(selectedColorRes).setDismissOnColorSelected(true)
+                .setOutlineWidth(2).setOnColorSelectedListener(ocsl)
+                .build().show(fm, "color_dialog");
     }
 }
