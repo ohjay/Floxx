@@ -59,7 +59,7 @@ public class FriendListActivity extends AppCompatActivity {
         button1.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                startActivity(new Intent(FriendListActivity.this, SettingActivity.class));
+                startActivity(new Intent(FriendListActivity.this, SettingsActivity.class));
             }
         });
 

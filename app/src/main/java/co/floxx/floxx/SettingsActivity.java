@@ -13,7 +13,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageButton;
-import android.widget.Toast;
 
 import com.firebase.client.DataSnapshot;
 import com.firebase.client.Firebase;
@@ -28,7 +27,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
-public class SettingActivity extends AppCompatActivity {
+public class SettingsActivity extends AppCompatActivity {
     final Context context = this;
     private Firebase ref;
     private String currentUser;
@@ -49,7 +48,7 @@ public class SettingActivity extends AppCompatActivity {
         Button more = (Button) findViewById(R.id.TeaEra);
         more.setOnClickListener(new View.OnClickListener() {
             public void onClick(View view) {
-                AlertDialog alertDialog = new AlertDialog.Builder(SettingActivity.this).create();
+                AlertDialog alertDialog = new AlertDialog.Builder(SettingsActivity.this).create();
                 alertDialog.setTitle("Is Tea Era open today?");
 
                 SimpleDateFormat sdf = new SimpleDateFormat("EEEE");
@@ -74,7 +73,7 @@ public class SettingActivity extends AppCompatActivity {
         Button addFriends = (Button) findViewById(R.id.add_friends);
         addFriends.setOnClickListener(new View.OnClickListener() {
             public void onClick(View view) {
-                Intent intent = new Intent(SettingActivity.this, RequestsActivity.class);
+                Intent intent = new Intent(SettingsActivity.this, RequestsActivity.class);
                 startActivity(intent);
             }
         });
@@ -109,7 +108,7 @@ public class SettingActivity extends AppCompatActivity {
 
             @Override
             public void onCancelled(FirebaseError error) {
-                System.out.println("[SettingActivity] Read failed: " + error.getMessage());
+                System.out.println("[SettingsActivity] Read failed: " + error.getMessage());
             }
         });
 
@@ -160,15 +159,16 @@ public class SettingActivity extends AppCompatActivity {
                     hexStr = "#" + hexStr.substring(hexStr.length() - 6);
                     Utility.saveColor(ref, currentUser, Integer.parseInt(hexStr.substring(1), 16));
 
-                    Toast.makeText(context, "Color selected: " + hexStr.toUpperCase(),
-                            Toast.LENGTH_SHORT).show();
+                    if (Utility.RES_COLORS.containsKey(hexStr.toUpperCase())) {
+                        selectedColorRes = Utility.RES_COLORS.get(hexStr.toUpperCase());
+                    }
                 }
             }
         };
 
         FragmentManager fm = getSupportFragmentManager();
         new SpectrumDialog.Builder(context).setColors(R.array.md_colors)
-                .setSelectedColorRes(selectedColorRes).setDismissOnColorSelected(true)
+                .setSelectedColorRes(selectedColorRes).setDismissOnColorSelected(false)
                 .setOutlineWidth(2).setOnColorSelectedListener(ocsl)
                 .build().show(fm, "color_dialog");
     }
