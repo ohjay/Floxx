@@ -2,6 +2,7 @@ package co.floxx.floxx;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.widget.Toast;
@@ -20,6 +21,8 @@ import java.util.Map;
 public class FirebaseActivity extends AppCompatActivity {
     public static final String OSKI_UID = "07750a2b-0f39-494d-ab19-59a6d3a276cc";
     String euser, epass, rpass, ruser, remail, uid; // "e" for sign in. "r" for registration
+    private String nodots; // REMAIL without dots (so it can be saved as a Firebase key)
+    private boolean emailChecked;
     Firebase ref;
 
     @Override
@@ -42,12 +45,17 @@ public class FirebaseActivity extends AppCompatActivity {
             // User registration
             // To start: check if REMAIL is unique. Used as a deterrent for account creation spam
             // TODO (important): test this!
+
+            emailChecked = false;
+            nodots = remail.substring(0, remail.lastIndexOf("."));
             ref.child("emails").addListenerForSingleValueEvent(new ValueEventListener() {
                 @Override
                 public void onDataChange(DataSnapshot snapshot) {
+                    if (emailChecked) { return; }
+
                     for (DataSnapshot child : snapshot.getChildren()) {
                         final String storedEmail = child.getKey();
-                        if (storedEmail.equals(remail)) {
+                        if (storedEmail.equals(nodots)) {
                             // Exit; we can't have duplicates
                             Intent intent = new Intent(FirebaseActivity.this, RegisterActivity.class);
                             Toast.makeText(FirebaseActivity.this, "Email already in use. :(",
@@ -56,6 +64,8 @@ public class FirebaseActivity extends AppCompatActivity {
                             return;
                         }
                     }
+
+                    emailChecked = true;
                 }
 
                 @Override
@@ -64,64 +74,7 @@ public class FirebaseActivity extends AppCompatActivity {
                 }
             });
 
-            // TODO: Send confirmation email to REMAIL
-            // User should not be fully registered until he/she confirms
-
-            String email = ruser + "@gmail.com"; // this doesn't need to change (- Owen 5/30)
-            Log.i(email, "should be registering this");
-            ref.createUser(email, rpass, new Firebase.ValueResultHandler<Map<String, Object>>() {
-                @Override
-                public void onSuccess(Map<String, Object> result) {
-                    uid = result.get("uid").toString();
-                    System.out.println("Successfully created user account with uid: " + uid);
-                    Toast.makeText(FirebaseActivity.this, "You were able to register!", Toast.LENGTH_LONG).show();
-
-                    // Add the username and UID to Firebase
-                    Map<String, Object> uidMap = new HashMap<String, Object>();
-                    uidMap.put(ruser, uid);
-                    ref.child("uids").updateChildren(uidMap);
-
-                    // Check for Oski, friend to everyone
-                    Query queryRef = ref.child("uids").orderByValue().equalTo(OSKI_UID);
-                    queryRef.addListenerForSingleValueEvent(new ValueEventListener() {
-                        @Override
-                        public void onDataChange(DataSnapshot dataSnapshot) {
-                            Object oskId = dataSnapshot.child("oski").getValue();
-                            if (oskId == null) {
-                                // He doesn't exist, so we'll create him
-                                createOski(uid);
-                            } else {
-                                String oskiUID = oskId.toString();
-                                // Add the new user to Oski's friend base
-                                addToFriends(uid, oskiUID, ref);
-                                // Add Oski to the new user's friend base
-                                addToFriends(oskiUID, uid, ref);
-                            }
-                        }
-
-                        @Override
-                        public void onCancelled(FirebaseError firebaseError) {
-                            // We can do something here if we want
-                        }
-                    });
-
-                    // Save REMAIL to Firebase along with associated UID
-                    Map<String, Object> emailMap = new HashMap<String, Object>();
-                    emailMap.put(remail, uid);
-                    ref.child("emails").updateChildren(emailMap);
-                }
-
-                @Override
-                public void onError(FirebaseError firebaseError) {
-                    String message = firebaseError.getMessage();
-                    if (message.startsWith("The specified email address is already in use")) {
-                        message = "The specified username is already in use.";
-                    }
-                    Toast.makeText(FirebaseActivity.this, message, Toast.LENGTH_LONG).show();
-                }
-            });
-            intent = new Intent(FirebaseActivity.this, FullscreenActivity.class);
-            FirebaseActivity.this.startActivity(intent);
+            blockUntilEmailChecked();
         } else {
             // Login with an existing account
             String email1 = euser + "@gmail.com";
@@ -140,6 +93,80 @@ public class FirebaseActivity extends AppCompatActivity {
                 }
             });
         }
+    }
+
+    private void finishRegistration() {
+        // TODO: Send confirmation email to REMAIL
+        // User should not be fully registered until he/she confirms
+
+        String email = ruser + "@gmail.com"; // this doesn't need to change (- Owen 5/30)
+        Log.i(email, "should be registering this");
+        ref.createUser(email, rpass, new Firebase.ValueResultHandler<Map<String, Object>>() {
+            @Override
+            public void onSuccess(Map<String, Object> result) {
+                uid = result.get("uid").toString();
+                System.out.println("Successfully created user account with uid: " + uid);
+                Toast.makeText(FirebaseActivity.this, "You were able to register!", Toast.LENGTH_LONG).show();
+
+                // Add the username and UID to Firebase
+                Map<String, Object> uidMap = new HashMap<String, Object>();
+                uidMap.put(ruser, uid);
+                ref.child("uids").updateChildren(uidMap);
+
+                // Check for Oski, friend to everyone
+                Query queryRef = ref.child("uids").orderByValue().equalTo(OSKI_UID);
+                queryRef.addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(DataSnapshot dataSnapshot) {
+                        Object oskId = dataSnapshot.child("oski").getValue();
+                        if (oskId == null) {
+                            // He doesn't exist, so we'll create him
+                            createOski(uid);
+                        } else {
+                            String oskiUID = oskId.toString();
+                            // Add the new user to Oski's friend base
+                            addToFriends(uid, oskiUID, ref);
+                            // Add Oski to the new user's friend base
+                            addToFriends(oskiUID, uid, ref);
+                        }
+                    }
+
+                    @Override
+                    public void onCancelled(FirebaseError firebaseError) {
+                        // We can do something here if we want
+                    }
+                });
+
+                // Save REMAIL to Firebase along with associated UID
+                Map<String, Object> emailMap = new HashMap<String, Object>();
+                emailMap.put(nodots, uid);
+                ref.child("emails").updateChildren(emailMap);
+            }
+
+            @Override
+            public void onError(FirebaseError firebaseError) {
+                String message = firebaseError.getMessage();
+                if (message.startsWith("The specified email address is already in use")) {
+                    message = "The specified username is already in use.";
+                }
+                Toast.makeText(FirebaseActivity.this, message, Toast.LENGTH_LONG).show();
+            }
+        });
+        Intent intent = new Intent(FirebaseActivity.this, FullscreenActivity.class);
+        FirebaseActivity.this.startActivity(intent);
+    }
+
+    private void blockUntilEmailChecked() {
+        new Handler().postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                if (emailChecked) {
+                    finishRegistration();
+                } else {
+                    blockUntilEmailChecked();
+                }
+            }
+        }, 500);
     }
 
     /**

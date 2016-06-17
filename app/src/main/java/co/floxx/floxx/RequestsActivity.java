@@ -11,6 +11,7 @@ import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.SearchView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.firebase.client.DataSnapshot;
 import com.firebase.client.Firebase;
@@ -128,6 +129,9 @@ public class RequestsActivity extends AppCompatActivity {
         addFriend(senderID, recipientID);
         addFriend(recipientID, senderID);
         delayedDestroyRequest(senderID, recipientID);
+
+        String confirmation = FriendListActivity.names.get(senderID) + " is now your friend!";
+        Toast.makeText(RequestsActivity.this, confirmation, Toast.LENGTH_LONG).show();
     }
 
     private void delayedDestroyRequest(final String senderID, final String recipientID) {
@@ -179,7 +183,9 @@ public class RequestsActivity extends AppCompatActivity {
     }
 
     private void declineRequest(String senderID, String recipientID) {
-        destroyRequest(senderID, recipientID); // this is all we'll do... for now
+        destroyRequest(senderID, recipientID);
+        String confirmation = FriendListActivity.names.get(senderID) + "'s request has been declined.";
+        Toast.makeText(RequestsActivity.this, confirmation, Toast.LENGTH_LONG).show();
     }
 
     private void destroyRequest(final String senderID, final String recipientID) {

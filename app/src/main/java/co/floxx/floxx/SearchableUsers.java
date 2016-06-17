@@ -18,6 +18,7 @@ import android.widget.ListView;
 import android.widget.SearchView;
 import android.widget.SearchView.OnQueryTextListener;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.firebase.client.DataSnapshot;
 import com.firebase.client.Firebase;
@@ -263,6 +264,7 @@ public class SearchableUsers extends Activity {
                 ArrayList<String> friends, requests;
 
                 // First, we'll grab the user's current friend/request lists
+                // Note (- Owen 6/16): we grab the friend list so that it doesn't get erased
                 Object result = dataSnapshot.child(recipientID).child("friends").getValue();
                 friends = (result == null) ? new ArrayList<String>() : (ArrayList<String>) result;
                 result = dataSnapshot.child(recipientID).child("requests").getValue();
@@ -274,6 +276,12 @@ public class SearchableUsers extends Activity {
                     map.put("friends", friends);
                     map.put("requests", requests);
                     ref.child("users").child(recipientID).setValue(map);
+
+                    String confirmation = "Your invitation has been sent!";
+                    Toast.makeText(SearchableUsers.this, confirmation, Toast.LENGTH_LONG).show();
+                } else {
+                    String confirmation = "You've already sent " + username + " an invitation!";
+                    Toast.makeText(SearchableUsers.this, confirmation, Toast.LENGTH_LONG).show();
                 }
             }
 
