@@ -81,19 +81,4 @@
                 android:textColor="#fff" />
         </RelativeLayout>
     </LinearLayout>
-
-    <!--<FrameLayout-->
-        <!--android:layout_width="match_parent"-->
-        <!--android:layout_height="match_parent"-->
-        <!--android:fitsSystemWindows="true">-->
-        <!--<ImageButton android:id="@+id/setting_logo"-->
-            <!--android:src="@drawable/setting_icon"-->
-            <!--android:layout_width="150dp"-->
-            <!--android:layout_height="150dp"-->
-            <!--android:scaleType="fitXY"-->
-            <!--android:layout_marginLeft="140dp"-->
-            <!--android:layout_marginTop="-10dp"-->
-            <!--android:layout_gravity="center|right"-->
-            <!--android:background="@null"/>-->
-    <!--</FrameLayout>-->
 </RelativeLayout>

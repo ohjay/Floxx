@@ -7,16 +7,12 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.ImageButton;
 import android.widget.TextView;
 
-import com.facebook.FacebookSdk;
 import com.firebase.client.Firebase;
 
-
 /**
- * An example full-screen activity that shows and hides the system UI (i.e.
- * status bar and navigation/system bar) with user interaction.
+ * The full-screen activity that serves as Floxx's splash page.
  */
 public class FullscreenActivity extends AppCompatActivity {
 
@@ -25,10 +21,8 @@ public class FullscreenActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
 
         Firebase.setAndroidContext(this);
-        FacebookSdk.sdkInitialize(getApplicationContext());
 
         setContentView(R.layout.activity_fullscreen);
-        EditText password =(EditText)findViewById(R.id.enter_password);
         final EditText password1 = (EditText) findViewById(R.id.enter_password);
 
         // Cool fonts let's go!
@@ -46,7 +40,6 @@ public class FullscreenActivity extends AppCompatActivity {
         Button button = (Button)findViewById(R.id.log_in_button);
         final Bundle extras = new Bundle();
         final EditText username1 = (EditText) findViewById(R.id.enter_username);
-        // sendingSetting();
         registerAccount();
         button.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -61,16 +54,6 @@ public class FullscreenActivity extends AppCompatActivity {
             }
         });
 
-    }
-
-    public void sendingSetting() {
-        ImageButton button = (ImageButton) findViewById(R.id.setting_logo);
-        button.setOnClickListener(new View.OnClickListener(){
-            @Override
-            public void onClick(View v) {
-                startActivity(new Intent(FullscreenActivity.this, SettingActivity.class));
-            }
-        });
     }
 
     public void registerAccount() {

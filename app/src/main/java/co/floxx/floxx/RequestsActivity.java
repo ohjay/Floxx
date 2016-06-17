@@ -94,7 +94,7 @@ public class RequestsActivity extends AppCompatActivity {
 
                     // Setting up the decline button
                     ImageButton declineButton = new ImageButton(context);
-                    declineButton.setImageResource(R.drawable.com_facebook_close);
+                    declineButton.setImageResource(R.drawable.ic_media_route_off_mono_dark);
                     declineButton.setOnClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(View v) {
