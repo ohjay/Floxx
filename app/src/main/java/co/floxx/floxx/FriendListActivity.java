@@ -37,6 +37,12 @@ public class FriendListActivity extends AppCompatActivity {
     private static final int GOLD = Color.parseColor("#ffde00");
 
     @Override
+    protected void onResume() {
+        super.onResume();
+        resetSelected();
+    }
+
+    @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         thisList = this;
@@ -58,8 +64,6 @@ public class FriendListActivity extends AppCompatActivity {
         });
 
         names.put(FirebaseActivity.OSKI_UID, "oski"); // just to be comprehensive
-
-        // TODO: find some way to clear the SELECTED set every time the view loads
 
         Firebase.setAndroidContext(this);
         ref = new Firebase("https://floxx.firebaseio.com/");
@@ -300,5 +304,14 @@ public class FriendListActivity extends AppCompatActivity {
                 System.out.println("[FriendListActivity] Read error: " + error.getMessage());
             }
         });
+    }
+
+    private void resetSelected() {
+        selected.clear();
+        LinearLayout buttonContainer = (LinearLayout) findViewById(R.id.button_container);
+        int numChildren = buttonContainer.getChildCount();
+        for (int i = 0; i < numChildren; ++i) {
+            buttonContainer.getChildAt(i).getBackground().clearColorFilter();
+        }
     }
 }
