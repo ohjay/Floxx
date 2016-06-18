@@ -5,9 +5,6 @@
     android:background="#0099cc"
     tools:context="co.floxx.floxx.MapActivity">
 
-    <!-- The primary full-screen view. This can be replaced with whatever view
-         is needed to present your content, e.g. VideoView, SurfaceView,
-         TextureView, etc. -->
     <TextView
         android:id="@+id/fullscreen_content"
         android:layout_width="match_parent"
@@ -23,10 +20,8 @@
         class="com.google.android.gms.maps.MapFragment"
         android:id="@+id/map"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"/>
+        android:layout_height="match_parent" />
 
-    <!-- This FrameLayout insets its children based on system windows using
-         android:fitsSystemWindows. -->
     <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -52,5 +47,20 @@
 
         </LinearLayout>
     </FrameLayout>
+
+    <View
+        android:id="@+id/myRectangleView"
+        android:layout_gravity="end|bottom"
+        android:layout_width="fill_parent"
+        android:layout_height="50dp"
+        android:background="@drawable/transrect" />
+
+    <TextView
+        android:id="@+id/eta_text"
+        android:layout_width="wrap_content"
+        android:layout_height="35dp"
+        android:layout_gravity="center_horizontal|bottom"
+        android:text="@string/eta_default"
+        android:textColor="@color/white" />
 
 </FrameLayout>

@@ -21,4 +21,5 @@
     <string name="confirm_pw_prompt">Confirm your password</string>
     <string name="register_button">Register</string>
     <string name="portal_greeting">Meetup Portal</string>
+    <string name="eta_default">Waiting for a meeting marker to be placed...</string>
 </resources>

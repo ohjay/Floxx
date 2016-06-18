@@ -20,6 +20,7 @@ import android.support.v4.content.ContextCompat;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
+import android.widget.TextView;
 
 import com.firebase.client.DataSnapshot;
 import com.firebase.client.Firebase;
@@ -51,6 +52,7 @@ import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
@@ -74,6 +76,7 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback,
     private static HashMap<String, Marker> others = new HashMap<String, Marker>(); // ouid -> oMarker
     private String meetupId = "";
     private String markerColor = Utility.BLUE_HEX;
+    private HashMap<String, Integer> etas = new HashMap<String, Integer>();
 
     /**
      * Whether or not the system UI should be auto-hidden after
@@ -720,8 +723,13 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback,
                 Marker oMarker = others.get(p.ouid);
                 if (oMarker == null) { return; }
 
-                oMarker.setSnippet(String.valueOf((int) (miDist / 0.45)) + " min (" + miDist + " mi)");
+                int eta = (int) (miDist / 0.45);
+                oMarker.setSnippet(String.valueOf(eta) + " min (" + miDist + " mi)");
                 // ^TODO: fix this. Currently saving API calls by assuming everyone travels @ 27 mph
+
+                etas.put(p.ouid, eta);
+                TextView etatv = (TextView) findViewById(R.id.eta_text);
+                etatv.setText("ETA: " + Collections.max(etas.values()) + " min");
             }
         }
     }
