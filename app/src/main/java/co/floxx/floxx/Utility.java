@@ -6,6 +6,7 @@ import com.firebase.client.FirebaseError;
 import com.firebase.client.Query;
 import com.firebase.client.ValueEventListener;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -91,6 +92,31 @@ public class Utility {
             @Override
             public void onCancelled(FirebaseError firebaseError) {
                 System.out.println("[saveColor] Read failed: " + firebaseError.getMessage());
+            }
+        });
+    }
+
+    /**
+     * Leaves the meetup. Enough said...
+     */
+    public static void leave(final String meetupId, final Firebase ref, final String uid) {
+        ref.child("ongoing").child(uid).setValue(null);
+
+        Query meetupsRef = ref.child("meetups").child(meetupId).child("confirmed");
+        meetupsRef.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot snapshot) {
+                ArrayList<String> confirmed = (ArrayList<String>) snapshot.getValue();
+                if (confirmed != null) {
+                    confirmed.remove(uid);
+                }
+
+                ref.child("meetups").child(meetupId).child("confirmed").setValue(confirmed);
+            }
+
+            @Override
+            public void onCancelled(FirebaseError firebaseError) {
+                System.out.println("[MeetupPortalActivity] Error: " + firebaseError.getMessage());
             }
         });
     }

@@ -42,6 +42,12 @@ public class FirebaseActivity extends AppCompatActivity {
         rpass = extras.getString("register_password");
 
         if (euser == null) {
+            if (!isEmailValid(remail)) {
+                Toast.makeText(this, "Invalid email!", Toast.LENGTH_LONG).show();
+                finish();
+                return; // not sure if this is necessary, but it won't hurt
+            }
+
             // User registration
             // To start: check if REMAIL is unique. Used as a deterrent for account creation spam
             // TODO (important): test this!
@@ -276,5 +282,18 @@ public class FirebaseActivity extends AppCompatActivity {
                 // We can do something here if we want
             }
         });
+    }
+
+    /**
+     * Checks whether or not an email is valid.
+     * @param target an email
+     * @return true if the email is of a legitimate form
+     */
+    public static boolean isEmailValid(CharSequence target) {
+        if (target == null) {
+            return false;
+        }
+
+        return android.util.Patterns.EMAIL_ADDRESS.matcher(target).matches();
     }
 }

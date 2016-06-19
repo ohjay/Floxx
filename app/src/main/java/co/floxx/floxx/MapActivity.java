@@ -774,6 +774,15 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback,
                             new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT,
                             LinearLayout.LayoutParams.WRAP_CONTENT);
                     ll.addView(leaveButton, lp);
+
+                    leaveButton.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View view) {
+                            Firebase ref = new Firebase("https://floxx.firebaseio.com/");
+                            Utility.leave(meetupId, ref, ref.getAuth().getUid());
+                            startActivity(new Intent(MapActivity.this, FriendListActivity.class));
+                        }
+                    });
                     leaveButtonExists = true;
                 } else {
                     if (leaveButtonExists) {
