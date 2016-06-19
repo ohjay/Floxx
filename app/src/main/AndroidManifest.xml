@@ -65,9 +65,8 @@
         </activity>
         <activity android:name=".MeetupPortalActivity" />
 
-        <service
-            android:name=".LocationUpdateService"
-            android:exported="false"></service>
+        <service android:name=".LocationUpdateService"
+            android:permission="android.permission.BIND_JOB_SERVICE"></service>
     </application>
 
 </manifest>

@@ -2,13 +2,11 @@
 TODO (ESSENTIAL)
 ----------------
 1. List hidden users somewhere on the map. [1 hr]
-2. Get the phone to send location updates even while asleep. [1 hr]
-3. Make changes take effect immediately (e.g. if a friend request is accepted, I want to see updates NOW). Reload things when you press the back button. [3 hrs] /OWEN
-4. Send email confirmations during registration. [2 hrs] /RICHARD
-5. Fix portrait/landscape transition (or, alternatively, restrict to portrait). [1 hr]
-6. Fix the app UI/layout...! [14 hrs]
+2. Make changes take effect immediately (e.g. if a friend request is accepted, I want to see updates NOW). Reload things when you press the back button. [3 hrs] /OWEN
+3. Send email confirmations during registration. [2 hrs] /RICHARD
+4. Fix the app UI/layout...! [14 hrs]
 
-// Total: 22 hrs
+// Total: 20 hrs
 * Time estimates = (Owen's original call) x 2
 
 ----------------------------
@@ -29,3 +27,4 @@ LAYOUTS/UX TO UPGRADE
 5. Features (formerly "Settings") interface. Convert to user portal (!?)
 6. Transition screens
 7. Meetup portal interface
+8. Portrait/landscape transition (/restrict to portrait?)

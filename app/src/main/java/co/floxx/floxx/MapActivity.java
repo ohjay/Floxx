@@ -2,6 +2,9 @@ package co.floxx.floxx;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
+import android.app.job.JobInfo;
+import android.app.job.JobScheduler;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentSender;
@@ -12,6 +15,7 @@ import android.location.LocationManager;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.PersistableBundle;
 import android.support.annotation.NonNull;
 import android.support.multidex.MultiDex;
 import android.support.v4.app.ActivityCompat;
@@ -81,6 +85,7 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback,
     private HashMap<String, Integer> etas = new HashMap<String, Integer>();
     private HashMap<String, Boolean> permissions = new HashMap<String, Boolean>();
     private boolean leaveButtonExists;
+    private final static int M_JOB_ID = 21;
 
     /**
      * Whether or not the system UI should be auto-hidden after
@@ -301,7 +306,17 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback,
         });
 
         // TODO (OJ?): If this works, we should probably migrate all locn updates to this service
-        LocationUpdateService.startUpdates(this, uid, mGoogleApiClient, mLocationRequest);
+        ComponentName mServiceComponent = new ComponentName(this, LocationUpdateService.class);
+        PersistableBundle bundle = new PersistableBundle();
+        bundle.putString("uid", uid);
+
+        JobInfo locnUpdateTask = new JobInfo.Builder(M_JOB_ID, mServiceComponent)
+                .setRequiresCharging(false)
+                .setRequiredNetworkType(JobInfo.NETWORK_TYPE_ANY)
+                .setExtras(bundle)
+                .build();
+        JobScheduler jobScheduler = (JobScheduler) this.getSystemService(Context.JOB_SCHEDULER_SERVICE);
+        jobScheduler.schedule(locnUpdateTask);
     }
 
     @Override

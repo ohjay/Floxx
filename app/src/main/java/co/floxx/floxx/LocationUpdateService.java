@@ -1,14 +1,18 @@
 package co.floxx.floxx;
 
 import android.Manifest;
-import android.app.IntentService;
-import android.content.Context;
-import android.content.Intent;
+import android.app.job.JobParameters;
+import android.app.job.JobService;
 import android.content.pm.PackageManager;
 import android.location.Location;
+import android.os.Bundle;
+import android.os.PersistableBundle;
+import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
+import android.util.Log;
 
 import com.firebase.client.Firebase;
+import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.LocationRequest;
@@ -19,65 +23,95 @@ import com.google.android.gms.location.LocationServices;
  * on a separate handler thread.
  * @author owenjow
  */
-public class LocationUpdateService extends IntentService implements LocationListener {
-    private static final String START_LOCN_UPDATES = "co.floxx.floxx.action.SLU";
+public class LocationUpdateService extends JobService implements LocationListener,
+        GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
     private static Firebase ref;
     private static GoogleApiClient mGoogleApiClient;
     private static LocationRequest mLocationRequest;
     private static String uid;
-
-    public LocationUpdateService() {
-        super("LocationUpdateService");
-    }
+    private static boolean isMakingRequests;
+    public static final String TAG = LocationUpdateService.class.getSimpleName();
 
     /**
      * Starts a service to continually update user UID's Firebase location. If
      * the service is already performing a task this action will be queued.
      */
-    public static void startUpdates(Context context, String uid,
-            GoogleApiClient mGoogleApiClient, LocationRequest mLocationRequest) {
-        ref = new Firebase("https://floxx.firebaseio.com/");
-        LocationUpdateService.mGoogleApiClient = mGoogleApiClient;
-        LocationUpdateService.mLocationRequest = mLocationRequest;
-        LocationUpdateService.uid = uid;
+    @Override
+    public boolean onStartJob(JobParameters params) {
+        PersistableBundle extras = params.getExtras();
+        isMakingRequests = false;
 
-        Intent intent = new Intent(context, LocationUpdateService.class);
-        intent.setAction(START_LOCN_UPDATES);
-        context.startService(intent);
+        ref = new Firebase("https://floxx.firebaseio.com/");
+        mGoogleApiClient = new GoogleApiClient.Builder(this)
+                .addConnectionCallbacks(this)
+                .addOnConnectionFailedListener(this)
+                .addApi(LocationServices.API)
+                .build();
+        mLocationRequest = LocationRequest.create()
+                .setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY)
+                .setInterval(10 * 1000)
+                .setFastestInterval(1000);
+        LocationUpdateService.uid = (String) extras.get("uid");
+
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
+                != PackageManager.PERMISSION_GRANTED
+                && ActivityCompat.checkSelfPermission(this,
+                Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            return false;
+        }
+
+        // Try to connect mGoogleApiClient
+        for (int i = 0; i < 3; i++) {
+            try {
+                mGoogleApiClient.connect();
+                if (isMakingRequests || mGoogleApiClient.isConnected()) {
+                    break;
+                }
+
+                Thread.sleep(3500);
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+            }
+        }
+
+        if (!isMakingRequests && mGoogleApiClient.isConnected()) {
+            LocationServices.FusedLocationApi.requestLocationUpdates(
+                    mGoogleApiClient, mLocationRequest, this);
+            isMakingRequests = true;
+        }
+
+        return true; // supposedly I need to call jobFinished
     }
 
     @Override
-    protected void onHandleIntent(Intent intent) {
-        if (intent != null) {
-            final String action = intent.getAction();
-            if (START_LOCN_UPDATES.equals(action)) {
-                if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
-                        != PackageManager.PERMISSION_GRANTED
-                        && ActivityCompat.checkSelfPermission(this,
-                        Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-                    return;
-                }
+    public boolean onStopJob(JobParameters params) {
+        return false;
+    }
 
-                // Try to connect mGoogleApiClient
-                for (int i = 0; i < 3; i++) {
-                    try {
-                        mGoogleApiClient.connect();
-                        if (mGoogleApiClient.isConnected()) {
-                            break;
-                        }
-
-                        Thread.sleep(3500);
-                    } catch (InterruptedException e) {
-                        Thread.currentThread().interrupt();
-                    }
-                }
-
-                if (mGoogleApiClient.isConnected()) {
-                    LocationServices.FusedLocationApi.requestLocationUpdates(
-                            mGoogleApiClient, mLocationRequest, this);
-                }
-            }
+    @Override
+    public void onConnected(Bundle connectionHint) {
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
+                != PackageManager.PERMISSION_GRANTED
+                && ActivityCompat.checkSelfPermission(this,
+                Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED
+                || isMakingRequests) {
+            return;
         }
+
+        LocationServices.FusedLocationApi.requestLocationUpdates(
+                mGoogleApiClient, mLocationRequest, this);
+        isMakingRequests = true;
+    }
+
+    @Override
+    public void onConnectionSuspended(int i) {
+        Log.i(TAG, "Location services suspended.");
+    }
+
+    @Override
+    public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
+        Log.i(TAG, "Location services connection failed with code "
+                + connectionResult.getErrorCode());
     }
 
     /**
