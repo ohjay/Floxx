@@ -141,6 +141,9 @@ public class FirebaseActivity extends AppCompatActivity {
                 Map<String, Object> emailMap = new HashMap<String, Object>();
                 emailMap.put(nodots, uid);
                 ref.child("emails").updateChildren(emailMap);
+
+                // Default the user's location permissions to "on" (sorry Tony)
+                ref.child("permissions").child(uid).child("location").setValue("on");
             }
 
             @Override

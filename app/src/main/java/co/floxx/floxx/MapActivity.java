@@ -20,6 +20,8 @@ import android.support.v4.content.ContextCompat;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
+import android.widget.Button;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.firebase.client.DataSnapshot;
@@ -73,10 +75,12 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback,
     private GoogleMap mMap;
     private Location mLastLocation;
     private Marker marker, meetingMarker;
-    private static HashMap<String, Marker> others = new HashMap<String, Marker>(); // ouid -> oMarker
+    private HashMap<String, Marker> others = new HashMap<String, Marker>(); // ouid -> oMarker
     private String meetupId = "";
     private String markerColor = Utility.BLUE_HEX;
     private HashMap<String, Integer> etas = new HashMap<String, Integer>();
+    private HashMap<String, Boolean> permissions = new HashMap<String, Boolean>();
+    private boolean leaveButtonExists;
 
     /**
      * Whether or not the system UI should be auto-hidden after
@@ -187,6 +191,8 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback,
         for (String ouid : intent.getExtras().keySet()) {
             if (ouid != "meetup id") {
                 others.put(ouid, null);
+                setPermissionListener(ouid);
+                permissions.put(ouid, false); // just for you Tony
             }
         }
         meetupId = intent.getStringExtra("meetup id");
@@ -248,7 +254,7 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback,
             }
         });
 
-        final String uid = ref.getAuth().getUid().toString();
+        final String uid = ref.getAuth().getUid();
 
         // Setting a data listener on the confirmed meetup users
         Firebase confRef = new Firebase("https://floxx.firebaseio.com/meetups/" + meetupId + "/confirmed");
@@ -263,6 +269,9 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback,
                 for (String ouid : confirmed) {
                     if (!ouid.equals(uid) && !veterans.contains(ouid)) {
                         others.put(ouid, null);
+                        setPermissionListener(ouid);
+                        permissions.put(ouid, false);
+
                         setOtherMarkerFull(ouid, ref);
                     }
                 }
@@ -545,6 +554,7 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback,
     // - show
     // - delayedHide
     // - getBitmapDescriptor (gets a color from a hex string)
+    // - setPermissionListener (sets a listener for some user's location permissions)
     //================================================================================
 
     public void handleNewLocation(Location location) {
@@ -664,10 +674,12 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback,
                     "#" + Integer.toHexString((int) color) : Utility.BURGUNDY_HEX;
 
             if (oMarker != null) { oMarker.remove(); }
-            oMarker = mMap.addMarker(new MarkerOptions().position(new LatLng(olat,
-                    olon)).title(oName).icon(getBitmapDescriptor(hexStr)));
-            oMarker.showInfoWindow();
-            others.put(ouid, oMarker);
+            if (permissions.get(ouid)) { // some users just want to be hidden
+                oMarker = mMap.addMarker(new MarkerOptions().position(new LatLng(olat,
+                        olon)).title(oName).icon(getBitmapDescriptor(hexStr)));
+                oMarker.showInfoWindow();
+                others.put(ouid, oMarker);
+            }
         }
     }
 
@@ -730,8 +742,32 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback,
                 // ^TODO: fix this. Currently saving API calls by assuming everyone travels @ 27 mph
 
                 etas.put(p.ouid, eta);
+                int collectiveETA = Collections.max(etas.values());
+                String etaMsg = "ETA: " + collectiveETA + " min";
+
                 TextView etatv = (TextView) findViewById(R.id.eta_text);
-                etatv.setText("ETA: " + Collections.max(etas.values()) + " min");
+                if (collectiveETA <= 1) {
+                    // Consider the meetup effectively "concluded"
+                    etaMsg += " (...move the marker?)";
+                    etatv.setText(etaMsg);
+
+                    Button leaveButton = new Button(MapActivity.this);
+                    leaveButton.setText("Leave");
+
+                    LinearLayout ll = (LinearLayout) findViewById(R.id.lb_container);
+                    LinearLayout.LayoutParams lp =
+                            new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT,
+                            LinearLayout.LayoutParams.WRAP_CONTENT);
+                    ll.addView(leaveButton, lp);
+                    leaveButtonExists = true;
+                } else {
+                    if (leaveButtonExists) {
+                        ((LinearLayout) findViewById(R.id.lb_container)).removeAllViews();
+                        leaveButtonExists = false;
+                    }
+
+                    etatv.setText(etaMsg);
+                }
             }
         }
     }
@@ -779,5 +815,33 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback,
         float[] hsv = new float[3];
         Color.colorToHSV(Color.parseColor(hexStr), hsv);
         return BitmapDescriptorFactory.defaultMarker(hsv[0]);
+    }
+
+    private void setPermissionListener(final String uid) {
+        final Firebase plRef = new Firebase("https://floxx.firebaseio.com/permissions/" + uid);
+        plRef.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot snapshot) {
+                if (!snapshot.exists()) {
+                    plRef.child("permissions").child(uid).child("location").setValue("on");
+                    permissions.put(uid, true);
+                    return;
+                }
+
+                switch((String) snapshot.child("location").getValue()) {
+                    case "on":
+                        permissions.put(uid, true);
+                        break;
+                    case "off":
+                        permissions.put(uid, false);
+                        break;
+                }
+            }
+
+            @Override
+            public void onCancelled(FirebaseError e) {
+                System.out.println("[setPermissionListener] Read failed: " + e.getMessage());
+            }
+        });
     }
 }

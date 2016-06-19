@@ -1,14 +1,14 @@
 ----------------
 TODO (ESSENTIAL)
 ----------------
-1. Allow the meetup creator to "conclude" the meetup. Otherwise, if all users are close enough together we'll also consider the meetup concluded. At this point, freeze the map and display a prompt allowing users to exit. [2 hrs] /OWEN
-2. Hide users who have location permissions set to "off". List hidden users somewhere on the map. Display their ETAs (just not distances or precise locations) anyway. [2 hrs]
-3. Make changes take effect immediately (e.g. if a friend request is accepted, I want to see updates NOW). Figure out how to reload things when you press the back button. [4 hrs] /OWEN
+1. List hidden users somewhere on the map. [1 hr]
+2. Get the phone to send location updates even while asleep. [1 hr]
+3. Make changes take effect immediately (e.g. if a friend request is accepted, I want to see updates NOW). Reload things when you press the back button. [3 hrs] /OWEN
 4. Send email confirmations during registration. [2 hrs] /RICHARD
 5. Fix portrait/landscape transition (or, alternatively, restrict to portrait). [1 hr]
 6. Fix the app UI/layout...! [14 hrs]
 
-// Total: 25 hrs
+// Total: 22 hrs
 * Time estimates = (Owen's original call) x 2
 
 ----------------------------
