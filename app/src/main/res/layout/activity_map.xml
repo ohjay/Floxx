@@ -49,7 +49,7 @@
     </FrameLayout>
 
     <View
-        android:id="@+id/myRectangleView"
+        android:id="@+id/rectangleView"
         android:layout_gravity="end|bottom"
         android:layout_width="fill_parent"
         android:layout_height="50dp"

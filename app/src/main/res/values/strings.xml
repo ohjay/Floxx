@@ -22,4 +22,5 @@
     <string name="register_button">Register</string>
     <string name="portal_greeting">Meetup Portal</string>
     <string name="eta_default">Waiting for a meeting marker to be placed...</string>
+    <string name="leave_content">Leave meetup</string>
 </resources>

@@ -298,8 +298,10 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback,
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
-        mMap.setMapType(GoogleMap.MAP_TYPE_HYBRID);
         if (mMap != null) {
+            mMap.setMapType(GoogleMap.MAP_TYPE_HYBRID);
+            mMap.setPadding(0, 0, 0, findViewById(R.id.rectangleView).getHeight());
+
             setUpMap();
             mMap.setOnMapClickListener(this);
             mMap.setOnMarkerDragListener(this);

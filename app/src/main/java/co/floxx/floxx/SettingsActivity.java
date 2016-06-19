@@ -88,7 +88,7 @@ public class SettingsActivity extends AppCompatActivity {
 
         Firebase.setAndroidContext(this);
         ref = new Firebase("https://floxx.firebaseio.com/");
-        currentUser = ref.getAuth().getUid().toString();
+        currentUser = ref.getAuth().getUid();
 
         // Set SELECTED_COLOR_RES if applicable
         Query queryRef = ref.child("locns").child(currentUser);
