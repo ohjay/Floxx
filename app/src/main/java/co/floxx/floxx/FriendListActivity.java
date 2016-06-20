@@ -72,6 +72,10 @@ public class FriendListActivity extends AppCompatActivity {
         initializeNames();
         updateMeetupParticipants();
 
+        final LinearLayout ll = (LinearLayout) findViewById(R.id.button_container);
+        final LayoutParams lp = new LayoutParams(LayoutParams.MATCH_PARENT,
+                LayoutParams.WRAP_CONTENT);
+
         Query queryRef = ref.child("users").orderByKey().equalTo(uid);
         queryRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
@@ -93,10 +97,6 @@ public class FriendListActivity extends AppCompatActivity {
                             public void onDataChange(DataSnapshot dataSnapshot) {
                                 for (DataSnapshot child : dataSnapshot.getChildren()) {
                                     b.setText(child.getKey());
-
-                                    LinearLayout ll = (LinearLayout) findViewById(R.id.button_container);
-                                    LayoutParams lp = new LayoutParams(LayoutParams.MATCH_PARENT,
-                                            LayoutParams.WRAP_CONTENT);
                                     ll.addView(b, lp);
 
                                     b.setOnClickListener(new View.OnClickListener() {

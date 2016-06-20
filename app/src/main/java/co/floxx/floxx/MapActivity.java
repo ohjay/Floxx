@@ -26,6 +26,7 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Button;
 import android.widget.LinearLayout;
+import android.widget.ScrollView;
 import android.widget.TextView;
 
 import com.firebase.client.DataSnapshot;
@@ -86,6 +87,8 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback,
     private HashMap<String, Boolean> permissions = new HashMap<String, Boolean>();
     private boolean leaveButtonExists;
     private final static int M_JOB_ID = 21;
+    private int hiddenDisplayCount;
+    private HashMap<String, String> markerColors = new HashMap<String, String>();
 
     /**
      * Whether or not the system UI should be auto-hidden after
@@ -153,6 +156,7 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback,
             return false;
         }
     };
+
     GoogleApiClient mGoogleApiClient;
     public static final String TAG = MapActivity.class.getSimpleName();
 
@@ -570,6 +574,7 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback,
     // - delayedHide
     // - getBitmapDescriptor (gets a color from a hex string)
     // - setPermissionListener (sets a listener for some user's location permissions)
+    // - updateHiddenUsersView [adds to (or removes from) the GUI elt for hidden users]
     //================================================================================
 
     public void handleNewLocation(Location location) {
@@ -685,8 +690,9 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback,
         if (olat > -Utility.LAT_INF && olon > -Utility.LON_INF) {
             String oName = FriendListActivity.names.get(ouid);
             Marker oMarker = others.get(ouid);
-            String hexStr = (color >= 0.0) ?
+            String hexStr = (color >= 0) ?
                     "#" + Integer.toHexString((int) color) : Utility.BURGUNDY_HEX;
+            markerColors.put(ouid, hexStr);
 
             if (oMarker != null) { oMarker.remove(); }
             if (permissions.get(ouid)) { // some users just want to be hidden
@@ -855,9 +861,11 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback,
                 switch((String) snapshot.child("location").getValue()) {
                     case "on":
                         permissions.put(uid, true);
+                        updateHiddenUsersView(uid, false);
                         break;
                     case "off":
                         permissions.put(uid, false);
+                        updateHiddenUsersView(uid, true);
                         break;
                 }
             }
@@ -867,5 +875,47 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback,
                 System.out.println("[setPermissionListener] Read failed: " + e.getMessage());
             }
         });
+    }
+
+    private void updateHiddenUsersView(String uid, boolean isHidden) {
+        final LinearLayout ll = (LinearLayout) findViewById(R.id.hidden_users);
+        LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT,
+                LinearLayout.LayoutParams.WRAP_CONTENT);
+
+        hiddenDisplayCount += (isHidden) ? 1 : -1;
+        if (hiddenDisplayCount == 0) {
+            // Hide the hidden users display
+            ScrollView sv = (ScrollView) findViewById(R.id.hidden_rect);
+            sv.getLayoutParams().width = 0;
+        } else if (hiddenDisplayCount == 1 && isHidden) {
+            // Show the hidden users display
+            ScrollView sv = (ScrollView) findViewById(R.id.hidden_rect);
+            sv.getLayoutParams().width =
+                    ScrollView.LayoutParams.WRAP_CONTENT;
+        }
+
+        if (isHidden) {
+            String username = FriendListActivity.names.get(uid);
+            TextView tv = new TextView(this);
+            tv.setId(uid.hashCode());
+            tv.setText(username);
+
+            String colorHex = markerColors.get(uid);
+            if (colorHex != null) {
+                tv.setTextColor(Color.parseColor(colorHex));
+            }
+
+            ll.addView(tv, lp);
+        } else {
+            final TextView tv = (TextView) findViewById(uid.hashCode());
+
+            // Get that thing out of here
+            ll.post(new Runnable() {
+                public void run() {
+                    ll.removeView(tv);
+                }
+            });
+        }
     }
 }

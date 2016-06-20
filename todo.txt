@@ -1,12 +1,11 @@
 ----------------
 TODO (ESSENTIAL)
 ----------------
-1. List hidden users somewhere on the map. [1 hr]
-2. Make changes take effect immediately (e.g. if a friend request is accepted, I want to see updates NOW). Reload things when you press the back button. [3 hrs] /OWEN
-3. Send email confirmations during registration. [2 hrs] /RICHARD
-4. Fix the app UI/layout...! [14 hrs]
+1. Make changes take effect immediately (e.g. if a friend request is accepted, I want to see updates NOW). Reload things when you press the back button. [3 hrs] /OWEN
+2. Send email confirmations during registration. [2 hrs] /RICHARD
+3. Fix the app UI/layout...! [14 hrs]
 
-// Total: 20 hrs
+// Total: 19 hrs
 * Time estimates = (Owen's original call) x 2
 
 ----------------------------
