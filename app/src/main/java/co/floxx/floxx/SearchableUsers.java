@@ -314,6 +314,8 @@ public class SearchableUsers extends Activity {
                 public void onClick(View v) {
                     // Send a connection request
                     sendFriendRequest(username);
+                    removeView(nameView);
+                    removeView(requestButton);
                 }
             });
 

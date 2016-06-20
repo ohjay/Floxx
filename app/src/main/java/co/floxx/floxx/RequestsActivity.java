@@ -53,6 +53,8 @@ public class RequestsActivity extends AppCompatActivity {
 
         // Populate the "received requests" area
         context = this;
+        final LinearLayout layout = (LinearLayout) findViewById(R.id.received_container);
+
         Query queryRef = ref.child("users").orderByKey().equalTo(currentUser);
         queryRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
@@ -66,6 +68,9 @@ public class RequestsActivity extends AppCompatActivity {
                     final TextView senderName = new TextView(context);
                     senderName.setTextSize(19);
                     senderName.setTypeface(Typeface.SANS_SERIF);
+
+                    final ImageButton declineButton = new ImageButton(context);
+                    final ImageButton acceptButton = new ImageButton(context);
 
                     // Grab the sender's actual username
                     Query nameQRef = ref.child("uids").orderByValue().equalTo(senderID);
@@ -82,18 +87,20 @@ public class RequestsActivity extends AppCompatActivity {
                     });
 
                     // Setting up the accept button
-                    ImageButton acceptButton = new ImageButton(context);
                     acceptButton.setImageResource(R.drawable.ic_plusone_standard_off_client);
                     acceptButton.setOnClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(View v) {
                             // Accept the request! Yay!
                             acceptRequest(senderID, currentUser);
+
+                            layout.removeView(senderName);
+                            layout.removeView(acceptButton);
+                            layout.removeView(declineButton);
                         }
                     });
 
                     // Setting up the decline button
-                    ImageButton declineButton = new ImageButton(context);
                     declineButton.setImageResource(R.drawable.ic_media_route_off_mono_dark);
                     declineButton.setOnClickListener(new View.OnClickListener() {
                         @Override
@@ -101,11 +108,14 @@ public class RequestsActivity extends AppCompatActivity {
                             // Decline the sender's request
                             // Remove it from the registry, for starters
                             declineRequest(senderID, currentUser);
+
+                            layout.removeView(senderName);
+                            layout.removeView(acceptButton);
+                            layout.removeView(declineButton);
                         }
                     });
 
                     // Add the name and buttons to the layout
-                    LinearLayout layout = (LinearLayout) findViewById(R.id.received_container);
                     layout.addView(senderName,
                             new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT,
                             LinearLayout.LayoutParams.WRAP_CONTENT));
