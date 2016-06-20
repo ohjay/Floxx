@@ -785,7 +785,7 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback,
                         public void onClick(View view) {
                             Firebase ref = new Firebase("https://floxx.firebaseio.com/");
                             Utility.leave(meetupId, ref, ref.getAuth().getUid());
-                            startActivity(new Intent(MapActivity.this, FriendListActivity.class));
+                            finish();
                         }
                     });
                     leaveButtonExists = true;
@@ -852,7 +852,8 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback,
             @Override
             public void onDataChange(DataSnapshot snapshot) {
                 if (!snapshot.exists()) {
-                    plRef.child("permissions").child(uid).child("location").setValue("on");
+                    new Firebase("https://floxx.firebaseio.com/permissions/"
+                            + uid + "/location").setValue("on");
                     permissions.put(uid, true);
                     return;
                 }

@@ -66,7 +66,7 @@ public class FirebaseActivity extends AppCompatActivity {
                             Intent intent = new Intent(FirebaseActivity.this, RegisterActivity.class);
                             Toast.makeText(FirebaseActivity.this, "Email already in use. :(",
                                     Toast.LENGTH_LONG).show();
-                            FirebaseActivity.this.startActivity(intent);
+                            finish();
                             return;
                         }
                     }

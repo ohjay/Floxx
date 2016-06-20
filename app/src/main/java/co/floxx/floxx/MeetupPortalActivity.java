@@ -1,6 +1,9 @@
 package co.floxx.floxx;
 
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
@@ -8,15 +11,42 @@ import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
 
+import com.firebase.client.DataSnapshot;
 import com.firebase.client.Firebase;
+import com.firebase.client.FirebaseError;
+import com.firebase.client.ValueEventListener;
 
 import java.util.ArrayList;
 
 public class MeetupPortalActivity extends AppCompatActivity {
+    BroadcastReceiver receiver;
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+
+        Firebase ref = new Firebase("https://floxx.firebaseio.com/");
+        ValueEventListener vel = new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                if (!dataSnapshot.exists()) {
+                    finish(); // no meetup to be found, so we're done here
+                }
+            }
+
+            @Override
+            public void onCancelled(FirebaseError firebaseError) {
+                System.out.println("[MPA – onResume] Read failed: " + firebaseError.getMessage());
+            }
+        };
+
+        ref.child("ongoing").child(ref.getAuth().getUid()).addListenerForSingleValueEvent(vel);
+    }
 
     @Override
     public void onBackPressed() {
         // Log this fool out
+        super.onBackPressed();
         new Firebase("https://floxx.firebaseio.com/").unauth();
     }
 
@@ -79,5 +109,24 @@ public class MeetupPortalActivity extends AppCompatActivity {
         });
 
         FriendListActivity.initializeNames();
+
+        IntentFilter intentFilter = new IntentFilter();
+        intentFilter.addAction("co.floxx.floxx.ACTION_LOGOUT");
+        receiver = new BroadcastReceiver() {
+            @Override
+            public void onReceive(Context context, Intent intent) {
+                startActivity(new Intent(MeetupPortalActivity.this, FullscreenActivity.class));
+                finish();
+            }
+        };
+        registerReceiver(receiver, intentFilter);
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        if (receiver != null) {
+            unregisterReceiver(receiver);
+        }
     }
 }

@@ -35,10 +35,16 @@ public class FriendListActivity extends AppCompatActivity {
     private HashSet<String> meetupParticipants = new HashSet<String>();
     private boolean participantsUpdated;
     private static final int GOLD = Color.parseColor("#ffde00");
+    private boolean recentCreation;
 
     @Override
     protected void onResume() {
         super.onResume();
+
+        if (recentCreation) {
+            recentCreation = false;
+            return;
+        }
 
         // Update the friend list (should also take care of deselection)
         ((LinearLayout) findViewById(R.id.button_container)).removeAllViews();
@@ -51,6 +57,7 @@ public class FriendListActivity extends AppCompatActivity {
 
     @Override
     public void onBackPressed() {
+        super.onBackPressed();
         new Firebase("https://floxx.firebaseio.com/").unauth();
     }
 
@@ -63,7 +70,11 @@ public class FriendListActivity extends AppCompatActivity {
         button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                startActivity(new Intent(FriendListActivity.this, FullscreenActivity.class));
+                Intent broadcastIntent = new Intent();
+                broadcastIntent.setAction("co.floxx.floxx.ACTION_LOGOUT");
+                sendBroadcast(broadcastIntent);
+                ref.unauth();
+                finish();
             }
         });
 
@@ -98,6 +109,8 @@ public class FriendListActivity extends AppCompatActivity {
                 }
             }
         });
+
+        recentCreation = true;
     }
 
     private void acceptMeetupInvitation(final String meetupId) {
