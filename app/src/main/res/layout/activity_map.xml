@@ -53,14 +53,14 @@
         android:orientation="vertical"
         android:id="@+id/lb_container"
         android:layout_gravity="center_horizontal"
-        android:layout_marginBottom="50dp">
+        android:layout_marginBottom="40dp">
     </LinearLayout>
 
     <View
         android:id="@+id/rectangleView"
         android:layout_gravity="end|bottom"
         android:layout_width="fill_parent"
-        android:layout_height="42dp"
+        android:layout_height="40dp"
         android:background="@drawable/transrect" />
 
     <TextView
@@ -75,8 +75,8 @@
         android:id="@+id/hidden_rect"
         android:layout_gravity="end|bottom"
         android:layout_width="0dp"
-        android:layout_height="42dp"
-        android:layout_marginBottom="42dp"
+        android:layout_height="40dp"
+        android:layout_marginBottom="40dp"
         android:background="@drawable/transrect">
 
         <LinearLayout

@@ -11,9 +11,8 @@ TODO (ESSENTIAL)
 TODO (MINOR and/or OPTIONAL)
 ----------------------------
 1. Let users specify their mode of transportation.
-2. Put some kind of instructions somewhere, or add an "About" page.
-3. Upon startup, have map zoom in at an appropriate level (scaled to minimally fit all of the people in the group).
-4. Implement a "good friends" feature, in which the meetup invitation stage is bypassed for certain users (the idea is that they meet up so often, they shouldn't have to waste time confirming things anymore).
+2. Upon startup, have map zoom in at an appropriate level (scaled to minimally fit all of the people in the group).
+3. Implement a "good friends" feature, in which the meetup invitation stage is bypassed for certain users (the idea is that they meet up so often, they shouldn't have to waste time confirming things anymore).
 
 ---------------------
 LAYOUTS/UX TO UPGRADE
@@ -23,6 +22,6 @@ LAYOUTS/UX TO UPGRADE
 3. Group creation interface
 4. Map interface
 5. Features (formerly "Settings") interface. Convert to user portal (!?)
-6. Transition screens
+6. Transition screens (bottom-layer content)
 7. Meetup portal interface
 8. Portrait/landscape transition (/restrict to portrait?)

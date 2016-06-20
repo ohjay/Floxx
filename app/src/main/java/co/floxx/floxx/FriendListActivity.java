@@ -44,6 +44,20 @@ public class FriendListActivity extends AppCompatActivity {
         if (recentCreation) {
             recentCreation = false;
             return;
+        } else if (Intermediary.mapToPortalMeetupId != null) {
+            // The map wanted us to go to the portal. To the portal we shall go
+            Intent intent = new Intent(this, MeetupPortalActivity.class);
+            for (String ouid : Intermediary.mapToPortalOthers) {
+                intent.putExtra(ouid, 0);
+            }
+            intent.putExtra("meetup id", Intermediary.mapToPortalMeetupId);
+
+            Intermediary.mapToPortalOthers = null;
+            Intermediary.mapToPortalMeetupId = null;
+
+            startActivity(intent);
+            finish(); // this is not the place to be
+            return;
         }
 
         // Update the friend list (should also take care of deselection)

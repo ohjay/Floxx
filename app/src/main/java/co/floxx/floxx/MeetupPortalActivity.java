@@ -11,6 +11,7 @@ import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
 
+import com.firebase.client.AuthData;
 import com.firebase.client.DataSnapshot;
 import com.firebase.client.Firebase;
 import com.firebase.client.FirebaseError;
@@ -26,6 +27,15 @@ public class MeetupPortalActivity extends AppCompatActivity {
         super.onResume();
 
         Firebase ref = new Firebase("https://floxx.firebaseio.com/");
+        AuthData auth = ref.getAuth();
+        if (auth == null) {
+            // Not supposed to be here!
+            // Most likely MP1 -> FL -> map -> (X map) -> (X FL) -> MP2 -> (X MP2) = MP1
+
+            startActivity(new Intent(this, FullscreenActivity.class));
+            finish(); return; // get the heck back to the login screen
+        }
+
         ValueEventListener vel = new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
@@ -40,7 +50,7 @@ public class MeetupPortalActivity extends AppCompatActivity {
             }
         };
 
-        ref.child("ongoing").child(ref.getAuth().getUid()).addListenerForSingleValueEvent(vel);
+        ref.child("ongoing").child(auth.getUid()).addListenerForSingleValueEvent(vel);
     }
 
     @Override

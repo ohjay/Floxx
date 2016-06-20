@@ -61,6 +61,7 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
@@ -179,6 +180,7 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback,
     // - onMarkerDrag
     // - onMarkerDragEnd
     // - onMarkerDragStart
+    // - onBackPressed
     //================================================================================
 
     protected void onStart() {
@@ -477,6 +479,13 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback,
     @Override
     public void onMarkerDragStart(Marker marker) {
         // Do something?
+    }
+
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        Intermediary.mapToPortalOthers = new HashSet<String>(others.keySet());
+        Intermediary.mapToPortalMeetupId = meetupId;
     }
 
     //================================================================================
