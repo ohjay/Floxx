@@ -198,7 +198,7 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback,
 
         // Unpack intent extras (user collection + meetup ID)
         for (String ouid : intent.getExtras().keySet()) {
-            if (ouid != "meetup id") {
+            if (!ouid.equals("meetup id")) {
                 others.put(ouid, null);
                 setPermissionListener(ouid);
                 permissions.put(ouid, false); // just for you Tony
@@ -236,7 +236,7 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback,
         mLocationRequest = LocationRequest.create()
                 .setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY)
                 .setInterval(10 * 1000)        // 10 seconds, in milliseconds
-                .setFastestInterval(1 * 1000); // 1 second, in milliseconds
+                .setFastestInterval(1000); // 1 second, in milliseconds
         setUpMapIfNeeded();
 
         final Firebase ref = new Firebase("https://floxx.firebaseio.com/");
@@ -433,7 +433,6 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback,
                 } else {
                     handleNewLocation(mLastLocation);
                 }
-                return;
             }
         }
     }
@@ -579,7 +578,7 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback,
 
     public void handleNewLocation(Location location) {
         Firebase ref = new Firebase("https://floxx.firebaseio.com/");
-        Utility.saveLatLng(ref, ref.getAuth().getUid().toString(),
+        Utility.saveLatLng(ref, ref.getAuth().getUid(),
                 location.getLatitude(), location.getLongitude());
 
         Log.d(TAG, location.toString());

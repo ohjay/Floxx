@@ -15,18 +15,24 @@ import java.util.ArrayList;
 public class MeetupPortalActivity extends AppCompatActivity {
 
     @Override
+    public void onBackPressed() {
+        // Log this fool out
+        new Firebase("https://floxx.firebaseio.com/").unauth();
+    }
+
+    @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_meetup_portal);
 
         Firebase.setAndroidContext(this);
         final Firebase ref = new Firebase("https://floxx.firebaseio.com/");
-        final String uid = ref.getAuth().getUid().toString();
+        final String uid = ref.getAuth().getUid();
 
         final ArrayList<String> confirmed = new ArrayList<String>();
         Intent intent = getIntent();
         for (String ouid : intent.getExtras().keySet()) {
-            if (ouid != "meetup id") {
+            if (!ouid.equals("meetup id")) {
                 confirmed.add(ouid);
             }
         }

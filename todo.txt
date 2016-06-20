@@ -1,11 +1,10 @@
 ----------------
 TODO (ESSENTIAL)
 ----------------
-1. Make changes take effect immediately (e.g. if a friend request is accepted, I want to see updates NOW). Reload things when you press the back button. [3 hrs] /OWEN
-2. Send email confirmations during registration. [2 hrs] /RICHARD
-3. Fix the app UI/layout...! [14 hrs]
+1. Send email confirmations during registration. [2 hrs] /RICHARD
+2. Fix the app UI/layout...! [14 hrs]
 
-// Total: 19 hrs
+// Total: 16 hrs
 * Time estimates = (Owen's original call) x 2
 
 ----------------------------

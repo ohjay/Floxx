@@ -17,6 +17,13 @@ import com.firebase.client.Firebase;
 public class FullscreenActivity extends AppCompatActivity {
 
     @Override
+    protected void onResume() {
+        super.onResume();
+        ((EditText) findViewById(R.id.enter_username)).setText("");
+        ((EditText) findViewById(R.id.enter_password)).setText("");
+    }
+
+    @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 

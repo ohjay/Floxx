@@ -39,7 +39,19 @@ public class FriendListActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        resetSelected();
+
+        // Update the friend list (should also take care of deselection)
+        ((LinearLayout) findViewById(R.id.button_container)).removeAllViews();
+        resetFriendList();
+
+        // Update the meetup invitation list
+        ((LinearLayout) findViewById(R.id.meetup_container)).removeAllViews();
+        resetMeetupInvitations();
+    }
+
+    @Override
+    public void onBackPressed() {
+        new Firebase("https://floxx.firebaseio.com/").unauth();
     }
 
     @Override
@@ -67,97 +79,13 @@ public class FriendListActivity extends AppCompatActivity {
 
         Firebase.setAndroidContext(this);
         ref = new Firebase("https://floxx.firebaseio.com/");
-        uid = ref.getAuth().getUid().toString();
+        uid = ref.getAuth().getUid();
 
         initializeNames();
-        updateMeetupParticipants();
-
-        final LinearLayout ll = (LinearLayout) findViewById(R.id.button_container);
-        final LayoutParams lp = new LayoutParams(LayoutParams.MATCH_PARENT,
-                LayoutParams.WRAP_CONTENT);
-
-        Query queryRef = ref.child("users").orderByKey().equalTo(uid);
-        queryRef.addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                Object result = dataSnapshot.child(uid).child("friends").getValue();
-                if (result != null) {
-                    ArrayList<String> friends = (ArrayList<String>) result;
-                    blockForParticipants();
-
-                    for (final String fuid : friends) {
-                        if (meetupParticipants.contains(fuid)) {
-                            continue; // rule #1: users can only be in one meetup at once
-                        }
-
-                        final Button b = new Button(thisList);
-                        Query nameQRef = ref.child("uids").orderByValue().equalTo(fuid);
-                        nameQRef.addListenerForSingleValueEvent(new ValueEventListener() {
-                            @Override
-                            public void onDataChange(DataSnapshot dataSnapshot) {
-                                for (DataSnapshot child : dataSnapshot.getChildren()) {
-                                    b.setText(child.getKey());
-                                    ll.addView(b, lp);
-
-                                    b.setOnClickListener(new View.OnClickListener() {
-                                        public void onClick(View view) {
-                                            if (selected.contains(fuid)) {
-                                                selected.remove(fuid);
-                                                b.getBackground().clearColorFilter();
-                                            } else {
-                                                selected.add(fuid);
-                                                b.getBackground().setColorFilter(GOLD,
-                                                        PorterDuff.Mode.DARKEN);
-                                            }
-                                        }
-                                    });
-                                }
-                            }
-
-                            @Override
-                            public void onCancelled(FirebaseError firebaseError) {}
-                        });
-                    }
-                }
-            }
-
-            @Override
-            public void onCancelled(FirebaseError firebaseError) {}
-        });
+        resetFriendList(); // fill in the entire friend list
 
         // Add meetup invitations to the layout
-        Query inviteRef = ref.child("invitations");
-        inviteRef.addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                ArrayList<String> invitations =
-                        (ArrayList<String>) dataSnapshot.child(uid).getValue();
-
-                if (invitations != null) {
-                    for (final String meetupId : invitations) {
-                        String iuid = meetupId.substring(0, meetupId.length() - 10);
-                        Button b = new Button(thisList);
-                        b.setText(names.get(iuid) + "'s meetup");
-
-                        LinearLayout ll = (LinearLayout) findViewById(R.id.meetup_container);
-                        LayoutParams lp = new LayoutParams(LayoutParams.MATCH_PARENT,
-                                LayoutParams.WRAP_CONTENT);
-                        ll.addView(b, lp);
-
-                        b.setOnClickListener(new View.OnClickListener() {
-                            public void onClick(View view) {
-                                acceptMeetupInvitation(meetupId);
-                            }
-                        });
-                    }
-                }
-            }
-
-            @Override
-            public void onCancelled(FirebaseError firebaseError) {
-                System.out.println(firebaseError.getMessage());
-            }
-        });
+        resetMeetupInvitations();
 
         Button mapButton = (Button) findViewById(R.id.mapgo);
         mapButton.setOnClickListener(new View.OnClickListener() {
@@ -306,6 +234,10 @@ public class FriendListActivity extends AppCompatActivity {
         });
     }
 
+    /**
+     * Currently taken care of in an alternate fashion (by resetting the entire friend list).
+     * However, this may prove to be useful in the future.
+     */
     private void resetSelected() {
         selected.clear();
         LinearLayout buttonContainer = (LinearLayout) findViewById(R.id.button_container);
@@ -313,5 +245,104 @@ public class FriendListActivity extends AppCompatActivity {
         for (int i = 0; i < numChildren; ++i) {
             buttonContainer.getChildAt(i).getBackground().clearColorFilter();
         }
+    }
+
+    /**
+     * Adds friends to the list container in the middle of the screen.
+     * For correct behavior, assumes that the container is initially empty.
+     */
+    private void resetFriendList() {
+        updateMeetupParticipants();
+
+        final LinearLayout ll = (LinearLayout) findViewById(R.id.button_container);
+        final LayoutParams lp = new LayoutParams(LayoutParams.MATCH_PARENT,
+                LayoutParams.WRAP_CONTENT);
+
+        Query friendsRef = ref.child("users").child(uid);
+        friendsRef.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot snapshot) {
+                Object result = snapshot.child("friends").getValue();
+                if (result != null) {
+                    ArrayList<String> friends = (ArrayList<String>) result;
+                    blockForParticipants();
+
+                    for (final String fuid : friends) {
+                        if (meetupParticipants.contains(fuid)) {
+                            continue;
+                        }
+
+                        final Button b = new Button(thisList);
+                        Query nameQRef = ref.child("uids").orderByValue().equalTo(fuid);
+                        nameQRef.addListenerForSingleValueEvent(new ValueEventListener() {
+                            @Override
+                            public void onDataChange(DataSnapshot dataSnapshot) {
+                                for (DataSnapshot child : dataSnapshot.getChildren()) {
+                                    b.setText(child.getKey());
+                                    ll.addView(b, lp);
+
+                                    b.setOnClickListener(new View.OnClickListener() {
+                                        public void onClick(View view) {
+                                            if (selected.contains(fuid)) {
+                                                selected.remove(fuid);
+                                                b.getBackground().clearColorFilter();
+                                            } else {
+                                                selected.add(fuid);
+                                                b.getBackground().setColorFilter(GOLD,
+                                                        PorterDuff.Mode.DARKEN);
+                                            }
+                                        }
+                                    });
+                                }
+                            }
+
+                            @Override
+                            public void onCancelled(FirebaseError firebaseError) {}
+                        });
+                    }
+                }
+            }
+
+            @Override
+            public void onCancelled(FirebaseError firebaseError) {
+                System.out.println("[resetFriendList] Read failed: " + firebaseError.getMessage());
+            }
+        });
+    }
+
+    private void resetMeetupInvitations() {
+        final LinearLayout ll = (LinearLayout) findViewById(R.id.meetup_container);
+        final LayoutParams lp = new LayoutParams(LayoutParams.MATCH_PARENT,
+                LayoutParams.WRAP_CONTENT);
+
+        Query inviteRef = ref.child("invitations");
+        inviteRef.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                ArrayList<String> invitations =
+                        (ArrayList<String>) dataSnapshot.child(uid).getValue();
+
+                if (invitations != null) {
+                    for (final String meetupId : invitations) {
+                        String iuid = meetupId.substring(0, meetupId.length() - 10);
+                        Button b = new Button(thisList);
+                        b.setText(names.get(iuid) + "'s meetup");
+
+                        ll.addView(b, lp);
+
+                        b.setOnClickListener(new View.OnClickListener() {
+                            public void onClick(View view) {
+                                acceptMeetupInvitation(meetupId);
+                            }
+                        });
+                    }
+                }
+            }
+
+            @Override
+            public void onCancelled(FirebaseError firebaseError) {
+                System.out.println(firebaseError.getMessage());
+            }
+        });
     }
 }
