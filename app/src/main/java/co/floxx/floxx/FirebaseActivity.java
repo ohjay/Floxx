@@ -50,7 +50,6 @@ public class FirebaseActivity extends AppCompatActivity {
 
             // User registration
             // To start: check if REMAIL is unique. Used as a deterrent for account creation spam
-            // TODO (important): test this!
 
             emailChecked = false;
             nodots = remail.substring(0, remail.lastIndexOf("."));
