@@ -25,4 +25,5 @@
     <string name="leave_content">Leave meetup</string>
 
     <string name="hidden_title">Hidden Users</string>
+    <string name="creation_confirm">Go to map</string>
 </resources>

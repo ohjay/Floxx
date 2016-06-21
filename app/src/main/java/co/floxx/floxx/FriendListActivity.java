@@ -70,33 +70,16 @@ public class FriendListActivity extends AppCompatActivity {
     }
 
     @Override
-    public void onBackPressed() {
-        super.onBackPressed();
-        new Firebase("https://floxx.firebaseio.com/").unauth();
-    }
-
-    @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         thisList = this;
-        setContentView(R.layout.activity_activity_friend_list);
-        Button button = (Button) findViewById(R.id.sign_out_button);
-        button.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Intent broadcastIntent = new Intent();
-                broadcastIntent.setAction("co.floxx.floxx.ACTION_LOGOUT");
-                sendBroadcast(broadcastIntent);
-                ref.unauth();
-                finish();
-            }
-        });
+        setContentView(R.layout.activity_friend_list);
 
-        ImageButton button1 = (ImageButton) findViewById(R.id.setting_logo);
-        button1.setOnClickListener(new View.OnClickListener() {
+        ImageButton userPortalButton = (ImageButton) findViewById(R.id.user_portal_fbutton);
+        userPortalButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                startActivity(new Intent(FriendListActivity.this, SettingsActivity.class));
+                finish();
             }
         });
 

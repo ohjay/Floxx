@@ -30,7 +30,7 @@ public class MeetupPortalActivity extends AppCompatActivity {
         AuthData auth = ref.getAuth();
         if (auth == null) {
             // Not supposed to be here!
-            // Most likely MP1 -> FL -> map -> (X map) -> (X FL) -> MP2 -> (X MP2) = MP1
+            // Possibly MP1 -> FL -> map -> (X map) -> (X FL) -> MP2 -> (X MP2) = MP1
 
             startActivity(new Intent(this, FullscreenActivity.class));
             finish(); return; // get the heck back to the login screen
@@ -40,6 +40,8 @@ public class MeetupPortalActivity extends AppCompatActivity {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 if (!dataSnapshot.exists()) {
+                    startActivity(new Intent(MeetupPortalActivity.this,
+                            FriendListActivity.class));
                     finish(); // no meetup to be found, so we're done here
                 }
             }
@@ -51,13 +53,6 @@ public class MeetupPortalActivity extends AppCompatActivity {
         };
 
         ref.child("ongoing").child(auth.getUid()).addListenerForSingleValueEvent(vel);
-    }
-
-    @Override
-    public void onBackPressed() {
-        // Log this fool out
-        super.onBackPressed();
-        new Firebase("https://floxx.firebaseio.com/").unauth();
     }
 
     @Override
@@ -83,7 +78,8 @@ public class MeetupPortalActivity extends AppCompatActivity {
         b.setText("Meetup " + meetupId.substring(meetupId.length() - 10));
 
         LinearLayout ll = (LinearLayout) findViewById(R.id.meetup_container);
-        LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT,
+        LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT,
                 LinearLayout.LayoutParams.WRAP_CONTENT);
         ll.addView(b, lp);
 
@@ -106,15 +102,15 @@ public class MeetupPortalActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 Utility.leave(meetupId, ref, uid);
-                startActivity(new Intent(MeetupPortalActivity.this, FriendListActivity.class));
+                finish();
             }
         });
 
-        ImageButton settingButton = (ImageButton) findViewById(R.id.setting_button);
-        settingButton.setOnClickListener(new View.OnClickListener() {
+        ImageButton userPortalButton = (ImageButton) findViewById(R.id.user_portal_mbutton);
+        userPortalButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                startActivity(new Intent(MeetupPortalActivity.this, SettingsActivity.class));
+                finish();
             }
         });
 

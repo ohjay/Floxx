@@ -95,6 +95,7 @@ public class FirebaseActivity extends AppCompatActivity {
                     Intent intent = new Intent(FirebaseActivity.this, FullscreenActivity.class);
                     Toast.makeText(FirebaseActivity.this, firebaseError.getMessage(), Toast.LENGTH_LONG).show();
                     FirebaseActivity.this.startActivity(intent);
+                    finish();
                 }
             });
         }
@@ -162,6 +163,7 @@ public class FirebaseActivity extends AppCompatActivity {
         });
         Intent intent = new Intent(FirebaseActivity.this, FullscreenActivity.class);
         FirebaseActivity.this.startActivity(intent);
+        finish();
     }
 
     private void blockUntilEmailChecked() {
@@ -187,11 +189,12 @@ public class FirebaseActivity extends AppCompatActivity {
             @Override
             public void onDataChange(DataSnapshot snapshot) {
                 if (snapshot.hasChild(uid)) {
-                    enterMeetupPortal(snapshot.child(uid).getValue().toString());
+                    signalMeetupPortal(snapshot.child(uid).getValue().toString());
                 } else {
-                    // Go to the friend list
-                    Intent intent = new Intent(FirebaseActivity.this, FriendListActivity.class);
+                    // Signal the friend list (/group creation) page
+                    Intent intent = new Intent(FirebaseActivity.this, UserPortalActivity.class);
                     FirebaseActivity.this.startActivity(intent);
+                    finish();
                 }
             }
 
@@ -200,22 +203,19 @@ public class FirebaseActivity extends AppCompatActivity {
         });
     }
 
-    private void enterMeetupPortal(final String meetupId) {
+    private void signalMeetupPortal(final String meetupId) {
         // Get the users who are currently in the meetup
         Query meetupsRef = ref.child("meetups").child(meetupId).child("confirmed");
         meetupsRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot snapshot) {
-                Intent intent = new Intent(FirebaseActivity.this, MeetupPortalActivity.class);
-                ArrayList<String> confirmed = (ArrayList<String>) snapshot.getValue();
-                for (String ouid : confirmed) {
-                    if (!ouid.equals(uid)) {
-                        intent.putExtra(ouid, 0);
-                    }
-                }
+                Intermediary.firebaseConfirmed = new ArrayList<String>(
+                        (ArrayList<String>) snapshot.getValue());
+                Intermediary.firebaseMeetupId = meetupId;
 
-                intent.putExtra("meetup id", meetupId);
-                FirebaseActivity.this.startActivity(intent);
+                FirebaseActivity.this.startActivity(
+                        new Intent(FirebaseActivity.this, UserPortalActivity.class));
+                finish();
             }
 
             @Override

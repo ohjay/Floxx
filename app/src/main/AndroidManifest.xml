@@ -33,7 +33,7 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".SettingsActivity"
+            android:name=".UserPortalActivity"
             android:label="@string/app_name" />
         <activity android:name=".FriendListActivity" />
         <activity

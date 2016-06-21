@@ -15,7 +15,6 @@ public class RegisterActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_register);
         Button button = (Button) findViewById(R.id.register_button);
-        final Bundle extras = new Bundle();
 
         Typeface montserrat = Typeface.createFromAsset(getAssets(), "Montserrat-Regular.otf");
         final EditText usernameText = (EditText) findViewById(R.id.register_user);
@@ -31,7 +30,6 @@ public class RegisterActivity extends AppCompatActivity {
         button.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(RegisterActivity.this, FirebaseActivity.class);
                 String password = passwordText.getText().toString();
                 String confirm = confirmText.getText().toString();
 
@@ -44,9 +42,13 @@ public class RegisterActivity extends AppCompatActivity {
                 String username = usernameText.getText().toString();
                 String email = emailText.getText().toString();
 
+                Bundle extras = new Bundle();
                 extras.putString("register_user", username);
                 extras.putString("register_email", email);
                 extras.putString("register_password", password);
+
+                Intent intent = new Intent(RegisterActivity.this,
+                        FirebaseActivity.class);
                 intent.putExtras(extras);
                 RegisterActivity.this.startActivity(intent);
             }
