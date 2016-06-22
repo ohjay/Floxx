@@ -2,7 +2,6 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#0099cc"
     tools:context="co.floxx.floxx.MapActivity">
 
     <TextView
@@ -11,9 +10,9 @@
         android:layout_height="match_parent"
         android:gravity="center"
         android:keepScreenOn="true"
-        android:text="@string/dummy_content"
+        android:text="@string/standby"
         android:textColor="#33b5e5"
-        android:textSize="50sp"
+        android:textSize="30sp"
         android:textStyle="bold" />
 
     <fragment xmlns:android="http://schemas.android.com/apk/res/android"

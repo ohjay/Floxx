@@ -45,7 +45,7 @@ public class FirebaseActivity extends AppCompatActivity {
         progressBar.setStartColor(ContextCompat.getColor(this, R.color.berkeley_blue));
         progressBar.setEndColor(ContextCompat.getColor(this, R.color.owen_gold));
         progressBar.setDotAmount(6);
-        progressBar.setAnimationTime(200);
+        progressBar.setAnimationTime(300);
 
         Intent intent = getIntent();
         Bundle extras = intent.getExtras();
