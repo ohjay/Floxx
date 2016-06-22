@@ -6,26 +6,29 @@ TODO (ESSENTIAL)
 
 // Total: 16 hrs
 * Time estimates = (Owen's original call) x 2
+* Reminder: also look @ the TODOs scattered across our codebase
 
 ----------------------------
 TODO (MINOR and/or OPTIONAL)
 ----------------------------
 1. Let users specify their mode of transportation.
 2. Upon startup, have map zoom in at an appropriate level (scaled to minimally fit all of the people in the group).
-3. Implement a "good friends" feature, in which the meetup invitation stage is bypassed for certain users (the idea is that they meet up so often, they shouldn't have to waste time confirming things anymore).
-4. Add a "move marker" button to the map overlay that allows only one user to move the meeting marker at a time (this should prevent weird jumpy meeting points).
+3. Add a "move marker" button to the map overlay that allows only one user to move the meeting marker at a time (this should prevent weird jumpy meeting points).
+
+------------------
+TODO (BUG REPORTS)
+------------------
+1. Somehow I got TWO fullscreen activities by hitting the back button a lot. Look into this.
+2. Get rid of the double requests page (since the searchable thingy seems to create a new view).
 
 ---------------------
 LAYOUTS/UX TO UPGRADE
 ---------------------
-1. Registration interface (6/20)
-2. Requests interface (6/21)
-3. Features (formerly "Settings") interface. Convert to user portal! (6/22)
-4. Group creation interface (6/23)
-5. Map interface (6/24)
-6. Transition screens (bottom-layer content) (6/25)
-7. Meetup portal interface (6/25)
+1. Firebase interface (6/21)
+2. User portal interface (6/21)
+3. Transition screen (bottom-layer content) for map (6/21)
+4. Requests interface (6/22)
+5. Group creation interface (6/23)
+6. Meetup portal interface (6/24)
+7. Map interface (6/25)
 8. Portrait/landscape transition (/restrict to portrait?) (6/25)
-
-* Reminder: look at all the little TODOs scattered across the codebase
-F (6/20 @ 4:13a): It WOULD be a lot better to convert Features into a user portal...

@@ -8,11 +8,10 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
-
-import com.firebase.client.Firebase;
+import android.widget.Toast;
 
 /**
- * The full-screen activity that serves as Floxx's splash page.
+ * The full-screen activity that serves as Floxx's splash (/landing) page.
  */
 public class FullscreenActivity extends AppCompatActivity {
 
@@ -26,49 +25,56 @@ public class FullscreenActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-        Firebase.setAndroidContext(this);
-
         setContentView(R.layout.activity_fullscreen);
-        final EditText password1 = (EditText) findViewById(R.id.enter_password);
 
         // Cool fonts let's go!
         Typeface montserrat = Typeface.createFromAsset(getAssets(), "Montserrat-Regular.otf");
-        EditText unameText = (EditText) findViewById(R.id.enter_username);
-        EditText pwText = (EditText) findViewById(R.id.enter_password);
+        final EditText unameText = (EditText) findViewById(R.id.enter_username);
+        final EditText pwText = (EditText) findViewById(R.id.enter_password);
         unameText.setTypeface(montserrat);
         pwText.setTypeface(montserrat);
 
-        // Upon interacting with UI controls, delay any scheduled hide()
-        // operations to prevent the jarring behavior of controls going away
-        // while interacting with the UI.
+        // Assign button behaviors
+        setRegisterButtonBehavior();
+        setLoginButtonBehavior(unameText, pwText);
+    }
 
-        Firebase.setAndroidContext(this);
-        Button button = (Button)findViewById(R.id.log_in_button);
-        final Bundle extras = new Bundle();
-        final EditText username1 = (EditText) findViewById(R.id.enter_username);
-        registerAccount();
+    public void setLoginButtonBehavior(final EditText unameText, final EditText pwText) {
+        Button button = (Button) findViewById(R.id.login_button);
         button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(FullscreenActivity.this, FirebaseActivity.class);
-                String username11 = username1.getText().toString();
-                String password11 = password1.getText().toString();
+                String username11 = unameText.getText().toString();
+                String password11 = pwText.getText().toString();
+
+                if (username11.isEmpty()) {
+                    Toast.makeText(FullscreenActivity.this,
+                            "You have to enter a username!", Toast.LENGTH_LONG).show();
+                    return;
+                } else if (password11.isEmpty()) {
+                    Toast.makeText(FullscreenActivity.this,
+                            "You have to enter a password!", Toast.LENGTH_LONG).show();
+                    return;
+                }
+
+                Intent intent = new Intent(FullscreenActivity.this,
+                        FirebaseActivity.class);
+                Bundle extras = new Bundle();
                 extras.putString("enter_username", username11);
                 extras.putString("enter_password", password11);
                 intent.putExtras(extras);
                 startActivity(intent);
             }
         });
-
     }
 
-    public void registerAccount() {
-        TextView button = (TextView) findViewById(R.id.register_button);
-        button.setOnClickListener(new View.OnClickListener(){
+    public void setRegisterButtonBehavior() {
+        TextView tv = (TextView) findViewById(R.id.register_button);
+        tv.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View v) {
-                startActivity(new Intent(FullscreenActivity.this, RegisterActivity.class));
+                startActivity(new Intent(FullscreenActivity.this,
+                        RegisterActivity.class));
             }
         });
     }

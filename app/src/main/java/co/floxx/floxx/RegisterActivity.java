@@ -2,11 +2,12 @@ package co.floxx.floxx;
 
 import android.content.Intent;
 import android.graphics.Typeface;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.TextView;
 import android.widget.Toast;
 
 public class RegisterActivity extends AppCompatActivity {
@@ -17,6 +18,9 @@ public class RegisterActivity extends AppCompatActivity {
         Button button = (Button) findViewById(R.id.register_button);
 
         Typeface montserrat = Typeface.createFromAsset(getAssets(), "Montserrat-Regular.otf");
+        ((TextView) findViewById(R.id.register_welcome)).setTypeface(montserrat);
+        ((TextView) findViewById(R.id.register_subtext)).setTypeface(montserrat);
+
         final EditText usernameText = (EditText) findViewById(R.id.register_user);
         final EditText emailText = (EditText) findViewById(R.id.register_email);
         final EditText passwordText = (EditText) findViewById(R.id.register_password);
