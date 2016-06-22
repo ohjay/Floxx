@@ -6,6 +6,8 @@
 
     <color name="black_overlay">#66000000</color>
     <color name="bright_green">#04f048</color>
+    <color name="owen_gold">#FFDE00</color>
+    <color name="berkeley_blue">#003A70</color>
 
     <!-- Android material design colors -->
     <color name="md_red_500">#F44336</color>

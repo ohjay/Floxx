@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.graphics.Typeface;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.view.Gravity;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -14,6 +15,8 @@ import android.widget.Toast;
  * The full-screen activity that serves as Floxx's splash (/landing) page.
  */
 public class FullscreenActivity extends AppCompatActivity {
+    private EditText unameText;
+    private EditText pwText;
 
     @Override
     protected void onResume() {
@@ -29,18 +32,20 @@ public class FullscreenActivity extends AppCompatActivity {
 
         // Cool fonts let's go!
         Typeface montserrat = Typeface.createFromAsset(getAssets(), "Montserrat-Regular.otf");
-        final EditText unameText = (EditText) findViewById(R.id.enter_username);
-        final EditText pwText = (EditText) findViewById(R.id.enter_password);
+        unameText = (EditText) findViewById(R.id.enter_username);
         unameText.setTypeface(montserrat);
+
+        pwText = (EditText) findViewById(R.id.enter_password);
         pwText.setTypeface(montserrat);
 
         // Assign button behaviors
         setRegisterButtonBehavior();
-        setLoginButtonBehavior(unameText, pwText);
+        setLoginButtonBehavior();
     }
 
-    public void setLoginButtonBehavior(final EditText unameText, final EditText pwText) {
+    public void setLoginButtonBehavior() {
         Button button = (Button) findViewById(R.id.login_button);
+
         button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -48,12 +53,16 @@ public class FullscreenActivity extends AppCompatActivity {
                 String password11 = pwText.getText().toString();
 
                 if (username11.isEmpty()) {
-                    Toast.makeText(FullscreenActivity.this,
-                            "You have to enter a username!", Toast.LENGTH_LONG).show();
+                    Toast toast = Toast.makeText(FullscreenActivity.this,
+                            "You have to enter a username!", Toast.LENGTH_LONG);
+                    toast.setGravity(Gravity.TOP|Gravity.CENTER_HORIZONTAL, 0, 30);
+                    toast.show();
                     return;
                 } else if (password11.isEmpty()) {
-                    Toast.makeText(FullscreenActivity.this,
-                            "You have to enter a password!", Toast.LENGTH_LONG).show();
+                    Toast toast = Toast.makeText(FullscreenActivity.this,
+                            "You have to enter a password!", Toast.LENGTH_LONG);
+                    toast.setGravity(Gravity.TOP|Gravity.CENTER_HORIZONTAL, 0, 30);
+                    toast.show();
                     return;
                 }
 
@@ -70,6 +79,7 @@ public class FullscreenActivity extends AppCompatActivity {
 
     public void setRegisterButtonBehavior() {
         TextView tv = (TextView) findViewById(R.id.register_button);
+
         tv.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View v) {

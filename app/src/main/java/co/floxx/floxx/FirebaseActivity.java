@@ -1,10 +1,14 @@
 package co.floxx.floxx;
 
 import android.content.Intent;
+import android.graphics.Typeface;
 import android.os.Bundle;
 import android.os.Handler;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
+import android.view.Gravity;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.firebase.client.AuthData;
@@ -13,6 +17,7 @@ import com.firebase.client.Firebase;
 import com.firebase.client.FirebaseError;
 import com.firebase.client.Query;
 import com.firebase.client.ValueEventListener;
+import com.github.silvestrpredko.dotprogressbar.DotProgressBar;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -32,6 +37,16 @@ public class FirebaseActivity extends AppCompatActivity {
         ref = new Firebase("https://floxx.firebaseio.com/");
 
         setContentView(R.layout.activity_firebase);
+
+        Typeface montserrat = Typeface.createFromAsset(getAssets(), "Montserrat-Regular.otf");
+        ((TextView) findViewById(R.id.connecting)).setTypeface(montserrat);
+
+        DotProgressBar progressBar = (DotProgressBar) findViewById(R.id.firebase_progress);
+        progressBar.setStartColor(ContextCompat.getColor(this, R.color.berkeley_blue));
+        progressBar.setEndColor(ContextCompat.getColor(this, R.color.owen_gold));
+        progressBar.setDotAmount(6);
+        progressBar.setAnimationTime(200);
+
         Intent intent = getIntent();
         Bundle extras = intent.getExtras();
 
@@ -93,7 +108,10 @@ public class FirebaseActivity extends AppCompatActivity {
                 @Override
                 public void onAuthenticationError(FirebaseError firebaseError) {
                     Intent intent = new Intent(FirebaseActivity.this, FullscreenActivity.class);
-                    Toast.makeText(FirebaseActivity.this, firebaseError.getMessage(), Toast.LENGTH_LONG).show();
+                    Toast toast = Toast.makeText(FirebaseActivity.this,
+                            firebaseError.getMessage(), Toast.LENGTH_LONG);
+                    toast.setGravity(Gravity.TOP|Gravity.CENTER_HORIZONTAL, 0, 30);
+                    toast.show();
                     FirebaseActivity.this.startActivity(intent);
                     finish();
                 }
@@ -278,7 +296,7 @@ public class FirebaseActivity extends AppCompatActivity {
 
             @Override
             public void onCancelled(FirebaseError firebaseError) {
-                // We can do something here if we want
+                Log.w("FA – addToFriends", "Read failed: " + firebaseError.getMessage());
             }
         });
     }

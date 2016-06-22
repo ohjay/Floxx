@@ -33,4 +33,5 @@
     <string name="register_subtext">Welcome to Floxx!</string>
     <string name="register_desc">You don\'t have a Floxx account!? Don\'t worry, we\'ll fix that
         in no time. Just fill in the fields below and hit the button.</string>
+    <string name="firebase_msg">&#8230;Connecting&#8230;</string>
 </resources>

@@ -24,11 +24,10 @@ TODO (BUG REPORTS)
 ---------------------
 LAYOUTS/UX TO UPGRADE
 ---------------------
-1. Firebase interface (6/21)
-2. User portal interface (6/21)
-3. Transition screen (bottom-layer content) for map (6/21)
-4. Requests interface (6/22)
-5. Group creation interface (6/23)
-6. Meetup portal interface (6/24)
-7. Map interface (6/25)
-8. Portrait/landscape transition (/restrict to portrait?) (6/25)
+1. User portal interface (6/21)
+2. Transition screen (bottom-layer content) for map (6/21)
+3. Requests interface (6/22)
+4. Group creation interface (6/23)
+5. Meetup portal interface (6/24)
+6. Map interface (6/25)
+7. Portrait/landscape transition (/restrict to portrait?) (6/25)
