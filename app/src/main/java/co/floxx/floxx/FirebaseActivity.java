@@ -175,6 +175,9 @@ public class FirebaseActivity extends AppCompatActivity {
 
                 // Default the user's location permissions to "on" (sorry Tony)
                 ref.child("permissions").child(uid).child("location").setValue("on");
+
+                Intermediary.firebaseToFullscreen = true;
+                finish();
             }
 
             @Override
@@ -184,13 +187,11 @@ public class FirebaseActivity extends AppCompatActivity {
                     message = "The specified username is already in use.";
                 }
                 Toast toast = Toast.makeText(FirebaseActivity.this, message, Toast.LENGTH_LONG);
-                toast.setGravity(Gravity.TOP|Gravity.CENTER_HORIZONTAL, 0, 30);
+                toast.setGravity(Gravity.BOTTOM|Gravity.CENTER_HORIZONTAL, 0, 10);
                 toast.show();
+                finish();
             }
         });
-        Intent intent = new Intent(FirebaseActivity.this, FullscreenActivity.class);
-        FirebaseActivity.this.startActivity(intent);
-        finish();
     }
 
     private void blockUntilEmailChecked() {

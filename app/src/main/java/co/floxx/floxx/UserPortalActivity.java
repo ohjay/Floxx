@@ -4,6 +4,7 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.PorterDuff;
 import android.graphics.Typeface;
 import android.os.Bundle;
 import android.support.annotation.ColorInt;
@@ -11,7 +12,9 @@ import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AppCompatActivity;
 import android.text.Html;
 import android.util.Log;
+import android.view.HapticFeedbackConstants;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageButton;
@@ -57,7 +60,7 @@ public class UserPortalActivity extends AppCompatActivity {
                     meetupsRef.addListenerForSingleValueEvent(new ValueEventListener() {
                         @Override
                         public void onDataChange(final DataSnapshot snapshot) {
-                            finalButton.setText("Meetup portal");
+                            finalButton.setText(R.string.meetup_portal);
                             finalButton.setOnClickListener(new View.OnClickListener() {
                                 @Override
                                 public void onClick(View v) {
@@ -84,7 +87,7 @@ public class UserPortalActivity extends AppCompatActivity {
                     });
                 } else {
                     // We want the group creation (fl) portal
-                    finalButton.setText("Group creation portal");
+                    finalButton.setText(R.string.group_creation_portal);
                     finalButton.setOnClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(View v) {
@@ -139,13 +142,15 @@ public class UserPortalActivity extends AppCompatActivity {
         initializePermissionsButton();
         initializeFinalButton();
 
-        ImageButton addFriends = (ImageButton) findViewById(R.id.manage_friends);
-        addFriends.setOnClickListener(new View.OnClickListener() {
+        ImageButton friendsButton = (ImageButton) findViewById(R.id.manage_friends);
+        friendsButton.setOnClickListener(new View.OnClickListener() {
+            @Override
             public void onClick(View view) {
                 Intent intent = new Intent(UserPortalActivity.this, RequestsActivity.class);
                 startActivity(intent);
             }
         });
+        addHighlightAndHapticFeedback(friendsButton);
 
         ImageButton personalizationButton = (ImageButton) findViewById(R.id.customize_marker);
         personalizationButton.setOnClickListener(new View.OnClickListener() {
@@ -154,6 +159,7 @@ public class UserPortalActivity extends AppCompatActivity {
                 makeColorDialog();
             }
         });
+        addHighlightAndHapticFeedback(personalizationButton);
 
         setSelectedColorResIfApplicable();
     }
@@ -198,6 +204,7 @@ public class UserPortalActivity extends AppCompatActivity {
             }
 
         });
+        addHighlightAndHapticFeedback(teButton);
     }
 
     private void initializePermissionsButton() {
@@ -241,6 +248,7 @@ public class UserPortalActivity extends AppCompatActivity {
                 alertDialog.show();
             }
         });
+        addHighlightAndHapticFeedback(permissionsButton);
     }
 
     private void initializeFinalButton() {
@@ -345,5 +353,33 @@ public class UserPortalActivity extends AppCompatActivity {
                 .setSelectedColorRes(selectedColorRes).setDismissOnColorSelected(false)
                 .setOutlineWidth(2).setOnColorSelectedListener(ocsl)
                 .build().show(fm, "color_dialog");
+    }
+
+    private void addHighlightAndHapticFeedback(final ImageButton b) {
+        // Highlight on selection
+        b.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                switch (event.getAction()) {
+                    case MotionEvent.ACTION_DOWN:
+                        b.getBackground().setColorFilter(0x77000000, PorterDuff.Mode.SRC_ATOP);
+                        break;
+                    case MotionEvent.ACTION_UP:
+                        b.getBackground().clearColorFilter();
+                        break;
+                }
+
+                return true;
+            }
+        });
+
+        // Haptic feedback on long press
+        b.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View v) {
+                v.performHapticFeedback(HapticFeedbackConstants.LONG_PRESS);
+                return true;
+            }
+        });
     }
 }

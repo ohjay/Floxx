@@ -12,4 +12,5 @@ public class Intermediary {
     public static String mapToPortalMeetupId;
     public static ArrayList<String> firebaseConfirmed;
     public static String firebaseMeetupId;
+    public static boolean firebaseToFullscreen;
 }

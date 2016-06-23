@@ -12,6 +12,17 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 public class RegisterActivity extends AppCompatActivity {
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+
+        if (Intermediary.firebaseToFullscreen) {
+            Intermediary.firebaseToFullscreen = false;
+            finish();
+        }
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

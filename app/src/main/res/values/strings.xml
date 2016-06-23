@@ -42,4 +42,6 @@
     <string name="tea_era">Tea Era</string>
     <string name="sign_out">Sign Out</string>
     <string name="locn_permission_prompt">Turn location services&#8230;</string>
+    <string name="meetup_portal">Meetup portal</string>
+    <string name="group_creation_portal">Group creation portal</string>
 </resources>
