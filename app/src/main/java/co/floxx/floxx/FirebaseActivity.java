@@ -220,6 +220,7 @@ public class FirebaseActivity extends AppCompatActivity {
                 } else {
                     // Signal the friend list (/group creation) page
                     Intent intent = new Intent(FirebaseActivity.this, UserPortalActivity.class);
+                    intent.putExtra("username", euser);
                     FirebaseActivity.this.startActivity(intent);
                     finish();
                 }
@@ -240,13 +241,16 @@ public class FirebaseActivity extends AppCompatActivity {
                         (ArrayList<String>) snapshot.getValue());
                 Intermediary.firebaseMeetupId = meetupId;
 
-                FirebaseActivity.this.startActivity(
-                        new Intent(FirebaseActivity.this, UserPortalActivity.class));
+                Intent intent = new Intent(FirebaseActivity.this, UserPortalActivity.class);
+                intent.putExtra("username", euser);
+                FirebaseActivity.this.startActivity(intent);
                 finish();
             }
 
             @Override
-            public void onCancelled(FirebaseError firebaseError) {}
+            public void onCancelled(FirebaseError firebaseError) {
+                Log.w("FA – signalMeetupPortal", "Read failed: " + firebaseError.getMessage());
+            }
         });
     }
 

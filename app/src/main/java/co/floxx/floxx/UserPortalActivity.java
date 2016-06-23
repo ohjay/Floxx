@@ -4,14 +4,19 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.Typeface;
 import android.os.Bundle;
 import android.support.annotation.ColorInt;
 import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AppCompatActivity;
+import android.text.Html;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageButton;
+import android.widget.LinearLayout;
+import android.widget.TextView;
 
 import com.firebase.client.DataSnapshot;
 import com.firebase.client.Firebase;
@@ -32,10 +37,12 @@ public class UserPortalActivity extends AppCompatActivity {
     private Firebase ref;
     private String currentUser;
     private int selectedColorRes = R.color.md_blue_500;
+    private String currPermissions = "on";
 
     @Override
     protected void onResume() {
         super.onResume();
+        grabLocnPermissions(currentUser);
         final Button finalButton = (Button) findViewById(R.id.final_button); // it's final get it??
 
         // Reset the functionality of the final button
@@ -112,14 +119,27 @@ public class UserPortalActivity extends AppCompatActivity {
         ref = new Firebase("https://floxx.firebaseio.com/");
         currentUser = ref.getAuth().getUid();
 
+        Intent intent = getIntent();
+        String subtext = "Logged in as " + "<b><font color='#FFFFFF'>"
+                + intent.getStringExtra("username") + "</font></b>";
         setContentView(R.layout.activity_user_portal);
+
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
+            ((TextView) findViewById(R.id.up_subtext)).setText(
+                    Html.fromHtml(subtext, Html.FROM_HTML_MODE_LEGACY));
+        } else {
+            ((TextView) findViewById(R.id.up_subtext)).setText(Html.fromHtml(subtext));
+        }
+
+        Typeface montserrat = Typeface.createFromAsset(getAssets(), "Montserrat-Regular.otf");
+        ((TextView) findViewById(R.id.up_header)).setTypeface(montserrat);
 
         initializeSignOutButton();
         initializeTeaEraButton();
         initializePermissionsButton();
         initializeFinalButton();
 
-        Button addFriends = (Button) findViewById(R.id.add_friends);
+        ImageButton addFriends = (ImageButton) findViewById(R.id.manage_friends);
         addFriends.setOnClickListener(new View.OnClickListener() {
             public void onClick(View view) {
                 Intent intent = new Intent(UserPortalActivity.this, RequestsActivity.class);
@@ -127,7 +147,7 @@ public class UserPortalActivity extends AppCompatActivity {
             }
         });
 
-        Button personalizationButton = (Button) findViewById(R.id.personalize_marker);
+        ImageButton personalizationButton = (ImageButton) findViewById(R.id.customize_marker);
         personalizationButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View view) {
                 // Open a dialog and let users choose colors for their markers
@@ -154,7 +174,7 @@ public class UserPortalActivity extends AppCompatActivity {
     }
 
     private void initializeTeaEraButton() {
-        Button teButton = (Button) findViewById(R.id.TeaEra);
+        ImageButton teButton = (ImageButton) findViewById(R.id.tea_era);
         teButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View view) {
                 AlertDialog alertDialog = new AlertDialog.Builder(UserPortalActivity.this).create();
@@ -181,7 +201,7 @@ public class UserPortalActivity extends AppCompatActivity {
     }
 
     private void initializePermissionsButton() {
-        Button permissionsButton = (Button) findViewById(R.id.locn_permissions_button);
+        ImageButton permissionsButton = (ImageButton) findViewById(R.id.toggle_locn_services);
         permissionsButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View view) {
                 LayoutInflater li = LayoutInflater.from(context);
@@ -207,6 +227,12 @@ public class UserPortalActivity extends AppCompatActivity {
                         });
 
                 AlertDialog alertDialog = dialogBuilder.create();
+
+                TextView currStateText = new TextView(UserPortalActivity.this);
+                currStateText.setText("(Location services are currently " + currPermissions + ".)");
+                LinearLayout ll = (LinearLayout) dialogView.findViewById(R.id.permission_root);
+                ll.addView(currStateText);
+
                 alertDialog.show();
             }
         });
@@ -272,6 +298,24 @@ public class UserPortalActivity extends AppCompatActivity {
         Map<String, String> map = new HashMap<String, String>();
         map.put("location", permissionValue);
         ref.child("permissions").child(uid).setValue(map);
+        currPermissions = permissionValue;
+    }
+
+    private void grabLocnPermissions(final String uid) {
+        Query queryRef = ref.child("permissions").child(uid).child("location");
+        queryRef.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                if (dataSnapshot.exists()) {
+                    currPermissions = dataSnapshot.getValue().toString();
+                }
+            }
+
+            @Override
+            public void onCancelled(FirebaseError firebaseError) {
+                Log.w("grabLocnPermissions", "Read failed: " + firebaseError.getMessage());
+            }
+        });
     }
 
     private void makeColorDialog() {
