@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.graphics.Typeface;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.view.Gravity;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -38,8 +39,10 @@ public class RegisterActivity extends AppCompatActivity {
                 String confirm = confirmText.getText().toString();
 
                 if (!password.equals(confirm)) {
-                    Toast.makeText(RegisterActivity.this, "Passwords did not match. Try again!",
-                            Toast.LENGTH_LONG).show();
+                    Toast toast = Toast.makeText(RegisterActivity.this,
+                            "Passwords did not match. Try again!", Toast.LENGTH_LONG);
+                    toast.setGravity(Gravity.BOTTOM|Gravity.CENTER_HORIZONTAL, 0, 10);
+                    toast.show();
                     return;
                 }
 

@@ -58,7 +58,10 @@ public class FirebaseActivity extends AppCompatActivity {
 
         if (euser == null) {
             if (!isEmailValid(remail)) {
-                Toast.makeText(this, "Invalid email!", Toast.LENGTH_LONG).show();
+                Toast toast = Toast.makeText(this, "That's not a valid email!",
+                        Toast.LENGTH_LONG);
+                toast.setGravity(Gravity.BOTTOM|Gravity.CENTER_HORIZONTAL, 0, 10);
+                toast.show();
                 finish();
                 return; // not sure if this is necessary, but it won't hurt
             }
@@ -77,9 +80,10 @@ public class FirebaseActivity extends AppCompatActivity {
                         final String storedEmail = child.getKey();
                         if (storedEmail.equals(nodots)) {
                             // Exit; we can't have duplicates
-                            Intent intent = new Intent(FirebaseActivity.this, RegisterActivity.class);
-                            Toast.makeText(FirebaseActivity.this, "Email already in use. :(",
-                                    Toast.LENGTH_LONG).show();
+                            Toast toast = Toast.makeText(FirebaseActivity.this,
+                                    "Email already in use. :(", Toast.LENGTH_LONG);
+                            toast.setGravity(Gravity.BOTTOM|Gravity.CENTER_HORIZONTAL, 0, 10);
+                            toast.show();
                             finish();
                             return;
                         }
@@ -130,7 +134,10 @@ public class FirebaseActivity extends AppCompatActivity {
             public void onSuccess(Map<String, Object> result) {
                 uid = result.get("uid").toString();
                 System.out.println("Successfully created user account with uid: " + uid);
-                Toast.makeText(FirebaseActivity.this, "You were able to register!", Toast.LENGTH_LONG).show();
+                Toast toast = Toast.makeText(FirebaseActivity.this, "You were able to register!",
+                        Toast.LENGTH_LONG);
+                toast.setGravity(Gravity.BOTTOM|Gravity.CENTER_HORIZONTAL, 0, 10);
+                toast.show();
 
                 // Add the username and UID to Firebase
                 Map<String, Object> uidMap = new HashMap<String, Object>();
@@ -176,7 +183,9 @@ public class FirebaseActivity extends AppCompatActivity {
                 if (message.startsWith("The specified email address is already in use")) {
                     message = "The specified username is already in use.";
                 }
-                Toast.makeText(FirebaseActivity.this, message, Toast.LENGTH_LONG).show();
+                Toast toast = Toast.makeText(FirebaseActivity.this, message, Toast.LENGTH_LONG);
+                toast.setGravity(Gravity.TOP|Gravity.CENTER_HORIZONTAL, 0, 30);
+                toast.show();
             }
         });
         Intent intent = new Intent(FirebaseActivity.this, FullscreenActivity.class);

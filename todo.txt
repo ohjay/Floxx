@@ -2,9 +2,9 @@
 TODO (ESSENTIAL)
 ----------------
 1. Send email confirmations during registration. [2 hrs] /RICHARD
-2. Fix the app UI/layout...! [14 hrs]
+2. Fix the app UI/layout...! [15 hrs]
 
-// Total: 16 hrs
+// Total: 17 hrs
 * Time estimates = (Owen's original call) x 2
 * Reminder: also look @ the TODOs scattered across our codebase
 
@@ -15,18 +15,20 @@ TODO (MINOR and/or OPTIONAL)
 2. Upon startup, have map zoom in at an appropriate level (scaled to minimally fit all of the people in the group).
 3. Add a "move marker" button to the map overlay that allows only one user to move the meeting marker at a time (this should prevent weird jumpy meeting points).
 
-------------------
-TODO (BUG REPORTS)
-------------------
+-------------------------
+TODO (BUG REPORTS / EASY)
+-------------------------
 1. Somehow I got TWO fullscreen activities by hitting the back button a lot. Look into this.
 2. Get rid of the double requests page (since the searchable thingy seems to create a new view).
+3. The search view says "...please stand by..." for some reason.
+4. Gray out (/disallow) already-requested friends on Requests page.
 
 ---------------------
 LAYOUTS/UX TO UPGRADE
 ---------------------
-1. User portal interface (6/21)
-2. Requests interface (6/22)
-3. Group creation interface (6/23)
+1. User portal interface (6/22)
+2. Requests interface (6/23)
+3. Group creation interface (6/24)
 4. Meetup portal interface (6/24)
 5. Map interface (incl. bottom layer) (6/25)
-6. Portrait/landscape transition (/restrict to portrait?) (6/25)
+6. Portrait/landscape transition for each page (/restrict to portrait?) (6/25)
