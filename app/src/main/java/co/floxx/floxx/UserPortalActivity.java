@@ -229,7 +229,12 @@ public class UserPortalActivity extends AppCompatActivity {
                 AlertDialog alertDialog = dialogBuilder.create();
 
                 TextView currStateText = new TextView(UserPortalActivity.this);
-                currStateText.setText("(Location services are currently " + currPermissions + ".)");
+                String currState = "(Location services are currently <b>" + currPermissions + "</b>.)";
+                if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
+                    currStateText.setText(Html.fromHtml(currState, Html.FROM_HTML_MODE_LEGACY));
+                } else {
+                    currStateText.setText(Html.fromHtml(currState));
+                }
                 LinearLayout ll = (LinearLayout) dialogView.findViewById(R.id.permission_root);
                 ll.addView(currStateText);
 

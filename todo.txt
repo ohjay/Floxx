@@ -2,9 +2,9 @@
 TODO (ESSENTIAL)
 ----------------
 1. Send email confirmations during registration. [2 hrs] /RICHARD
-2. Fix the app UI/layout...! [15 hrs]
+2. Fix the app UI/layout...! [12 hrs]
 
-// Total: 17 hrs
+// Total: 14 hrs
 * Time estimates = (Owen's original call) x 2
 * Reminder: also look @ the TODOs scattered across our codebase
 
