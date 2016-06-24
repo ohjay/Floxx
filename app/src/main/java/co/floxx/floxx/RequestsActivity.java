@@ -106,7 +106,7 @@ public class RequestsActivity extends AppCompatActivity {
                     });
 
                     // Setting up the accept button
-                    acceptButton.setImageResource(R.drawable.ic_plusone_standard_off_client);
+                    acceptButton.setImageResource(R.drawable.ic_check_circle_white_24dp);
                     acceptButton.setOnClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(View v) {
@@ -120,7 +120,7 @@ public class RequestsActivity extends AppCompatActivity {
                     });
 
                     // Setting up the decline button
-                    declineButton.setImageResource(R.drawable.ic_media_route_off_mono_dark);
+                    declineButton.setImageResource(R.drawable.ic_block_white_24dp);
                     declineButton.setOnClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(View v) {
@@ -458,7 +458,7 @@ public class RequestsActivity extends AppCompatActivity {
     void sendFriendRequest(final String username) {
         Firebase.setAndroidContext(this);
         final Firebase ref = new Firebase("https://floxx.firebaseio.com/");
-        final String senderID = ref.getAuth().getUid().toString(); // current user
+        final String senderID = ref.getAuth().getUid(); // current user
         final String recipientID = allUsers.get(username);
 
         // Save sender UID under /users/<recipient UID>/requests
@@ -515,7 +515,7 @@ public class RequestsActivity extends AppCompatActivity {
 
             // Creating the image button (the ADD symbol)
             requestButton = new ImageButton(context);
-            requestButton.setImageResource(R.drawable.ic_plusone_standard_off_client);
+            requestButton.setImageResource(R.drawable.ic_add_circle_white_24dp);
 
             requestButton.setOnClickListener(new OnClickListener() {
                 @Override
