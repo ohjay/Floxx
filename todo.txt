@@ -19,11 +19,9 @@ TODO (MINOR and/or OPTIONAL)
 TODO (BUG REPORTS / EASY)
 -------------------------
 1. Somehow I got TWO fullscreen activities by hitting the back button a lot. Look into this.
-2. Get rid of the double requests page (since the searchable thingy seems to create a new view).
-3. The search view says "...please stand by..." for some reason.
-4. Gray out (/disallow) already-requested friends on Requests page.
-5. Crash when creating a group and running the map for the first time (after confirming that I'll allow Floxx to "access this device's location").
-6. Include your own ETA on the map.
+2. Gray out (/disallow) already-requested friends on Requests page.
+3. Bug report: crash when creating a group and running the map for the first time (after confirming that you'll allow Floxx to "access this device's location").
+4. Include your own ETA on the map.
 
 ---------------------
 LAYOUTS/UX TO UPGRADE

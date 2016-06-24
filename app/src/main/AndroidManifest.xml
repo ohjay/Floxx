@@ -28,7 +28,6 @@
             android:theme="@style/FullscreenTheme">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
@@ -45,20 +44,12 @@
         <activity
             android:name=".FirebaseActivity"
             android:noHistory="true" />
-        <activity android:name=".RequestsActivity">
-            <meta-data
-                android:name="android.app.default_searchable"
-                android:value=".SearchableUsers" />
-
+        <activity
+            android:name=".RequestsActivity"
+            android:launchMode="singleTop">
             <intent-filter>
                 <action android:name="android.intent.action.SEARCH" />
             </intent-filter>
-        </activity>
-        <activity android:name=".SearchableUsers">
-            <intent-filter>
-                <action android:name="android.intent.action.SEARCH" />
-            </intent-filter>
-
             <meta-data
                 android:name="android.app.searchable"
                 android:resource="@xml/searchable" />
@@ -66,7 +57,7 @@
         <activity android:name=".MeetupPortalActivity" />
 
         <service android:name=".LocationUpdateService"
-            android:permission="android.permission.BIND_JOB_SERVICE"></service>
+            android:permission="android.permission.BIND_JOB_SERVICE" />
     </application>
 
 </manifest>

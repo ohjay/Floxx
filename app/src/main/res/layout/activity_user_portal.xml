@@ -19,10 +19,7 @@
         <RelativeLayout
             android:id="@+id/portal_layout"
             android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:clickable="true"
-            android:focusable="true"
-            android:focusableInTouchMode="true">
+            android:layout_height="wrap_content">
 
             <View
                 android:layout_marginTop="35dp"

@@ -11,7 +11,7 @@
     <string name="standby">&#8230;Please stand by&#8230;</string>
     <string name="group_creation_header">Create a group</string>
     <string name="search_users">Search for friends</string>
-    <string name="reqs_header">== Requests ==</string>
+    <string name="reqs_header">Friends</string>
     <string name="search_header">[Search and request]</string>
     <string name="received_header">[Received]</string>
 
