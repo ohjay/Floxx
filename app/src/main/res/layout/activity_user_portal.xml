@@ -19,7 +19,10 @@
         <RelativeLayout
             android:id="@+id/portal_layout"
             android:layout_width="fill_parent"
-            android:layout_height="wrap_content">
+            android:layout_height="wrap_content"
+            android:clickable="true"
+            android:focusable="true"
+            android:focusableInTouchMode="true">
 
             <View
                 android:layout_marginTop="35dp"
@@ -120,28 +123,32 @@
                 android:scaleType="centerInside"
                 android:background="@null" />
 
-            <Button
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="35dp"
+            <ImageButton
                 android:id="@+id/final_button"
+                android:src="@drawable/group_creation"
                 android:layout_below="@id/toggle_locn_services"
-                android:layout_centerHorizontal="true"
-                android:layout_marginBottom="-3dip"
-                android:backgroundTint="#000"
-                android:textColor="#fff" />
-
-            <Button
-                android:id="@+id/sign_out"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/sign_out"
-                android:layout_below="@+id/final_button"
+                android:layout_alignStart="@id/ruler"
+                android:layout_alignEnd="@id/ruler"
                 android:layout_centerHorizontal="true"
-                android:layout_marginBottom="35dp"
-                android:backgroundTint="#000"
-                android:layout_marginTop="-3dip"
-                android:textColor="#fff" />
+                android:adjustViewBounds="true"
+                android:scaleType="centerInside"
+                android:background="@null" />
+
+            <ImageButton
+                android:id="@+id/sign_out"
+                android:src="@drawable/sign_out"
+                android:layout_below="@id/final_button"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignStart="@id/ruler"
+                android:layout_alignEnd="@id/ruler"
+                android:layout_centerHorizontal="true"
+                android:adjustViewBounds="true"
+                android:scaleType="centerInside"
+                android:background="@null"
+                android:layout_marginBottom="35dp" />
         </RelativeLayout>
     </ScrollView>
 </RelativeLayout>

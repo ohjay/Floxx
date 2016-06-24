@@ -36,12 +36,5 @@
     <string name="firebase_msg">&#8230;Connecting&#8230;</string>
 
     <string name="up_header">User Portal</string>
-    <string name="add_friends">Add Friends</string>
-    <string name="toggle_locn">Toggle Location Service</string>
-    <string name="personalize_marker">Personalize Marker</string>
-    <string name="tea_era">Tea Era</string>
-    <string name="sign_out">Sign Out</string>
     <string name="locn_permission_prompt">Turn location services&#8230;</string>
-    <string name="meetup_portal">Meetup portal</string>
-    <string name="group_creation_portal">Group creation portal</string>
 </resources>

@@ -113,7 +113,8 @@ public class FirebaseActivity extends AppCompatActivity {
                 public void onAuthenticationError(FirebaseError firebaseError) {
                     Intent intent = new Intent(FirebaseActivity.this, FullscreenActivity.class);
                     Toast toast = Toast.makeText(FirebaseActivity.this,
-                            firebaseError.getMessage(), Toast.LENGTH_LONG);
+                            firebaseError.getMessage().replace("email address", "username"),
+                            Toast.LENGTH_LONG);
                     toast.setGravity(Gravity.TOP|Gravity.CENTER_HORIZONTAL, 0, 30);
                     toast.show();
                     FirebaseActivity.this.startActivity(intent);

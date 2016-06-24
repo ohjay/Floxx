@@ -28,8 +28,8 @@ TODO (BUG REPORTS / EASY)
 ---------------------
 LAYOUTS/UX TO UPGRADE
 ---------------------
-1. Requests interface (6/23)
-2. Group creation interface (6/24)
-3. Meetup portal interface (6/24)
-4. Map interface (incl. bottom layer) (6/25)
-5. Portrait/landscape transition for each page (/restrict to portrait?) (6/25)
+1. Requests interface (6/24)
+2. Group creation interface (6/25)
+3. Meetup portal interface (6/25)
+4. Map interface (incl. bottom layer) (6/26)
+5. Portrait/landscape transition for each page (/restrict to portrait?) (6/26)

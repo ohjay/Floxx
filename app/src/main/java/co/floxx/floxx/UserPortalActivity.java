@@ -16,7 +16,6 @@ import android.view.HapticFeedbackConstants;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
-import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -33,6 +32,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 
 public class UserPortalActivity extends AppCompatActivity {
@@ -41,12 +41,14 @@ public class UserPortalActivity extends AppCompatActivity {
     private String currentUser;
     private int selectedColorRes = R.color.md_blue_500;
     private String currPermissions = "on";
+    private HashSet<ImageButton> highlightedButtons = new HashSet<ImageButton>();
 
     @Override
     protected void onResume() {
         super.onResume();
         grabLocnPermissions(currentUser);
-        final Button finalButton = (Button) findViewById(R.id.final_button); // it's final get it??
+        final ImageButton finalButton =
+                (ImageButton) findViewById(R.id.final_button); // it's final get it??
 
         // Reset the functionality of the final button
         Query ongoingRef = ref.child("ongoing");
@@ -60,7 +62,7 @@ public class UserPortalActivity extends AppCompatActivity {
                     meetupsRef.addListenerForSingleValueEvent(new ValueEventListener() {
                         @Override
                         public void onDataChange(final DataSnapshot snapshot) {
-                            finalButton.setText(R.string.meetup_portal);
+                            finalButton.setImageResource(R.drawable.meetup_portal);
                             finalButton.setOnClickListener(new View.OnClickListener() {
                                 @Override
                                 public void onClick(View v) {
@@ -87,7 +89,7 @@ public class UserPortalActivity extends AppCompatActivity {
                     });
                 } else {
                     // We want the group creation (fl) portal
-                    finalButton.setText(R.string.group_creation_portal);
+                    finalButton.setImageResource(R.drawable.group_creation);
                     finalButton.setOnClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(View v) {
@@ -165,7 +167,7 @@ public class UserPortalActivity extends AppCompatActivity {
     }
 
     private void initializeSignOutButton() {
-        Button signOutButton = (Button) findViewById(R.id.sign_out);
+        ImageButton signOutButton = (ImageButton) findViewById(R.id.sign_out);
         signOutButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -177,6 +179,7 @@ public class UserPortalActivity extends AppCompatActivity {
                 finish();
             }
         });
+        addHighlightAndHapticFeedback(signOutButton);
     }
 
     private void initializeTeaEraButton() {
@@ -252,11 +255,11 @@ public class UserPortalActivity extends AppCompatActivity {
     }
 
     private void initializeFinalButton() {
-        Button finalButton = (Button) findViewById(R.id.final_button);
+        ImageButton finalButton = (ImageButton) findViewById(R.id.final_button);
         if (Intermediary.firebaseMeetupId != null) {
-            finalButton.setText("Meetup portal");
+            finalButton.setImageResource(R.drawable.meetup_portal);
         } else {
-            finalButton.setText("Group creation portal");
+            finalButton.setImageResource(R.drawable.group_creation);
         }
 
         finalButton.setOnClickListener(new View.OnClickListener() {
@@ -282,6 +285,7 @@ public class UserPortalActivity extends AppCompatActivity {
                 startActivity(intent);
             }
         });
+        addHighlightAndHapticFeedback(finalButton);
     }
 
     private void setSelectedColorResIfApplicable() {
@@ -355,30 +359,31 @@ public class UserPortalActivity extends AppCompatActivity {
                 .build().show(fm, "color_dialog");
     }
 
-    private void addHighlightAndHapticFeedback(final ImageButton b) {
+    private void addHighlightAndHapticFeedback(final ImageButton ib) {
         // Highlight on selection
-        b.setOnTouchListener(new View.OnTouchListener() {
+        ib.setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View v, MotionEvent event) {
-                switch (event.getAction()) {
-                    case MotionEvent.ACTION_DOWN:
-                        b.getBackground().setColorFilter(0x77000000, PorterDuff.Mode.SRC_ATOP);
-                        break;
-                    case MotionEvent.ACTION_UP:
-                        b.getBackground().clearColorFilter();
-                        break;
+                if (event.getAction() == MotionEvent.ACTION_DOWN) {
+                    ib.setColorFilter(0x21000000, PorterDuff.Mode.SRC_ATOP);
+                    highlightedButtons.add(ib);
+                } else {
+                    for (ImageButton hb : highlightedButtons) {
+                        hb.clearColorFilter();
+                    }
+                    highlightedButtons.clear();
                 }
 
-                return true;
+                return false;
             }
         });
 
         // Haptic feedback on long press
-        b.setOnLongClickListener(new View.OnLongClickListener() {
+        ib.setOnLongClickListener(new View.OnLongClickListener() {
             @Override
             public boolean onLongClick(View v) {
                 v.performHapticFeedback(HapticFeedbackConstants.LONG_PRESS);
-                return true;
+                return false;
             }
         });
     }
