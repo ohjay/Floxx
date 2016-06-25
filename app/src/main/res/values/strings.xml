@@ -12,8 +12,8 @@
     <string name="group_creation_header">Create a group</string>
     <string name="search_users">Search for friends</string>
     <string name="reqs_header">Friends</string>
-    <string name="search_header">[Search and request]</string>
-    <string name="received_header">[Received]</string>
+    <string name="search_header">Add Friends</string>
+    <string name="received_header">Pending Friend Requests</string>
 
     <string name="register_username_prompt">Enter a desired username</string>
     <string name="register_email_prompt">Enter an email address</string>

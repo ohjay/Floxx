@@ -50,11 +50,17 @@ public class RequestsActivity extends AppCompatActivity {
     private static final int PROGRESS_DELAY = 1000; // this is in ms!
     private HashSet<String> currentFriends;
     private String currentUsername;
+    private HashSet<String> pending = new HashSet<String>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_requests);
+
+        Typeface montserrat = Typeface.createFromAsset(getAssets(), "Montserrat-Regular.otf");
+        ((TextView) findViewById(R.id.reqs_header)).setTypeface(montserrat);
+        ((TextView) findViewById(R.id.received_header)).setTypeface(montserrat);
+        ((TextView) findViewById(R.id.search_header)).setTypeface(montserrat);
 
         // Search view stuff
         SearchManager searchManager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
@@ -67,6 +73,22 @@ public class RequestsActivity extends AppCompatActivity {
         Firebase.setAndroidContext(this);
         ref = new Firebase("https://floxx.firebaseio.com/");
         final String currentUser = ref.getAuth().getUid();
+
+        // Get pending friend reqs
+        ref.child(currentUser).addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                ArrayList<String> sent = (ArrayList<String>) dataSnapshot.getValue();
+                if (sent != null) {
+                    pending = new HashSet<String>(sent);
+                }
+            }
+
+            @Override
+            public void onCancelled(FirebaseError firebaseError) {
+                Log.w("RA – onCreate", "Read failed: " + firebaseError.getMessage());
+            }
+        });
 
         // Populate the "received requests" area
         context = this;
@@ -364,6 +386,23 @@ public class RequestsActivity extends AppCompatActivity {
                 Log.w("RA – destroyRequest", "Read failed: " + firebaseError.getMessage());
             }
         });
+
+        // Remove the request from the sender's pending list
+        ref.child(senderID).addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                ArrayList<String> sent = (ArrayList<String>) dataSnapshot.getValue();
+                if (sent != null) {
+                    sent.remove(FriendListActivity.names.get(recipientID));
+                    ref.child(senderID).setValue(sent);
+                }
+            }
+
+            @Override
+            public void onCancelled(FirebaseError firebaseError) {
+                Log.w("RA – destroyReq", "Read failed: " + firebaseError.getMessage());
+            }
+        });
     }
 
     private void runProgressHandler() {
@@ -403,7 +442,6 @@ public class RequestsActivity extends AppCompatActivity {
     private void executeSearch(String query) {
         ArrayList<String> results = new ArrayList<String>();
 
-        // TODO (Owen): exclude users whom you've already requested
         if (!query.isEmpty()) { // alternatively, maybe > 2 chars or so?
             for (String username : allUsers.keySet()) {
                 if (username.equals(currentUsername) || currentFriends.contains(username)) {
@@ -461,6 +499,28 @@ public class RequestsActivity extends AppCompatActivity {
         final String senderID = ref.getAuth().getUid(); // current user
         final String recipientID = allUsers.get(username);
 
+        pending.add(username);
+
+        ref.child(senderID).addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                ArrayList<String> sent = (ArrayList<String>) dataSnapshot.getValue();
+                if (sent == null) {
+                    sent = new ArrayList<String>();
+                    sent.add(username);
+                } else if (!sent.contains(username)) {
+                    sent.add(username);
+                }
+
+                ref.child(senderID).setValue(sent);
+            }
+
+            @Override
+            public void onCancelled(FirebaseError firebaseError) {
+                Log.w("RA – sendFReq", "Read failed: " + firebaseError.getMessage());
+            }
+        });
+
         // Save sender UID under /users/<recipient UID>/requests
         // For the future: it'd be nice to store the date as well
         Query queryRef = ref.child("users").orderByKey().equalTo(recipientID);
@@ -510,27 +570,34 @@ public class RequestsActivity extends AppCompatActivity {
             nameView = new TextView(context);
             nameView.setText(username);
             nameView.setTextSize(19);
-            nameView.setTextColor(Color.BLACK);
             nameView.setTypeface(Typeface.SANS_SERIF);
 
             // Creating the image button (the ADD symbol)
-            requestButton = new ImageButton(context);
-            requestButton.setImageResource(R.drawable.ic_add_circle_white_24dp);
+            if (pending.contains(username)) {
+                nameView.setTextColor(Color.GRAY);
+                addView(nameView, new LinearLayout.LayoutParams(LayoutParams.WRAP_CONTENT,
+                        LayoutParams.WRAP_CONTENT));
+            } else {
+                nameView.setTextColor(Color.BLACK);
 
-            requestButton.setOnClickListener(new OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    // Send a connection request
-                    sendFriendRequest(username);
-                    removeView(nameView);
-                    removeView(requestButton);
-                }
-            });
+                requestButton = new ImageButton(context);
+                requestButton.setImageResource(R.drawable.ic_add_circle_white_24dp);
 
-            addView(nameView, new LinearLayout.LayoutParams(LayoutParams.WRAP_CONTENT,
-                    LayoutParams.WRAP_CONTENT));
-            addView(requestButton, new LinearLayout.LayoutParams(LayoutParams.WRAP_CONTENT,
-                    LayoutParams.WRAP_CONTENT)); // can set .gravity = Gravity.RIGHT
+                requestButton.setOnClickListener(new OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        // Send a connection request
+                        sendFriendRequest(username);
+                        nameView.setTextColor(Color.GRAY);
+                        removeView(requestButton);
+                    }
+                });
+
+                addView(nameView, new LinearLayout.LayoutParams(LayoutParams.WRAP_CONTENT,
+                        LayoutParams.WRAP_CONTENT));
+                addView(requestButton, new LinearLayout.LayoutParams(LayoutParams.WRAP_CONTENT,
+                        LayoutParams.WRAP_CONTENT)); // can set .gravity = Gravity.RIGHT
+            }
         }
 
         public void setTextContent(String content) {

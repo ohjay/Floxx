@@ -2,7 +2,7 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
+    android:layout_height="wrap_content"
     tools:context="co.floxx.floxx.RequestsActivity">
 
     <ImageView
@@ -12,98 +12,104 @@
         android:scaleType="centerCrop"
         android:src="@drawable/gradient_ii" />
 
-    <View
-        android:layout_marginTop="35dp"
-        android:layout_width="fill_parent"
-        android:layout_height="2dp"
-        android:id="@+id/reqs_divider1"
-        android:background="#fff"
-        android:layout_marginBottom="15dp"
-        android:layout_marginStart="@dimen/up_side_margin"
-        android:layout_marginEnd="@dimen/up_side_margin" />
-
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/reqs_header"
-        android:textSize="40sp"
-        android:id="@+id/reqs_header"
-        android:layout_centerHorizontal="true"
-        android:textColor="#fff"
-        android:layout_below="@id/reqs_divider1"
-        android:layout_marginBottom="15dp" />
-
-    <View
-        android:layout_width="fill_parent"
-        android:layout_height="2dp"
-        android:layout_below="@id/reqs_header"
-        android:id="@+id/reqs_divider2"
-        android:background="#fff"
-        android:layout_marginBottom="35dp"
-        android:layout_marginStart="@dimen/up_side_margin"
-        android:layout_marginEnd="@dimen/up_side_margin" />
-
-    <!-- ========================== -->
-    <!-- Let the main content begin -->
-    <!-- ========================== -->
-
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/search_header"
-        android:textSize="25sp"
-        android:id="@+id/search_header"
-        android:layout_centerHorizontal="true"
-        android:layout_below="@id/reqs_divider2"
-        android:layout_marginBottom="10dp"
-        android:textColor="#fff" />
-
-    <SearchView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:id="@+id/user_search_bar"
-        android:layout_below="@id/search_header"
-        android:textColor="#fff" />
-
-    <ListView
-        android:id="@+id/search_list"
-        android:layout_width="fill_parent"
-        android:layout_height="150dp"
-        android:layout_marginTop="20dp"
-        android:layout_below="@id/user_search_bar" />
-
-    <View
-        android:id="@+id/separator"
-        android:background="#000"
-        android:layout_below="@id/search_list"
-        android:layout_width="fill_parent"
-        android:layout_height="1dp"
-        android:layout_marginTop="10dp"
-        android:layout_margin="10dp" />
-
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/received_header"
-        android:textSize="25sp"
-        android:id="@+id/received_header"
-        android:layout_centerHorizontal="true"
-        android:layout_below="@id/separator"
-        android:textColor="#fff" />
-
     <ScrollView
         android:layout_width="fill_parent"
-        android:layout_height="150dp"
-        android:layout_below="@id/received_header"
-        android:layout_marginTop="20dp"
-        android:id="@+id/received_scrollview">
+        android:layout_height="fill_parent">
 
-        <LinearLayout
+        <RelativeLayout
+            android:id="@+id/areq_layout"
             android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:id="@+id/received_container">
-        </LinearLayout>
-    </ScrollView>
+            android:layout_height="wrap_content">
 
+            <View
+                android:layout_marginTop="35dp"
+                android:layout_width="fill_parent"
+                android:layout_height="2dp"
+                android:id="@+id/reqs_divider1"
+                android:background="#fff"
+                android:layout_marginBottom="15dp"
+                android:layout_marginStart="@dimen/up_side_margin"
+                android:layout_marginEnd="@dimen/up_side_margin" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/reqs_header"
+                android:textSize="40sp"
+                android:id="@+id/reqs_header"
+                android:layout_centerHorizontal="true"
+                android:textColor="#fff"
+                android:layout_below="@id/reqs_divider1"
+                android:layout_marginBottom="15dp" />
+
+            <View
+                android:layout_width="fill_parent"
+                android:layout_height="2dp"
+                android:layout_below="@id/reqs_header"
+                android:id="@+id/reqs_divider2"
+                android:background="#fff"
+                android:layout_marginBottom="35dp"
+                android:layout_marginStart="@dimen/up_side_margin"
+                android:layout_marginEnd="@dimen/up_side_margin" />
+
+            <!-- ========================== -->
+            <!-- Let the main content begin -->
+            <!-- ========================== -->
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/received_header"
+                android:textSize="21sp"
+                android:id="@+id/received_header"
+                android:layout_below="@id/reqs_divider2"
+                android:textColor="#fff"
+                android:layout_marginStart="@dimen/ra_side_margin" />
+
+            <ScrollView
+                android:layout_width="fill_parent"
+                android:layout_height="150dp"
+                android:layout_below="@+id/received_header"
+                android:layout_marginTop="20dp"
+                android:id="@+id/received_scrollview">
+
+                <LinearLayout
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:id="@+id/received_container">
+                </LinearLayout>
+            </ScrollView>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/search_header"
+                android:textSize="21sp"
+                android:id="@+id/search_header"
+                android:layout_below="@+id/received_scrollview"
+                android:layout_marginBottom="10dp"
+                android:textColor="#fff"
+                android:layout_marginStart="@dimen/ra_side_margin" />
+
+            <SearchView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/user_search_bar"
+                android:layout_below="@id/search_header"
+                android:textColor="#fff"
+                android:layout_marginStart="@dimen/ra_side_margin"
+                android:layout_marginEnd="@dimen/ra_side_margin" />
+
+            <ListView
+                android:id="@+id/search_list"
+                android:layout_width="fill_parent"
+                android:layout_height="150dp"
+                android:layout_marginTop="20dp"
+                android:layout_below="@id/user_search_bar"
+                android:layout_marginStart="@dimen/ra_side_margin"
+                android:layout_marginEnd="@dimen/ra_side_margin"
+                android:layout_marginBottom="35dp" />
+        </RelativeLayout>
+    </ScrollView>
 </RelativeLayout>

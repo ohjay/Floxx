@@ -19,9 +19,8 @@ TODO (MINOR and/or OPTIONAL)
 TODO (BUG REPORTS / EASY)
 -------------------------
 1. Somehow I got TWO fullscreen activities by hitting the back button a lot. Look into this.
-2. Gray out (/disallow) already-requested friends on Requests page.
-3. Bug report: crash when creating a group and running the map for the first time (after confirming that you'll allow Floxx to "access this device's location").
-4. Include your own ETA on the map.
+2. Bug report: crash when creating a group and running the map for the first time (after confirming that you'll allow Floxx to "access this device's location").
+3. Include your own ETA on the map.
 
 ---------------------
 LAYOUTS/UX TO UPGRADE
