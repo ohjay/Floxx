@@ -11,7 +11,7 @@
     tools:showIn="@layout/activity_friend_list">
     <ImageButton
         android:id="@+id/user_portal_fbutton"
-        android:src="@drawable/setting_icon"
+        android:src="@drawable/ic_media_route_disabled_mono_dark"
         android:layout_width="62dp"
         android:layout_height="62dp"
         android:layout_marginTop="505dp"

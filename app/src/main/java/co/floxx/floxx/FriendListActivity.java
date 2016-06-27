@@ -89,7 +89,9 @@ public class FriendListActivity extends AppCompatActivity {
         ref = new Firebase("https://floxx.firebaseio.com/");
         uid = ref.getAuth().getUid();
 
-        initializeNames();
+        if (names.isEmpty()) {
+            initializeNames();
+        }
         resetFriendList(); // fill in the entire friend list
 
         // Add meetup invitations to the layout

@@ -10,9 +10,11 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.BaseAdapter;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
@@ -51,8 +53,8 @@ public class RequestsActivity extends AppCompatActivity {
     private ProgressDialog dialog;
     private static final int PROGRESS_DELAY = 1000; // this is in ms!
     private HashSet<String> currentFriends;
-    private String currentUsername;
-    private HashSet<String> pending = new HashSet<String>();
+    private String currentUsername, currUser; // user = UID
+    private HashSet<String> pending = new HashSet<String>(); // YOU sent these and you're waiting
 
     @Override
     protected void onResume() {
@@ -71,9 +73,13 @@ public class RequestsActivity extends AppCompatActivity {
         ((TextView) findViewById(R.id.received_header)).setTypeface(montserrat);
         ((TextView) findViewById(R.id.search_header)).setTypeface(montserrat);
 
+        if (FriendListActivity.names.isEmpty()) {
+            FriendListActivity.initializeNames();
+        }
+
         // Search view stuff
         SearchManager searchManager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
-        SearchView searchView = (SearchView) findViewById(R.id.user_search_bar);
+        final SearchView searchView = (SearchView) findViewById(R.id.user_search_bar);
 
         searchView.setSearchableInfo(searchManager.getSearchableInfo(getComponentName()));
         searchView.setIconifiedByDefault(true);
@@ -164,8 +170,8 @@ public class RequestsActivity extends AppCompatActivity {
                             acceptRequest(senderID, currentUser);
 
                             senderName.setTextColor(Color.DKGRAY);
-                            layout.removeView(acceptButton);
-                            layout.removeView(declineButton);
+                            acceptButton.setVisibility(View.INVISIBLE);
+                            declineButton.setVisibility(View.INVISIBLE);
                         }
                     });
 
@@ -179,8 +185,8 @@ public class RequestsActivity extends AppCompatActivity {
                             declineRequest(senderID, currentUser);
 
                             senderName.setTextColor(Color.DKGRAY);
-                            layout.removeView(acceptButton);
-                            layout.removeView(declineButton);
+                            acceptButton.setVisibility(View.INVISIBLE);
+                            declineButton.setVisibility(View.INVISIBLE);
                         }
                     });
 
@@ -190,13 +196,16 @@ public class RequestsActivity extends AppCompatActivity {
 
                     littleLayout.addView(senderName,
                             new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT,
-                            LinearLayout.LayoutParams.WRAP_CONTENT));
+                            LinearLayout.LayoutParams.MATCH_PARENT));
+                    littleLayout.addView(new View(context), new LinearLayout.LayoutParams(0, 0, 1));
                     littleLayout.addView(acceptButton,
                             new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT,
                             LinearLayout.LayoutParams.WRAP_CONTENT));
                     littleLayout.addView(declineButton,
                             new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT,
                             LinearLayout.LayoutParams.WRAP_CONTENT));
+
+                    senderName.setGravity(Gravity.CENTER_VERTICAL); // it looks weird otherwise
 
                     layout.addView(littleLayout, new LinearLayout.LayoutParams(
                             LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT));
@@ -216,7 +225,7 @@ public class RequestsActivity extends AppCompatActivity {
         listView = (ListView) findViewById(R.id.search_list);
 
         final Firebase ref = new Firebase("https://floxx.firebaseio.com/");
-        final String currUser = ref.getAuth().getUid();
+        currUser = ref.getAuth().getUid();
 
         // Launching the progress dialog
         dialog = new ProgressDialog(this);
@@ -248,11 +257,6 @@ public class RequestsActivity extends AppCompatActivity {
                                     for (DataSnapshot child : dataSnapshot.getChildren()) {
                                         final String name = child.getKey();
                                         allUsers.put(name, fuid);
-
-                                        if (fuid.equals(currUser)) {
-                                            // This is the current user's username
-                                            currentUsername = name;
-                                        }
                                     }
 
                                     ++progressIndex;
@@ -317,6 +321,8 @@ public class RequestsActivity extends AppCompatActivity {
             @Override
             public boolean onQueryTextSubmit(String query) {
                 executeSearch(query);
+                InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+                imm.toggleSoftInput(InputMethodManager.SHOW_FORCED, 0);
                 return true;
             }
 
@@ -326,6 +332,8 @@ public class RequestsActivity extends AppCompatActivity {
                 return true;
             }
         });
+
+        currentUsername = FriendListActivity.names.get(currUser);
     }
 
     private void acceptRequest(String senderID, String recipientID) {
@@ -496,6 +504,9 @@ public class RequestsActivity extends AppCompatActivity {
      */
     private void executeSearch(String query) {
         ArrayList<String> results = new ArrayList<String>();
+        if (currentUsername == null) {
+            currentUsername = FriendListActivity.names.get(currUser);
+        }
 
         if (!query.isEmpty()) { // alternatively, maybe > 2 chars or so?
             int i = 0;
@@ -505,12 +516,12 @@ public class RequestsActivity extends AppCompatActivity {
                 } else if (Pattern.compile(Pattern.quote(query),
                         Pattern.CASE_INSENSITIVE).matcher(username).find()) {
                     results.add(username);
-                }
 
-                if (i >= 4) {
-                    break;
-                } else {
-                    ++i;
+                    if (i >= 4) {
+                        break;
+                    } else {
+                        ++i;
+                    }
                 }
             }
         }
@@ -635,30 +646,30 @@ public class RequestsActivity extends AppCompatActivity {
             nameView.setTypeface(Typeface.SANS_SERIF);
 
             // Creating the image button (the ADD symbol)
+            requestButton = new ImageButton(context);
+            requestButton.setImageResource(R.drawable.ic_add_circle_white_24dp);
+
+            requestButton.setOnClickListener(new OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    // Send a connection request
+                    sendFriendRequest(username);
+                    nameView.setTextColor(Color.DKGRAY);
+                    requestButton.setVisibility(View.INVISIBLE);
+                }
+            });
+
+            addView(nameView, new LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.MATCH_PARENT));
+            addView(new View(context), new LayoutParams(0, 0, 1));
+            addView(requestButton, new LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT));
+
+            nameView.setGravity(Gravity.CENTER_VERTICAL);
+
             if (pending.contains(username)) {
                 nameView.setTextColor(Color.DKGRAY);
-                addView(nameView, new LinearLayout.LayoutParams(LayoutParams.WRAP_CONTENT,
-                        LayoutParams.WRAP_CONTENT));
+                requestButton.setVisibility(View.INVISIBLE);
             } else {
                 nameView.setTextColor(Color.LTGRAY);
-
-                requestButton = new ImageButton(context);
-                requestButton.setImageResource(R.drawable.ic_add_circle_white_24dp);
-
-                requestButton.setOnClickListener(new OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        // Send a connection request
-                        sendFriendRequest(username);
-                        nameView.setTextColor(Color.DKGRAY);
-                        removeView(requestButton);
-                    }
-                });
-
-                addView(nameView, new LinearLayout.LayoutParams(LayoutParams.WRAP_CONTENT,
-                        LayoutParams.WRAP_CONTENT));
-                addView(requestButton, new LinearLayout.LayoutParams(LayoutParams.WRAP_CONTENT,
-                        LayoutParams.WRAP_CONTENT)); // can set .gravity = Gravity.RIGHT
             }
         }
 

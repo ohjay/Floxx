@@ -129,18 +129,18 @@
                 android:layout_below="@id/search_header"
                 android:textColor="#fff"
                 android:layout_marginStart="25dp"
-                android:layout_marginEnd="@dimen/ra_side_margin"
+                android:layout_marginEnd="35dp"
                 android:searchIcon="@drawable/places_ic_search"
                 android:closeIcon="@drawable/places_ic_clear" />
 
             <ListView
                 android:id="@+id/search_list"
                 android:layout_width="fill_parent"
-                android:layout_height="200dp"
+                android:layout_height="225dp"
                 android:layout_marginTop="20dp"
                 android:layout_below="@id/user_search_bar"
                 android:layout_marginStart="@dimen/ra_side_margin"
-                android:layout_marginEnd="@dimen/ra_side_margin"
+                android:layout_marginEnd="45dp"
                 android:layout_marginBottom="35dp" />
         </RelativeLayout>
     </ScrollView>

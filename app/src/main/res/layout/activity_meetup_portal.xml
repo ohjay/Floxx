@@ -37,7 +37,7 @@
 
     <ImageButton
         android:id="@+id/user_portal_mbutton"
-        android:src="@drawable/setting_icon"
+        android:src="@drawable/common_plus_signin_btn_icon_dark_pressed"
         android:layout_width="62dp"
         android:layout_height="62dp"
         android:layout_marginTop="505dp"
