@@ -3,14 +3,15 @@ package co.floxx.floxx;
 import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
+import android.graphics.Typeface;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.Button;
-import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.LinearLayout.LayoutParams;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.firebase.client.DataSnapshot;
@@ -75,7 +76,11 @@ public class FriendListActivity extends AppCompatActivity {
         thisList = this;
         setContentView(R.layout.activity_friend_list);
 
-        ImageButton userPortalButton = (ImageButton) findViewById(R.id.user_portal_fbutton);
+        Typeface montserrat = Typeface.createFromAsset(getAssets(), "Montserrat-Regular.otf");
+        ((TextView) findViewById(R.id.gc_header)).setTypeface(montserrat);
+        ((TextView) findViewById(R.id.meetup_invitations)).setTypeface(montserrat);
+
+        Button userPortalButton = (Button) findViewById(R.id.up_back);
         userPortalButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {

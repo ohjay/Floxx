@@ -9,7 +9,7 @@
     <string name="title_activity_map">MapActivity</string>
     <string name="dummy_button">Dummy Button</string>
     <string name="standby">&#8230;Please stand by&#8230;</string>
-    <string name="group_creation_header">Create a group</string>
+    <string name="group_creation_header">Create a Group</string>
     <string name="search_users">(&#8230;search for friends!)</string>
     <string name="reqs_header">Friends</string>
     <string name="search_header">Add Friends</string>
@@ -39,4 +39,7 @@
     <string name="locn_permission_prompt">Turn location services&#8230;</string>
     <string name="curr_friends_header">Current Friends</string>
     <string name="reqs_subtext">If, you know, you have any. :)</string>
+    <string name="gc_subtext">Who do you want to see today?</string>
+    <string name="up_back">Back to user portal</string>
+    <string name="invitations">Invitations</string>
 </resources>
