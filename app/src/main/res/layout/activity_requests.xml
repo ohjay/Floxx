@@ -10,7 +10,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:scaleType="centerCrop"
-        android:src="@drawable/gradient_ii" />
+        android:src="@drawable/gradient_dark" />
 
     <ScrollView
         android:layout_width="fill_parent"
@@ -39,13 +39,23 @@
                 android:id="@+id/reqs_header"
                 android:layout_centerHorizontal="true"
                 android:textColor="#fff"
-                android:layout_below="@id/reqs_divider1"
+                android:layout_below="@id/reqs_divider1" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="15sp"
+                android:id="@+id/reqs_subtext"
+                android:layout_centerHorizontal="true"
+                android:layout_below="@id/reqs_header"
+                android:textColor="#cecece"
+                android:text="@string/reqs_subtext"
                 android:layout_marginBottom="15dp" />
 
             <View
                 android:layout_width="fill_parent"
                 android:layout_height="2dp"
-                android:layout_below="@id/reqs_header"
+                android:layout_below="@id/reqs_subtext"
                 android:id="@+id/reqs_divider2"
                 android:background="#fff"
                 android:layout_marginBottom="35dp"
@@ -59,27 +69,46 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/received_header"
+                android:text="@string/curr_friends_header"
                 android:textSize="21sp"
-                android:id="@+id/received_header"
+                android:id="@+id/curr_friends_header"
                 android:layout_below="@id/reqs_divider2"
                 android:textColor="#fff"
                 android:layout_marginStart="@dimen/ra_side_margin" />
 
-            <ScrollView
+            <LinearLayout
                 android:layout_width="fill_parent"
-                android:layout_height="150dp"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/curr_friends_header"
+                android:layout_marginTop="20dp"
+                android:orientation="vertical"
+                android:id="@+id/curr_friends_container"
+                android:layout_marginStart="@dimen/ra_side_margin"
+                android:layout_marginEnd="@dimen/ra_side_margin"
+                android:layout_marginBottom="25dp">
+            </LinearLayout>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/received_header"
+                android:textSize="21sp"
+                android:id="@+id/received_header"
+                android:layout_below="@id/curr_friends_container"
+                android:textColor="#fff"
+                android:layout_marginStart="@dimen/ra_side_margin" />
+
+            <LinearLayout
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
                 android:layout_below="@+id/received_header"
                 android:layout_marginTop="20dp"
-                android:id="@+id/received_scrollview">
-
-                <LinearLayout
-                    android:layout_width="fill_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    android:id="@+id/received_container">
-                </LinearLayout>
-            </ScrollView>
+                android:orientation="vertical"
+                android:id="@+id/received_container"
+                android:layout_marginStart="@dimen/ra_side_margin"
+                android:layout_marginEnd="@dimen/ra_side_margin"
+                android:layout_marginBottom="25dp">
+            </LinearLayout>
 
             <TextView
                 android:layout_width="wrap_content"
@@ -87,7 +116,7 @@
                 android:text="@string/search_header"
                 android:textSize="21sp"
                 android:id="@+id/search_header"
-                android:layout_below="@+id/received_scrollview"
+                android:layout_below="@+id/received_container"
                 android:layout_marginBottom="10dp"
                 android:textColor="#fff"
                 android:layout_marginStart="@dimen/ra_side_margin" />
@@ -104,7 +133,7 @@
             <ListView
                 android:id="@+id/search_list"
                 android:layout_width="fill_parent"
-                android:layout_height="150dp"
+                android:layout_height="200dp"
                 android:layout_marginTop="20dp"
                 android:layout_below="@id/user_search_bar"
                 android:layout_marginStart="@dimen/ra_side_margin"

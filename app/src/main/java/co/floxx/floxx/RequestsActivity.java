@@ -30,6 +30,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
+import java.util.TreeMap;
 import java.util.regex.Pattern;
 
 /**
@@ -43,7 +44,7 @@ public class RequestsActivity extends AppCompatActivity {
     private Firebase ref;
     private Context context;
 
-    static HashMap<String, String> allUsers = new HashMap<String, String>();
+    static TreeMap<String, String> allUsers = new TreeMap<String, String>();
     private ListView listView; // where we'll put the search output
     private int progressIndex = -1, numFriends;
     private ProgressDialog dialog;
@@ -59,6 +60,7 @@ public class RequestsActivity extends AppCompatActivity {
 
         Typeface montserrat = Typeface.createFromAsset(getAssets(), "Montserrat-Regular.otf");
         ((TextView) findViewById(R.id.reqs_header)).setTypeface(montserrat);
+        ((TextView) findViewById(R.id.curr_friends_header)).setTypeface(montserrat);
         ((TextView) findViewById(R.id.received_header)).setTypeface(montserrat);
         ((TextView) findViewById(R.id.search_header)).setTypeface(montserrat);
 
@@ -68,6 +70,11 @@ public class RequestsActivity extends AppCompatActivity {
 
         searchView.setSearchableInfo(searchManager.getSearchableInfo(getComponentName()));
         searchView.setIconifiedByDefault(false);
+
+        int id = searchView.getContext().getResources().getIdentifier("android:id/search_src_text", null, null);
+        TextView searchText = (TextView) searchView.findViewById(id);
+        searchText.setTextColor(Color.WHITE);
+        searchText.setHintTextColor(Color.WHITE);
 
         // Firebase configuration
         Firebase.setAndroidContext(this);
@@ -102,11 +109,25 @@ public class RequestsActivity extends AppCompatActivity {
                 Object result = dataSnapshot.child(currentUser).child("requests").getValue();
                 requests = (result == null) ? new ArrayList<String>() : (ArrayList<String>) result;
 
+                if (requests.isEmpty()) {
+                    TextView notApplicableText = new TextView(context);
+                    notApplicableText.setTextSize(19);
+                    notApplicableText.setTypeface(Typeface.SANS_SERIF);
+                    notApplicableText.setTextColor(Color.WHITE);
+                    notApplicableText.setText("N/A");
+
+                    layout.addView(notApplicableText, new LinearLayout.LayoutParams(
+                            LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT));
+
+                    return;
+                }
+
                 for (final String senderID : requests) {
                     // Setting up the view for the name text
                     final TextView senderName = new TextView(context);
                     senderName.setTextSize(19);
                     senderName.setTypeface(Typeface.SANS_SERIF);
+                    senderName.setTextColor(Color.WHITE);
 
                     final ImageButton declineButton = new ImageButton(context);
                     final ImageButton acceptButton = new ImageButton(context);
@@ -135,11 +156,12 @@ public class RequestsActivity extends AppCompatActivity {
                             // Accept the request! Yay!
                             acceptRequest(senderID, currentUser);
 
-                            layout.removeView(senderName);
+                            senderName.setTextColor(Color.GRAY);
                             layout.removeView(acceptButton);
                             layout.removeView(declineButton);
                         }
                     });
+                    acceptButton.setTextAlignment(View.TEXT_ALIGNMENT_VIEW_END);
 
                     // Setting up the decline button
                     declineButton.setImageResource(R.drawable.ic_block_white_24dp);
@@ -150,22 +172,29 @@ public class RequestsActivity extends AppCompatActivity {
                             // Remove it from the registry, for starters
                             declineRequest(senderID, currentUser);
 
-                            layout.removeView(senderName);
+                            senderName.setTextColor(Color.GRAY);
                             layout.removeView(acceptButton);
                             layout.removeView(declineButton);
                         }
                     });
+                    acceptButton.setTextAlignment(View.TEXT_ALIGNMENT_VIEW_END);
 
                     // Add the name and buttons to the layout
-                    layout.addView(senderName,
+                    LinearLayout littleLayout = new LinearLayout(context);
+                    littleLayout.setOrientation(LinearLayout.HORIZONTAL);
+
+                    littleLayout.addView(senderName,
                             new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT,
                             LinearLayout.LayoutParams.WRAP_CONTENT));
-                    layout.addView(acceptButton,
+                    littleLayout.addView(acceptButton,
                             new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT,
                             LinearLayout.LayoutParams.WRAP_CONTENT));
-                    layout.addView(declineButton,
+                    littleLayout.addView(declineButton,
                             new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT,
                             LinearLayout.LayoutParams.WRAP_CONTENT));
+
+                    layout.addView(littleLayout, new LinearLayout.LayoutParams(
+                            LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT));
                 }
             }
 
@@ -175,7 +204,12 @@ public class RequestsActivity extends AppCompatActivity {
             }
         });
 
-        configureSearch();
+        configureSearch(); // and also fill in the current friend list
+
+        View focusedView = getCurrentFocus();
+        if (focusedView != null) {
+            focusedView.clearFocus();
+        }
     }
 
     private void configureSearch() {
@@ -298,7 +332,8 @@ public class RequestsActivity extends AppCompatActivity {
         addFriend(recipientID, senderID);
         delayedDestroyRequest(senderID, recipientID);
 
-        String confirmation = FriendListActivity.names.get(senderID) + " is now your friend!";
+        String confirmation = FriendListActivity.names.get(senderID) + " is now your friend! "
+                + "Your friend list will be updated the next time you load this page.";
         Toast.makeText(RequestsActivity.this, confirmation, Toast.LENGTH_LONG).show();
     }
 
@@ -410,6 +445,7 @@ public class RequestsActivity extends AppCompatActivity {
             @Override
             public void run() {
                 if (progressIndex >= numFriends) {
+                    populateFriendList();
                     dialog.dismiss();
                     handleIntent(getIntent());
                 } else {
@@ -435,6 +471,22 @@ public class RequestsActivity extends AppCompatActivity {
         }
     }
 
+    private void populateFriendList() {
+        // Populate the current friends area
+        final LinearLayout cfLayout = (LinearLayout) findViewById(R.id.curr_friends_container);
+        for (final String friend : currentFriends) {
+            final TextView friendText = new TextView(context);
+            friendText.setTextSize(19);
+            friendText.setTypeface(Typeface.SANS_SERIF);
+            friendText.setText(friend);
+            friendText.setTextColor(Color.WHITE);
+
+            // Add the name and buttons to the layout
+            cfLayout.addView(friendText, new LinearLayout.LayoutParams(
+                    LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT));
+        }
+    }
+
     /**
      * Searches for a user with a name matching QUERY, then displays the results.
      * @param query the search query (some username, presumably)
@@ -443,12 +495,19 @@ public class RequestsActivity extends AppCompatActivity {
         ArrayList<String> results = new ArrayList<String>();
 
         if (!query.isEmpty()) { // alternatively, maybe > 2 chars or so?
+            int i = 0;
             for (String username : allUsers.keySet()) {
                 if (username.equals(currentUsername) || currentFriends.contains(username)) {
                     continue; // we don't want to be able to add our curr. friends... or ourselves
                 } else if (Pattern.compile(Pattern.quote(query),
                         Pattern.CASE_INSENSITIVE).matcher(username).find()) {
                     results.add(username);
+                }
+
+                if (i >= 4) {
+                    break;
+                } else {
+                    ++i;
                 }
             }
         }
@@ -564,7 +623,7 @@ public class RequestsActivity extends AppCompatActivity {
 
         public EntryView(Context context, final String username) {
             super(context);
-            this.setOrientation(VERTICAL);
+            this.setOrientation(HORIZONTAL);
 
             // Creating the nameView (which should contain a username)
             nameView = new TextView(context);
@@ -578,10 +637,11 @@ public class RequestsActivity extends AppCompatActivity {
                 addView(nameView, new LinearLayout.LayoutParams(LayoutParams.WRAP_CONTENT,
                         LayoutParams.WRAP_CONTENT));
             } else {
-                nameView.setTextColor(Color.BLACK);
+                nameView.setTextColor(Color.WHITE);
 
                 requestButton = new ImageButton(context);
                 requestButton.setImageResource(R.drawable.ic_add_circle_white_24dp);
+                requestButton.setTextAlignment(View.TEXT_ALIGNMENT_VIEW_END);
 
                 requestButton.setOnClickListener(new OnClickListener() {
                     @Override

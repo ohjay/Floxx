@@ -37,4 +37,6 @@
 
     <string name="up_header">User Portal</string>
     <string name="locn_permission_prompt">Turn location services&#8230;</string>
+    <string name="curr_friends_header">Current Friends</string>
+    <string name="reqs_subtext">If, you know, you have any. :)</string>
 </resources>

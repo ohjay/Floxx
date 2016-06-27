@@ -7,11 +7,9 @@ TODO (ESSENTIAL)
    - [S2] Redirect unconfirmed users to a "confirm code" entry screen when they log in
    - [S2] In this way, force the user to enter the code when he/she comes back to the app
    - [S2] If the code verifies, set the user to "active" or something, and grant user portal access
-2. Upgrade requests interface. [3 hrs]
-   - [S1] Limit search output to the top five matches
-   - [S2] Display your current list of friends
-   - [S3] Gray out / change icon for invitations when you accept them
-   - [S4] Formatting changes (e.g. making icons appear on the same lines as names)
+2. Upgrade requests interface. [1 hr]
+   - [S1] Get the back button to work again
+   - [S2] Formatting changes
 3. Upgrade group creation interface. [2 hrs]
    - [S1] Add a "back to user portal" button (onClick: probably just call the onBackPressed method)
    - [S2] Change text and formatting
@@ -26,7 +24,7 @@ TODO (ESSENTIAL)
    - [S4] Add a "move marker" button that allows only one user to move the meeting marker at a time
    - [S5] General layout changes
 
-// Total: 14 hrs
+// Total: 12 hrs
 * Time estimates = (Owen's original call) x 2
 
 --------------------------
@@ -36,3 +34,10 @@ TODO (BUG REPORTS / MINOR)
 2. Bug report: crash when creating a group and running the map for the first time (after confirming that you'll allow Floxx to "access this device's location").
 3. Look at the TODOs scattered across our codebase.
 4. Fix meetup IDs... make them actually unique. (Right now, they're indistinguishable if started by the same user on the same day.)
+
+-----------
+TODO (TEST)
+-----------
+- Limit search output to the top five matches
+- Gray out / change icon for invitations when you accept them
+- Display your current list of friends
