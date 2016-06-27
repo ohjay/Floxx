@@ -3,7 +3,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    tools:context="co.floxx.floxx.RequestsActivity">
+    tools:context="co.floxx.floxx.RequestsActivity"
+    android:id="@+id/requests_wrapper">
 
     <ImageView
         android:id="@+id/up_background"
@@ -127,8 +128,10 @@
                 android:id="@+id/user_search_bar"
                 android:layout_below="@id/search_header"
                 android:textColor="#fff"
-                android:layout_marginStart="@dimen/ra_side_margin"
-                android:layout_marginEnd="@dimen/ra_side_margin" />
+                android:layout_marginStart="25dp"
+                android:layout_marginEnd="@dimen/ra_side_margin"
+                android:searchIcon="@drawable/places_ic_search"
+                android:closeIcon="@drawable/places_ic_clear" />
 
             <ListView
                 android:id="@+id/search_list"

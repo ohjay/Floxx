@@ -8,8 +8,7 @@ TODO (ESSENTIAL)
    - [S2] In this way, force the user to enter the code when he/she comes back to the app
    - [S2] If the code verifies, set the user to "active" or something, and grant user portal access
 2. Upgrade requests interface. [1 hr]
-   - [S1] Get the back button to work again
-   - [S2] Formatting changes
+   - [S1] Formatting changes
 3. Upgrade group creation interface. [2 hrs]
    - [S1] Add a "back to user portal" button (onClick: probably just call the onBackPressed method)
    - [S2] Change text and formatting

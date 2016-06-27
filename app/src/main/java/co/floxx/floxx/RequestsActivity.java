@@ -12,6 +12,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.WindowManager;
 import android.widget.BaseAdapter;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
@@ -54,6 +55,12 @@ public class RequestsActivity extends AppCompatActivity {
     private HashSet<String> pending = new HashSet<String>();
 
     @Override
+    protected void onResume() {
+        super.onResume();
+        getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_HIDDEN);
+    }
+
+    @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_requests);
@@ -69,12 +76,12 @@ public class RequestsActivity extends AppCompatActivity {
         SearchView searchView = (SearchView) findViewById(R.id.user_search_bar);
 
         searchView.setSearchableInfo(searchManager.getSearchableInfo(getComponentName()));
-        searchView.setIconifiedByDefault(false);
+        searchView.setIconifiedByDefault(true);
 
         int id = searchView.getContext().getResources().getIdentifier("android:id/search_src_text", null, null);
         TextView searchText = (TextView) searchView.findViewById(id);
-        searchText.setTextColor(Color.WHITE);
-        searchText.setHintTextColor(Color.WHITE);
+        searchText.setTextColor(Color.LTGRAY);
+        searchText.setHintTextColor(Color.LTGRAY);
 
         // Firebase configuration
         Firebase.setAndroidContext(this);
@@ -113,7 +120,7 @@ public class RequestsActivity extends AppCompatActivity {
                     TextView notApplicableText = new TextView(context);
                     notApplicableText.setTextSize(19);
                     notApplicableText.setTypeface(Typeface.SANS_SERIF);
-                    notApplicableText.setTextColor(Color.WHITE);
+                    notApplicableText.setTextColor(Color.GRAY);
                     notApplicableText.setText("N/A");
 
                     layout.addView(notApplicableText, new LinearLayout.LayoutParams(
@@ -127,7 +134,7 @@ public class RequestsActivity extends AppCompatActivity {
                     final TextView senderName = new TextView(context);
                     senderName.setTextSize(19);
                     senderName.setTypeface(Typeface.SANS_SERIF);
-                    senderName.setTextColor(Color.WHITE);
+                    senderName.setTextColor(Color.LTGRAY);
 
                     final ImageButton declineButton = new ImageButton(context);
                     final ImageButton acceptButton = new ImageButton(context);
@@ -156,12 +163,11 @@ public class RequestsActivity extends AppCompatActivity {
                             // Accept the request! Yay!
                             acceptRequest(senderID, currentUser);
 
-                            senderName.setTextColor(Color.GRAY);
+                            senderName.setTextColor(Color.DKGRAY);
                             layout.removeView(acceptButton);
                             layout.removeView(declineButton);
                         }
                     });
-                    acceptButton.setTextAlignment(View.TEXT_ALIGNMENT_VIEW_END);
 
                     // Setting up the decline button
                     declineButton.setImageResource(R.drawable.ic_block_white_24dp);
@@ -172,12 +178,11 @@ public class RequestsActivity extends AppCompatActivity {
                             // Remove it from the registry, for starters
                             declineRequest(senderID, currentUser);
 
-                            senderName.setTextColor(Color.GRAY);
+                            senderName.setTextColor(Color.DKGRAY);
                             layout.removeView(acceptButton);
                             layout.removeView(declineButton);
                         }
                     });
-                    acceptButton.setTextAlignment(View.TEXT_ALIGNMENT_VIEW_END);
 
                     // Add the name and buttons to the layout
                     LinearLayout littleLayout = new LinearLayout(context);
@@ -205,11 +210,6 @@ public class RequestsActivity extends AppCompatActivity {
         });
 
         configureSearch(); // and also fill in the current friend list
-
-        View focusedView = getCurrentFocus();
-        if (focusedView != null) {
-            focusedView.clearFocus();
-        }
     }
 
     private void configureSearch() {
@@ -218,14 +218,18 @@ public class RequestsActivity extends AppCompatActivity {
         final Firebase ref = new Firebase("https://floxx.firebaseio.com/");
         final String currUser = ref.getAuth().getUid();
 
+        // Launching the progress dialog
+        dialog = new ProgressDialog(this);
+        dialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
+        dialog.setMessage("Retrieving user data...");
+        dialog.show();
+
+        // Initialization for progress variables
+        progressIndex = 0;
+        numFriends = 0;
+
         // Download all usernames and UIDs (uname -> uid)
         if (allUsers.isEmpty()) {
-            // Launching the progress dialog
-            dialog = new ProgressDialog(this);
-            dialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
-            dialog.setMessage("Retrieving user data...");
-            dialog.show();
-
             Query queryRef = ref.child("users").orderByKey().equalTo(FirebaseActivity.OSKI_UID);
             queryRef.addListenerForSingleValueEvent(new ValueEventListener() {
                 @Override
@@ -234,7 +238,6 @@ public class RequestsActivity extends AppCompatActivity {
                             .child("friends").getValue();
                     if (result != null) {
                         ArrayList<String> friends = (ArrayList<String>) result;
-                        progressIndex = 0;
                         numFriends = friends.size();
 
                         for (final String fuid : friends) {
@@ -479,7 +482,7 @@ public class RequestsActivity extends AppCompatActivity {
             friendText.setTextSize(19);
             friendText.setTypeface(Typeface.SANS_SERIF);
             friendText.setText(friend);
-            friendText.setTextColor(Color.WHITE);
+            friendText.setTextColor(Color.LTGRAY);
 
             // Add the name and buttons to the layout
             cfLayout.addView(friendText, new LinearLayout.LayoutParams(
@@ -633,22 +636,21 @@ public class RequestsActivity extends AppCompatActivity {
 
             // Creating the image button (the ADD symbol)
             if (pending.contains(username)) {
-                nameView.setTextColor(Color.GRAY);
+                nameView.setTextColor(Color.DKGRAY);
                 addView(nameView, new LinearLayout.LayoutParams(LayoutParams.WRAP_CONTENT,
                         LayoutParams.WRAP_CONTENT));
             } else {
-                nameView.setTextColor(Color.WHITE);
+                nameView.setTextColor(Color.LTGRAY);
 
                 requestButton = new ImageButton(context);
                 requestButton.setImageResource(R.drawable.ic_add_circle_white_24dp);
-                requestButton.setTextAlignment(View.TEXT_ALIGNMENT_VIEW_END);
 
                 requestButton.setOnClickListener(new OnClickListener() {
                     @Override
                     public void onClick(View v) {
                         // Send a connection request
                         sendFriendRequest(username);
-                        nameView.setTextColor(Color.GRAY);
+                        nameView.setTextColor(Color.DKGRAY);
                         removeView(requestButton);
                     }
                 });
