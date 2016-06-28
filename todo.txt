@@ -7,18 +7,20 @@ TODO (ESSENTIAL)
    - [S2] Redirect unconfirmed users to a "confirm code" entry screen when they log in
    - [S2] In this way, force the user to enter the code when he/she comes back to the app
    - [S2] If the code verifies, set the user to "active" or something, and grant user portal access
-2. Upgrade map interface (incl. bottom layer). [5 hrs]
-   - [S1] Include your own ETA on the map
-   - [S2] Let users specify their mode of transportation
-   - [S3] Add a "move marker" button that allows only one user to move the meeting marker at a time
-   - [S4] General layout changes
+2. Upgrade map interface (incl. bottom layer).
+   - [S1] Include your own ETA on the map [0.5 hrs]
+   - [S2] Let users specify their mode of transportation [1 hr]
+   - [S3] Add a "move marker" button that allows only one user to move the meeting marker at a time [1.5 hrs]
+   - [S4] General layout changes [1 hr]
 
-// Total: 7 hrs
+// Total: 6 hrs
 * Time estimates = (Owen's original call) x 2
 
 --------------------------
 TODO (BUG REPORTS / MINOR)
 --------------------------
 1. Bug report: crash when creating a group and running the map for the first time (after confirming that you'll allow Floxx to "access this device's location").
-2. Look at the TODOs scattered across our codebase.
-3. Look through (/clean up) all code. For example, turn standard output into logs.
+2. Bug report: "user is already in a meetup" just because some other person INVITED him to her meetup (?).
+3. Look at the TODOs scattered across our codebase.
+4. Look through (/clean up) all code. For example, turn standard output into logs.
+5. Limit length of usernames (maybe < 15 characters?).

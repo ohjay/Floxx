@@ -10,7 +10,7 @@
     <string name="dummy_button">Dummy Button</string>
     <string name="standby">&#8230;Please stand by&#8230;</string>
     <string name="group_creation_header">Create a Group</string>
-    <string name="search_users">(&#8230;search for friends!)</string>
+    <string name="search_users">(&#8230;search for somebody!)</string>
     <string name="reqs_header">Friends</string>
     <string name="search_header">Add Friends</string>
     <string name="received_header">Pending Friend Requests</string>

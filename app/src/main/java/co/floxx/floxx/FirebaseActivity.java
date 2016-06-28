@@ -47,6 +47,10 @@ public class FirebaseActivity extends AppCompatActivity {
         progressBar.setDotAmount(6);
         progressBar.setAnimationTime(300);
 
+        if (FriendListActivity.names.isEmpty()) {
+            FriendListActivity.initializeNames(); // lol let's do this now
+        }
+
         Intent intent = getIntent();
         Bundle extras = intent.getExtras();
 

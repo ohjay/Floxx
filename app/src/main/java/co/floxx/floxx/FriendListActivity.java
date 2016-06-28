@@ -348,8 +348,9 @@ public class FriendListActivity extends AppCompatActivity {
                         String time = meetupId.substring(tBegin, meetupId.length() - 3);
 
                         Button b = new Button(thisList);
-                        String meetupInfo = date + " meetup\nInvited by " + names.get(iuid)
-                                + " @ " + time;
+                        String iusername = names.get(iuid);
+                        String meetupInfo = date + " meetup\nInvited by "
+                                + ((iusername == null) ? "???" : iusername) + " @ " + time;
                         b.setText(meetupInfo);
 
                         ll.addView(b, lp);

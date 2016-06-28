@@ -66,7 +66,9 @@
         android:layout_height="wrap_content"
         android:orientation="vertical"
         android:id="@+id/meetup_container"
-        android:layout_below="@id/am_divider2">
+        android:layout_below="@id/am_divider2"
+        android:layout_marginStart="@dimen/up_side_margin"
+        android:layout_marginEnd="@dimen/up_side_margin">
     </LinearLayout>
 
     <Button
@@ -75,7 +77,7 @@
         android:text="@string/leave_content"
         android:id="@+id/leave_button"
         android:layout_below="@+id/meetup_container"
-        android:layout_marginTop="5dp"
+        android:layout_marginTop="15dp"
         android:layout_centerHorizontal="true"
         android:backgroundTint="@color/bright_green" />
 
@@ -86,5 +88,6 @@
         android:id="@+id/user_portal_mbutton"
         android:backgroundTint="#cecece"
         android:layout_centerHorizontal="true"
-        android:layout_below="@id/leave_button" />
+        android:layout_below="@id/leave_button"
+        android:layout_marginTop="-3dip" />
 </RelativeLayout>

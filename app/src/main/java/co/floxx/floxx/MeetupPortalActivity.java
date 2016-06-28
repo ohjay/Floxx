@@ -8,6 +8,7 @@ import android.graphics.Color;
 import android.graphics.Typeface;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.text.Html;
 import android.view.View;
 import android.widget.Button;
 import android.widget.LinearLayout;
@@ -91,15 +92,24 @@ public class MeetupPortalActivity extends AppCompatActivity {
         bDesc.setTextColor(Color.LTGRAY);
 
         // Create the participants information string
-        String participantsInfo = "Current participants:";
+        String participantsInfo = "Current participants: <b>you</b>";
         int numConfirmed = confirmed.size();
+        if (numConfirmed > 0) { participantsInfo += ","; }
+
         for (int i = 0; i < numConfirmed; ++i) {
-            participantsInfo += " " + confirmed.get(i);
+            String participantName = FriendListActivity.names.get(confirmed.get(i));
+            participantsInfo += " " + ((participantName != null) ? participantName : "???");
+
             if (i != numConfirmed - 1) {
                 participantsInfo += ",";
             }
         }
-        bDesc.setText(participantsInfo);
+
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
+            bDesc.setText(Html.fromHtml(participantsInfo, Html.FROM_HTML_MODE_LEGACY));
+        } else {
+            bDesc.setText(Html.fromHtml(participantsInfo));
+        }
 
         LinearLayout ll = (LinearLayout) findViewById(R.id.meetup_container);
         LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(
