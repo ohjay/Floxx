@@ -22,7 +22,7 @@ import com.firebase.client.ValueEventListener;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
+import java.util.Calendar;
 import java.util.HashMap;
 import java.util.HashSet;
 
@@ -200,11 +200,12 @@ public class FriendListActivity extends AppCompatActivity {
         // Add to the meetups section of the database
         ArrayList<String> confirmed = new ArrayList<String>(); // confirmed users
         confirmed.add(uid);
-        final String date = new SimpleDateFormat("MM-dd-yyyy").format(new Date());
-        ref.child("meetups").child(uid + date).child("confirmed").setValue(confirmed);
+        final String datetime = " " + new SimpleDateFormat("yyyy/MM/dd HH:mm:ss")
+                .format(Calendar.getInstance().getTime());
+        ref.child("meetups").child(uid + datetime).child("confirmed").setValue(confirmed);
 
         // Add the meetup to the user's ongoing meetup list
-        ref.child("ongoing").child(uid).setValue(uid + date);
+        ref.child("ongoing").child(uid).setValue(uid + datetime);
 
         // Send out meetup invitations
         for (final String ouid : selected) {
@@ -219,7 +220,7 @@ public class FriendListActivity extends AppCompatActivity {
                         invitations = new ArrayList<String>();
                     }
 
-                    invitations.add(uid + date);
+                    invitations.add(uid + datetime);
                     ref.child("invitations").child(ouid).setValue(invitations);
                 }
 
@@ -230,7 +231,7 @@ public class FriendListActivity extends AppCompatActivity {
             });
         }
 
-        intent.putExtra("meetup id", uid + date);
+        intent.putExtra("meetup id", uid + datetime);
         FriendListActivity.this.startActivity(intent);
     }
 
@@ -341,9 +342,15 @@ public class FriendListActivity extends AppCompatActivity {
 
                 if (invitations != null) {
                     for (final String meetupId : invitations) {
-                        String iuid = meetupId.substring(0, meetupId.length() - 10);
+                        int dBegin = meetupId.length() - 19, tBegin = meetupId.length() - 8;
+                        String iuid = meetupId.substring(0, dBegin - 1);
+                        String date = meetupId.substring(dBegin + 5, tBegin - 1);
+                        String time = meetupId.substring(tBegin, meetupId.length() - 3);
+
                         Button b = new Button(thisList);
-                        b.setText(names.get(iuid) + "'s meetup");
+                        String meetupInfo = date + " meetup\nInvited by " + names.get(iuid)
+                                + " @ " + time;
+                        b.setText(meetupInfo);
 
                         ll.addView(b, lp);
 

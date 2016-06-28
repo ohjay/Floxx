@@ -7,26 +7,18 @@ TODO (ESSENTIAL)
    - [S2] Redirect unconfirmed users to a "confirm code" entry screen when they log in
    - [S2] In this way, force the user to enter the code when he/she comes back to the app
    - [S2] If the code verifies, set the user to "active" or something, and grant user portal access
-2. Upgrade group creation interface. [1 hr]
-   - [S1] Fix meetup IDs... make them actually unique. (Right now, they're indistinguishable if started by the same user on the same day)
-   - [S2] Extend meetup information in the invitation section
-3. Upgrade meetup portal interface. [2 hrs]
-   - [S1] Display more information about the meetup on the button
-   - [S2] Add a "back to user portal" button
-   - [S3] Change text and formatting
-4. Upgrade map interface (incl. bottom layer). [5 hrs]
+2. Upgrade map interface (incl. bottom layer). [5 hrs]
    - [S1] Include your own ETA on the map
    - [S2] Let users specify their mode of transportation
-   - [S3] Upon startup, have map zoom in at an appropriate level
-   - [S4] Add a "move marker" button that allows only one user to move the meeting marker at a time
-   - [S5] General layout changes
+   - [S3] Add a "move marker" button that allows only one user to move the meeting marker at a time
+   - [S4] General layout changes
 
-// Total: 10 hrs
+// Total: 7 hrs
 * Time estimates = (Owen's original call) x 2
 
 --------------------------
 TODO (BUG REPORTS / MINOR)
 --------------------------
-1. Bug report: somehow I got TWO fullscreen activities by hitting the back button a lot.
-2. Bug report: crash when creating a group and running the map for the first time (after confirming that you'll allow Floxx to "access this device's location").
-3. Look at the TODOs scattered across our codebase.
+1. Bug report: crash when creating a group and running the map for the first time (after confirming that you'll allow Floxx to "access this device's location").
+2. Look at the TODOs scattered across our codebase.
+3. Look through (/clean up) all code. For example, turn standard output into logs.

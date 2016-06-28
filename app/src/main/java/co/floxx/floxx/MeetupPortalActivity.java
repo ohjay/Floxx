@@ -4,12 +4,14 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.graphics.Color;
+import android.graphics.Typeface;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.Button;
-import android.widget.ImageButton;
 import android.widget.LinearLayout;
+import android.widget.TextView;
 
 import com.firebase.client.AuthData;
 import com.firebase.client.DataSnapshot;
@@ -72,16 +74,41 @@ public class MeetupPortalActivity extends AppCompatActivity {
             }
         }
 
+        Typeface montserrat = Typeface.createFromAsset(getAssets(), "Montserrat-Regular.otf");
+        ((TextView) findViewById(R.id.am_header)).setTypeface(montserrat);
+
         final String meetupId = intent.getStringExtra("meetup id");
 
+        int dBegin = meetupId.length() - 19, tBegin = meetupId.length() - 8;
+        String date = meetupId.substring(dBegin, tBegin - 1);
+        String time = meetupId.substring(tBegin);
+
         Button b = new Button(this);
-        b.setText("Meetup " + meetupId.substring(meetupId.length() - 10));
+        String meetupInfo = date + " meetup\nStarted @ " + time;
+        b.setText(meetupInfo);
+
+        TextView bDesc = new TextView(this);
+        bDesc.setTextColor(Color.LTGRAY);
+
+        // Create the participants information string
+        String participantsInfo = "Current participants:";
+        int numConfirmed = confirmed.size();
+        for (int i = 0; i < numConfirmed; ++i) {
+            participantsInfo += " " + confirmed.get(i);
+            if (i != numConfirmed - 1) {
+                participantsInfo += ",";
+            }
+        }
+        bDesc.setText(participantsInfo);
 
         LinearLayout ll = (LinearLayout) findViewById(R.id.meetup_container);
         LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(
                 LinearLayout.LayoutParams.MATCH_PARENT,
                 LinearLayout.LayoutParams.WRAP_CONTENT);
         ll.addView(b, lp);
+        ll.addView(bDesc, new LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.WRAP_CONTENT,
+                LinearLayout.LayoutParams.WRAP_CONTENT));
 
         b.setOnClickListener(new View.OnClickListener() {
             public void onClick(View view) {
@@ -106,7 +133,7 @@ public class MeetupPortalActivity extends AppCompatActivity {
             }
         });
 
-        ImageButton userPortalButton = (ImageButton) findViewById(R.id.user_portal_mbutton);
+        Button userPortalButton = (Button) findViewById(R.id.user_portal_mbutton);
         userPortalButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {

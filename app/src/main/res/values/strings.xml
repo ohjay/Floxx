@@ -42,4 +42,5 @@
     <string name="gc_subtext">Who do you want to see today?</string>
     <string name="up_back">Back to user portal</string>
     <string name="invitations">Invitations</string>
+    <string name="am_subtext">Last chance to back out, man</string>
 </resources>
