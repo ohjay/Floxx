@@ -41,6 +41,7 @@ public class LocationUpdateService extends JobService implements LocationListene
         PersistableBundle extras = params.getExtras();
         isMakingRequests = false;
 
+        Firebase.setAndroidContext(this);
         ref = new Firebase("https://floxx.firebaseio.com/");
         mGoogleApiClient = new GoogleApiClient.Builder(this)
                 .addConnectionCallbacks(this)

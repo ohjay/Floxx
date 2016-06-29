@@ -7,6 +7,9 @@ import android.graphics.Typeface;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
+import android.text.Html;
+import android.util.TypedValue;
+import android.view.Gravity;
 import android.view.View;
 import android.widget.Button;
 import android.widget.LinearLayout;
@@ -284,11 +287,14 @@ public class FriendListActivity extends AppCompatActivity {
                 if (result != null) {
                     ArrayList<String> friends = (ArrayList<String>) result;
                     blockForParticipants();
+                    boolean noFriends = true;
 
                     for (final String fuid : friends) {
                         if (meetupParticipants.contains(fuid)) {
                             continue;
                         }
+
+                        noFriends = false;
 
                         final Button b = new Button(thisList);
                         Query nameQRef = ref.child("uids").orderByValue().equalTo(fuid);
@@ -318,6 +324,22 @@ public class FriendListActivity extends AppCompatActivity {
                             public void onCancelled(FirebaseError firebaseError) {}
                         });
                     }
+
+                    if (noFriends) {
+                        TextView noFriendsText = new TextView(thisList);
+                        String msg = "<i>You have no available friends.</i>";
+                        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
+                            noFriendsText.setText(Html.fromHtml(msg, Html.FROM_HTML_MODE_LEGACY));
+                        } else {
+                            noFriendsText.setText(Html.fromHtml(msg));
+                        }
+                        noFriendsText.setTextColor(Color.LTGRAY);
+                        noFriendsText.setTextSize(TypedValue.COMPLEX_UNIT_SP, 18);
+
+                        ll.setHorizontalGravity(Gravity.CENTER);
+                        ll.addView(noFriendsText, new LayoutParams(LayoutParams.WRAP_CONTENT,
+                                LayoutParams.WRAP_CONTENT));
+                    }
                 }
             }
 
@@ -340,7 +362,21 @@ public class FriendListActivity extends AppCompatActivity {
                 ArrayList<String> invitations =
                         (ArrayList<String>) dataSnapshot.child(uid).getValue();
 
-                if (invitations != null) {
+                if (invitations == null) {
+                    TextView noInvitationsText = new TextView(thisList);
+                    String msg = "<i>You have no meetup invitations.</i>";
+                    if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
+                        noInvitationsText.setText(Html.fromHtml(msg, Html.FROM_HTML_MODE_LEGACY));
+                    } else {
+                        noInvitationsText.setText(Html.fromHtml(msg));
+                    }
+                    noInvitationsText.setTextColor(Color.LTGRAY);
+                    noInvitationsText.setTextSize(TypedValue.COMPLEX_UNIT_SP, 18);
+
+                    ll.setHorizontalGravity(Gravity.CENTER);
+                    ll.addView(noInvitationsText, new LayoutParams(LayoutParams.WRAP_CONTENT,
+                            LayoutParams.WRAP_CONTENT));
+                } else {
                     for (final String meetupId : invitations) {
                         int dBegin = meetupId.length() - 19, tBegin = meetupId.length() - 8;
                         String iuid = meetupId.substring(0, dBegin - 1);
@@ -349,8 +385,8 @@ public class FriendListActivity extends AppCompatActivity {
 
                         Button b = new Button(thisList);
                         String iusername = names.get(iuid);
-                        String meetupInfo = date + " meetup\nInvited by "
-                                + ((iusername == null) ? "???" : iusername) + " @ " + time;
+                        String meetupInfo = date + " meetup\n[Invited by "
+                                + ((iusername == null) ? "???" : iusername) + " @ " + time + "]";
                         b.setText(meetupInfo);
 
                         ll.addView(b, lp);

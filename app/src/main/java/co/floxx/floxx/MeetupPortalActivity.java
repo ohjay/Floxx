@@ -85,7 +85,7 @@ public class MeetupPortalActivity extends AppCompatActivity {
         String time = meetupId.substring(tBegin);
 
         Button b = new Button(this);
-        String meetupInfo = date + " meetup\nStarted @ " + time;
+        String meetupInfo = date + " meetup\n[Started @ " + time + "]";
         b.setText(meetupInfo);
 
         TextView bDesc = new TextView(this);

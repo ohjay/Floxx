@@ -11,6 +11,7 @@ import android.content.IntentSender;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.graphics.LightingColorFilter;
+import android.graphics.Typeface;
 import android.location.Location;
 import android.location.LocationManager;
 import android.os.AsyncTask;
@@ -23,6 +24,7 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.content.ContextCompat;
 import android.util.Log;
+import android.util.TypedValue;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Button;
@@ -94,6 +96,7 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback,
     private String uid;
     private Button selectedTransportButton;
     private String currTransportMode = "driving";
+    private boolean etaExists;
 
     /**
      * Whether or not the system UI should be auto-hidden after
@@ -221,6 +224,9 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback,
         mVisible = true;
         mControlsView = findViewById(R.id.fullscreen_content_controls);
         mContentView = findViewById(R.id.fullscreen_content);
+
+        Typeface montserrat = Typeface.createFromAsset(getAssets(), "Montserrat-Regular.otf");
+        ((TextView) mContentView).setTypeface(montserrat);
 
         // Set up the user interaction to manually show or hide the system UI.
         mContentView.setOnClickListener(new View.OnClickListener() {
@@ -350,6 +356,11 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback,
         if (meetingMarker != null) { return; } // only ONE of these on the map!!
         MarkerOptions mmo = new MarkerOptions().position(point).title("meet here!").draggable(true);
         meetingMarker = mMap.addMarker(mmo); // create the almighty meeting marker
+
+        if (!etaExists) {
+            TextView etatv = (TextView) findViewById(R.id.eta_text);
+            etatv.setText("Computing ETA. Please wait...");
+        }
 
         computeETA();
 
@@ -506,12 +517,7 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback,
     //================================================================================
 
     private void setUpMap() {
-        if (mLastLocation == null) {
-            if (marker != null) { marker.remove(); }
-            marker = mMap.addMarker(new MarkerOptions().position(new LatLng(0, 0))
-                    .icon(getBitmapDescriptor(markerColor)));
-            marker.showInfoWindow();
-        } else {
+        if (mLastLocation != null) {
             LocationManager locationManager =
                     (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);
             try {
@@ -519,7 +525,7 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback,
                         locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
                 if (marker != null) { marker.remove(); }
                 marker = mMap.addMarker(new MarkerOptions().position(new LatLng(location.getLatitude(),
-                        location.getLongitude())).icon(getBitmapDescriptor(markerColor)));
+                        location.getLongitude())).title("You").icon(getBitmapDescriptor(markerColor)));
                 marker.showInfoWindow();
             } catch (SecurityException e) {
                 e.printStackTrace(); // lol
@@ -621,16 +627,15 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback,
 
         // Params for each of the buttons
         RelativeLayout.LayoutParams drivingParams = getTransportParams();
-        drivingParams.addRule(RelativeLayout.LEFT_OF, R.id.bicycling);
 
         RelativeLayout.LayoutParams bicyclingParams = getTransportParams();
-        bicyclingParams.addRule(RelativeLayout.LEFT_OF, R.id.transit);
+        bicyclingParams.addRule(RelativeLayout.RIGHT_OF, R.id.driving);
 
         RelativeLayout.LayoutParams transitParams = getTransportParams();
-        transitParams.addRule(RelativeLayout.LEFT_OF, R.id.walking);
+        transitParams.addRule(RelativeLayout.RIGHT_OF, R.id.bicycling);
 
         RelativeLayout.LayoutParams walkingParams = getTransportParams();
-        walkingParams.setMargins(5, 2, 5, 0);
+        walkingParams.addRule(RelativeLayout.RIGHT_OF, R.id.transit);
 
         // Add the buttons to the layout
         RelativeLayout buttonContainer = (RelativeLayout) findViewById(R.id.transport_modes);
@@ -638,6 +643,10 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback,
         buttonContainer.addView(bicyclingButton, bicyclingParams);
         buttonContainer.addView(transitButton, transitParams);
         buttonContainer.addView(walkingButton, walkingParams);
+
+        bicyclingButton.getBackground().setColorFilter(null);
+        transitButton.getBackground().setColorFilter(null);
+        walkingButton.getBackground().setColorFilter(null);
 
         // Select the driving button (this is the default)
         drivingButton.getBackground().setColorFilter(new LightingColorFilter(0xff888888, 0x000000));
@@ -655,6 +664,7 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback,
     // - setOtherMarker (places a marker for a user that isn't on the map already)
     // - Pair (POJO that serves as a ouid/queryRes data bundle)
     // - DirQueryTask (asynchronous task that queries the Directions API)
+    // - handleNewETA (updates the UI when it receives a new ETA information packet)
     // - toggle
     // - hide
     // - show
@@ -678,7 +688,7 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback,
         LatLng latLng = new LatLng(currentLatitude, currentLongitude);
 
         MarkerOptions options = new MarkerOptions()
-                .position(latLng).icon(getBitmapDescriptor(markerColor));
+                .position(latLng).title("You").icon(getBitmapDescriptor(markerColor));
         if (marker != null) { marker.remove(); }
         marker = mMap.addMarker(options);
         marker.showInfoWindow();
@@ -703,6 +713,11 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback,
             MarkerOptions mmo = new MarkerOptions().position(new LatLng(latitude, longitude))
                     .title("meet here!").draggable(true);
             meetingMarker = mMap.addMarker(mmo); // create the meeting marker
+
+            if (!etaExists) {
+                TextView etatv = (TextView) findViewById(R.id.eta_text);
+                etatv.setText("Computing ETA. Please wait...");
+            }
         } else {
             meetingMarker.setPosition(new LatLng(latitude, longitude));
         }
@@ -871,6 +886,7 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback,
             // Consider the meetup effectively "concluded"
             etaMsg += " (...move the marker?)";
             etatv.setText(etaMsg);
+            etaExists = true;
 
             Button leaveButton = new Button(MapActivity.this);
             leaveButton.setText("Leave");
@@ -1049,11 +1065,10 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback,
     }
 
     private RelativeLayout.LayoutParams getTransportParams() {
-        RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(
-                RelativeLayout.LayoutParams.WRAP_CONTENT,
-                RelativeLayout.LayoutParams.WRAP_CONTENT
-        );
-        params.setMargins(5, 2, 5, 0); // (left, top, right, bottom)
+        int pxLen = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 40,
+                getResources().getDisplayMetrics());
+        RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(pxLen, pxLen);
+        params.setMargins(8, 8, 8, 0); // (left, top, right, bottom)
         return params;
     }
 }
