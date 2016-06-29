@@ -10,6 +10,7 @@ import android.content.Intent;
 import android.content.IntentSender;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
+import android.graphics.LightingColorFilter;
 import android.location.Location;
 import android.location.LocationManager;
 import android.os.AsyncTask;
@@ -26,6 +27,7 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Button;
 import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.ScrollView;
 import android.widget.TextView;
 
@@ -62,7 +64,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 
@@ -90,6 +91,9 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback,
     private final static int M_JOB_ID = 21;
     private int hiddenDisplayCount;
     private HashMap<String, String> markerColors = new HashMap<String, String>();
+    private String uid;
+    private Button selectedTransportButton;
+    private String currTransportMode = "driving";
 
     /**
      * Whether or not the system UI should be auto-hidden after
@@ -265,7 +269,7 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback,
             }
         });
 
-        final String uid = ref.getAuth().getUid();
+        uid = ref.getAuth().getUid();
 
         // Setting a data listener on the confirmed meetup users
         Firebase confRef = new Firebase("https://floxx.firebaseio.com/meetups/" + meetupId + "/confirmed");
@@ -284,6 +288,7 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback,
                         permissions.put(ouid, false);
 
                         setOtherMarkerFull(ouid, ref);
+                        setETAListener(ouid, ref);
                     }
                 }
             }
@@ -323,6 +328,8 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback,
                 .build();
         JobScheduler jobScheduler = (JobScheduler) this.getSystemService(Context.JOB_SCHEDULER_SERVICE);
         jobScheduler.schedule(locnUpdateTask);
+
+        addTransportOptionsToUI();
     }
 
     @Override
@@ -344,7 +351,7 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback,
         MarkerOptions mmo = new MarkerOptions().position(point).title("meet here!").draggable(true);
         meetingMarker = mMap.addMarker(mmo); // create the almighty meeting marker
 
-        computeETAs();
+        computeETA();
 
         mMap.setOnMapClickListener(null); // we only want to be adding one marker
         saveMeetupLocation(point.latitude, point.longitude);
@@ -495,6 +502,7 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback,
     // - setUpMapIfNeeded
     // - startLocationUpdates
     // - attachBaseContext
+    // - addTransportOptionsToUI (adds buttons for different transport modes)
     //================================================================================
 
     private void setUpMap() {
@@ -565,13 +573,84 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback,
         MultiDex.install(this);
     }
 
+    /**
+     * Transport selection, featuring lots of well-written and non-repetitive code.
+     */
+    private void addTransportOptionsToUI() {
+        // Create the four buttons
+        final Button drivingButton = new Button(this);
+        final Button bicyclingButton = new Button(this);
+        final Button transitButton = new Button(this);
+        final Button walkingButton = new Button(this);
+
+        drivingButton.setBackgroundResource(R.drawable.driving);
+        bicyclingButton.setBackgroundResource(R.drawable.bicycling);
+        transitButton.setBackgroundResource(R.drawable.transit);
+        walkingButton.setBackgroundResource(R.drawable.walking);
+
+        drivingButton.setId(R.id.driving);
+        bicyclingButton.setId(R.id.bicycling);
+        transitButton.setId(R.id.transit);
+        walkingButton.setId(R.id.walking);
+
+        // Set button listeners
+        drivingButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                updateTransportMode(drivingButton, "driving");
+            }
+        });
+        bicyclingButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                updateTransportMode(bicyclingButton, "bicycling");
+            }
+        });
+        transitButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                updateTransportMode(transitButton, "transit");
+            }
+        });
+        walkingButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                updateTransportMode(walkingButton, "walking");
+            }
+        });
+
+        // Params for each of the buttons
+        RelativeLayout.LayoutParams drivingParams = getTransportParams();
+        drivingParams.addRule(RelativeLayout.LEFT_OF, R.id.bicycling);
+
+        RelativeLayout.LayoutParams bicyclingParams = getTransportParams();
+        bicyclingParams.addRule(RelativeLayout.LEFT_OF, R.id.transit);
+
+        RelativeLayout.LayoutParams transitParams = getTransportParams();
+        transitParams.addRule(RelativeLayout.LEFT_OF, R.id.walking);
+
+        RelativeLayout.LayoutParams walkingParams = getTransportParams();
+        walkingParams.setMargins(5, 2, 5, 0);
+
+        // Add the buttons to the layout
+        RelativeLayout buttonContainer = (RelativeLayout) findViewById(R.id.transport_modes);
+        buttonContainer.addView(drivingButton, drivingParams);
+        buttonContainer.addView(bicyclingButton, bicyclingParams);
+        buttonContainer.addView(transitButton, transitParams);
+        buttonContainer.addView(walkingButton, walkingParams);
+
+        // Select the driving button (this is the default)
+        drivingButton.getBackground().setColorFilter(new LightingColorFilter(0xff888888, 0x000000));
+        selectedTransportButton = drivingButton;
+    }
+
     //================================================================================
     // Utility/update classes and methods
     //================================================================================
     // - handleNewLocation (what to do when we have a location update for the user)
     // - saveMeetupLocation (saves location to Firebase so other users can access it)
     // - updateMeetingMarker (updates the meeting marker position)
-    // - computeETAs (computes ETA and distance information for other users)
+    // - computeETA (computes ETA and distance information for you, yourself, and you)
     // - setOtherMarkerFull (creates a listener whose callback = setOtherMarker)
     // - setOtherMarker (places a marker for a user that isn't on the map already)
     // - Pair (POJO that serves as a ouid/queryRes data bundle)
@@ -583,12 +662,14 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback,
     // - getBitmapDescriptor (gets a color from a hex string)
     // - setPermissionListener (sets a listener for some user's location permissions)
     // - updateHiddenUsersView [adds to (or removes from) the GUI elt for hidden users]
+    // - updateTransportMode (assigns a new transport mode and recomputes ETAs)
+    // - setETAListener (sets an ETA listener for someone else)
+    // - getTransportParams
     //================================================================================
 
     public void handleNewLocation(Location location) {
         Firebase ref = new Firebase("https://floxx.firebaseio.com/");
-        Utility.saveLatLng(ref, ref.getAuth().getUid(),
-                location.getLatitude(), location.getLongitude());
+        Utility.saveLatLng(ref, uid, location.getLatitude(), location.getLongitude());
 
         Log.d(TAG, location.toString());
         double currentLatitude = location.getLatitude();
@@ -626,28 +707,20 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback,
             meetingMarker.setPosition(new LatLng(latitude, longitude));
         }
 
-        computeETAs();
+        computeETA();
     }
 
-    private void computeETAs() {
-        if (meetingMarker == null) { return; }
+    private void computeETA() {
+        if (meetingMarker != null && marker != null) {
+            LatLng meetingPos = meetingMarker.getPosition();
+            LatLng yourPosition = marker.getPosition();
 
-        LatLng meetingPos = meetingMarker.getPosition();
-        Iterator it = others.entrySet().iterator();
-        while (it.hasNext()) {
-            Map.Entry pair = (Map.Entry) it.next();
-            String ouid = (String) pair.getKey();
-            Marker oMarker = (Marker) pair.getValue();
-
-            if (oMarker != null) {
-                LatLng oMarkerPos = oMarker.getPosition();
-
-                // TODO (Owen): add API key and request "Maps-official" travel time
-                new DirQueryTask().execute("http://maps.googleapis.com/maps/api/directions/json?origin="
-                        + oMarkerPos.latitude + "," + oMarkerPos.longitude + "&destination="
-                        + meetingPos.latitude + "," + meetingPos.longitude + "&mode=driving&sensor=false",
-                        ouid);
-            }
+            // TODO (Owen): add API key and request "Maps-official" travel time
+            // TODO: also integrate transport mode [currTransportMode]
+            new DirQueryTask().execute("http://maps.googleapis.com/maps/api/directions/json?origin="
+                    + yourPosition.latitude + "," + yourPosition.longitude + "&destination="
+                    + meetingPos.latitude + "," + meetingPos.longitude + "&mode=driving&sensor=false",
+                    uid);
         }
     }
 
@@ -669,7 +742,6 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback,
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 setOtherMarker(ouid, dataSnapshot);
-                computeETAs();
             }
 
             @Override
@@ -713,10 +785,10 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback,
     }
 
     class Pair {
-        String ouid, queryRes;
+        String id, queryRes;
 
-        public Pair(String ouid, String queryRes) {
-            this.ouid = ouid;
+        public Pair(String id, String queryRes) {
+            this.id = id; // by ID, we mean UID
             this.queryRes = queryRes;
         }
     }
@@ -763,50 +835,68 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback,
         protected void onPostExecute(Pair p) {
             if (this.exception == null) {
                 double miDist = Double.parseDouble(p.queryRes.replaceAll("[^0-9\\.]", ""));
-                Marker oMarker = others.get(p.ouid);
-                if (oMarker == null) { return; }
-
                 int eta = (int) (miDist / 0.45);
-                oMarker.setSnippet(String.valueOf(eta) + " min (" + miDist + " mi)");
                 // ^TODO: fix this. Currently saving API calls by assuming everyone travels @ 27 mph
 
-                etas.put(p.ouid, eta);
-                int collectiveETA = Collections.max(etas.values());
-                String etaMsg = "ETA: " + collectiveETA + " min";
+                // Publish ETA to database
+                ArrayList<Double> etaInfo = new ArrayList<Double>();
+                etaInfo.add((double) eta); etaInfo.add(miDist);
+                Firebase ref = new Firebase("https://floxx.firebaseio.com/");
+                ref.child(meetupId).child(p.id).setValue(etaInfo);
 
-                TextView etatv = (TextView) findViewById(R.id.eta_text);
-                if (collectiveETA <= 1) {
-                    // Consider the meetup effectively "concluded"
-                    etaMsg += " (...move the marker?)";
-                    etatv.setText(etaMsg);
-
-                    Button leaveButton = new Button(MapActivity.this);
-                    leaveButton.setText("Leave");
-
-                    LinearLayout ll = (LinearLayout) findViewById(R.id.lb_container);
-                    LinearLayout.LayoutParams lp =
-                            new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT,
-                            LinearLayout.LayoutParams.WRAP_CONTENT);
-                    ll.addView(leaveButton, lp);
-
-                    leaveButton.setOnClickListener(new View.OnClickListener() {
-                        @Override
-                        public void onClick(View view) {
-                            Firebase ref = new Firebase("https://floxx.firebaseio.com/");
-                            Utility.leave(meetupId, ref, ref.getAuth().getUid());
-                            finish();
-                        }
-                    });
-                    leaveButtonExists = true;
-                } else {
-                    if (leaveButtonExists) {
-                        ((LinearLayout) findViewById(R.id.lb_container)).removeAllViews();
-                        leaveButtonExists = false;
-                    }
-
-                    etatv.setText(etaMsg);
-                }
+                handleNewETA(p.id, eta, miDist);
             }
+        }
+    }
+
+    /**
+     * Updates the UI and internal configuration to account for some user's new ETA.
+     * @param id some user's UID
+     * @param eta the ETA for said user
+     */
+    private void handleNewETA(String id, int eta, double miDist) {
+        Marker userMarker = (id.equals(uid)) ? marker : others.get(id);
+        if (userMarker != null) {
+            userMarker.setSnippet(String.valueOf(eta) + " min (" + miDist + " mi)");
+        }
+
+        etas.put(id, eta);
+
+        // Calculate the overall ETA (the maximum of all participants' ETAs)
+        int collectiveETA = Collections.max(etas.values());
+        String etaMsg = "ETA: " + collectiveETA + " min";
+
+        TextView etatv = (TextView) findViewById(R.id.eta_text);
+        if (collectiveETA <= 1) {
+            // Consider the meetup effectively "concluded"
+            etaMsg += " (...move the marker?)";
+            etatv.setText(etaMsg);
+
+            Button leaveButton = new Button(MapActivity.this);
+            leaveButton.setText("Leave");
+
+            LinearLayout ll = (LinearLayout) findViewById(R.id.lb_container);
+            LinearLayout.LayoutParams lp =
+                    new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT,
+                            LinearLayout.LayoutParams.WRAP_CONTENT);
+            ll.addView(leaveButton, lp);
+
+            leaveButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    Firebase ref = new Firebase("https://floxx.firebaseio.com/");
+                    Utility.leave(meetupId, ref, ref.getAuth().getUid());
+                    finish();
+                }
+            });
+            leaveButtonExists = true;
+        } else {
+            if (leaveButtonExists) {
+                ((LinearLayout) findViewById(R.id.lb_container)).removeAllViews();
+                leaveButtonExists = false;
+            }
+
+            etatv.setText(etaMsg);
         }
     }
 
@@ -926,5 +1016,44 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback,
                 }
             });
         }
+    }
+
+    private void updateTransportMode(Button button, String transportMode) {
+        selectedTransportButton.getBackground().setColorFilter(null);
+        button.getBackground().setColorFilter(new LightingColorFilter(0xff888888, 0x000000));
+        selectedTransportButton = button;
+        currTransportMode = transportMode;
+        computeETA();
+    }
+
+    /**
+     * Assigns an ETA listener for some other guy.
+     * @param ouid the other guy's user ID
+     */
+    private void setETAListener(final String ouid, Firebase ref) {
+        Query etaRef = ref.child(meetupId).child(ouid);
+        etaRef.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                ArrayList<Double> etaInfo = (ArrayList<Double>) dataSnapshot.getValue();
+                if (etaInfo != null) {
+                    handleNewETA(ouid, etaInfo.get(0).intValue(), etaInfo.get(1));
+                }
+            }
+
+            @Override
+            public void onCancelled(FirebaseError firebaseError) {
+                Log.w("MA – setETAListener", "Read failed: " + firebaseError.getMessage());
+            }
+        });
+    }
+
+    private RelativeLayout.LayoutParams getTransportParams() {
+        RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(
+                RelativeLayout.LayoutParams.WRAP_CONTENT,
+                RelativeLayout.LayoutParams.WRAP_CONTENT
+        );
+        params.setMargins(5, 2, 5, 0); // (left, top, right, bottom)
+        return params;
     }
 }

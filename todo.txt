@@ -8,12 +8,10 @@ TODO (ESSENTIAL)
    - [S2] In this way, force the user to enter the code when he/she comes back to the app
    - [S2] If the code verifies, set the user to "active" or something, and grant user portal access
 2. Upgrade map interface (incl. bottom layer).
-   - [S1] Include your own ETA on the map [0.5 hrs]
-   - [S2] Let users specify their mode of transportation [1 hr]
-   - [S3] Add a "move marker" button that allows only one user to move the meeting marker at a time [1.5 hrs]
-   - [S4] General layout changes [1 hr]
+   - [S1] Add a "move marker" button that allows only one user to move the meeting marker at a time [1.5 hrs]
+   - [S2] General layout changes [1 hr]
 
-// Total: 6 hrs
+// Total: 4.5 hrs
 * Time estimates = (Owen's original call) x 2
 
 --------------------------
