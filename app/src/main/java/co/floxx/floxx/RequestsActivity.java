@@ -17,6 +17,7 @@ import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.BaseAdapter;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.SearchView;
@@ -55,6 +56,8 @@ public class RequestsActivity extends AppCompatActivity {
     private HashSet<String> currentFriends;
     private String currentUsername, currUser; // user = UID
     private HashSet<String> pending = new HashSet<String>(); // YOU sent these and you're waiting
+    private ImageView closeButton;
+    private float initialY;
 
     @Override
     protected void onResume() {
@@ -88,6 +91,11 @@ public class RequestsActivity extends AppCompatActivity {
         TextView searchText = (TextView) searchView.findViewById(id);
         searchText.setTextColor(Color.LTGRAY);
         searchText.setHintTextColor(Color.LTGRAY);
+
+        id = searchView.getContext().getResources().getIdentifier("android:id/search_close_btn", null, null);
+        closeButton = (ImageView) searchView.findViewById(id);
+        initialY = closeButton.getY() + 5;
+        closeButton.setY(initialY + 4); // obviously, this is an approximation
 
         // Firebase configuration
         Firebase.setAndroidContext(this);
@@ -328,6 +336,8 @@ public class RequestsActivity extends AppCompatActivity {
 
             @Override
             public boolean onQueryTextChange(String newText) {
+                closeButton.setY((newText.length() == 0) ? initialY + 4 : initialY);
+
                 executeSearch(newText);
                 return true;
             }
