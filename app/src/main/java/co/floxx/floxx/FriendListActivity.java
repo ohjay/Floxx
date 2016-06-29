@@ -200,7 +200,7 @@ public class FriendListActivity extends AppCompatActivity {
         // Add to the meetups section of the database
         ArrayList<String> confirmed = new ArrayList<String>(); // confirmed users
         confirmed.add(uid);
-        final String datetime = " " + new SimpleDateFormat("yyyy/MM/dd HH:mm:ss")
+        final String datetime = " " + new SimpleDateFormat("yyyy-MM-dd HH:mm:ss")
                 .format(Calendar.getInstance().getTime());
         ref.child("meetups").child(uid + datetime).child("confirmed").setValue(confirmed);
 

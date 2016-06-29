@@ -23,4 +23,3 @@ TODO (BUG REPORTS / MINOR)
 2. Bug report: "user is already in a meetup" just because some other person INVITED him to her meetup (?).
 3. Look at the TODOs scattered across our codebase.
 4. Look through (/clean up) all code. For example, turn standard output into logs.
-5. Limit length of usernames (maybe < 15 characters?).
