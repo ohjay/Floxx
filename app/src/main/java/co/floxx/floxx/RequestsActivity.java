@@ -56,7 +56,7 @@ public class RequestsActivity extends AppCompatActivity {
     private HashSet<String> currentFriends;
     private String currentUsername, currUser; // user = UID
     private HashSet<String> pending = new HashSet<String>(); // YOU sent these and you're waiting
-    private ImageView closeButton;
+    private TextView searchText;
     private float initialY;
 
     @Override
@@ -88,14 +88,16 @@ public class RequestsActivity extends AppCompatActivity {
         searchView.setIconifiedByDefault(true);
 
         int id = searchView.getContext().getResources().getIdentifier("android:id/search_src_text", null, null);
-        TextView searchText = (TextView) searchView.findViewById(id);
+        searchText = (TextView) searchView.findViewById(id);
         searchText.setTextColor(Color.LTGRAY);
         searchText.setHintTextColor(Color.LTGRAY);
 
+        initialY = searchText.getY() - 4;
+        searchText.setY(initialY);
+
         id = searchView.getContext().getResources().getIdentifier("android:id/search_close_btn", null, null);
-        closeButton = (ImageView) searchView.findViewById(id);
-        initialY = closeButton.getY() + 5;
-        closeButton.setY(initialY + 4); // obviously, this is an approximation
+        ImageView closeButton = (ImageView) searchView.findViewById(id);
+        closeButton.setY(closeButton.getY() + 6); // obviously, this is an approximation
 
         // Firebase configuration
         Firebase.setAndroidContext(this);
@@ -336,7 +338,7 @@ public class RequestsActivity extends AppCompatActivity {
 
             @Override
             public boolean onQueryTextChange(String newText) {
-                closeButton.setY((newText.length() == 0) ? initialY + 4 : initialY);
+                searchText.setY((newText.length() == 0) ? initialY : initialY + 5);
 
                 executeSearch(newText);
                 return true;
