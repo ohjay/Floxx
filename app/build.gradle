@@ -38,4 +38,8 @@ dependencies {
     compile 'com.google.android.gms:play-services-auth:8.4.0'
     compile 'com.google.android.gms:play-services-gcm:8.4.0'
     compile 'com.thebluealliance:spectrum:0.5.0'
+    compile 'com.amazonaws:aws-android-sdk-core:2.2.20'
+    compile 'com.amazonaws:aws-android-sdk-cognito:2.2.20'
+    compile 'com.amazonaws:aws-android-sdk-cognitoidentityprovider:2.2.20'
+    compile 'com.amazonaws:aws-android-sdk-ses:2.2.20'
 }

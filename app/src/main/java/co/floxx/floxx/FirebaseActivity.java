@@ -11,6 +11,15 @@ import android.view.Gravity;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.amazonaws.auth.CognitoCachingCredentialsProvider;
+import com.amazonaws.regions.Regions;
+import com.amazonaws.services.simpleemail.AmazonSimpleEmailServiceClient;
+import com.amazonaws.services.simpleemail.model.Body;
+import com.amazonaws.services.simpleemail.model.Content;
+import com.amazonaws.services.simpleemail.model.Destination;
+import com.amazonaws.services.simpleemail.model.Message;
+import com.amazonaws.services.simpleemail.model.SendEmailRequest;
+import com.amazonaws.services.simpleemail.model.SendEmailResult;
 import com.firebase.client.AuthData;
 import com.firebase.client.DataSnapshot;
 import com.firebase.client.Firebase;
@@ -29,6 +38,7 @@ public class FirebaseActivity extends AppCompatActivity {
     private String nodots; // REMAIL without dots (so it can be saved as a Firebase key)
     private boolean emailChecked;
     Firebase ref;
+    private static final String FLOXX_EMAIL_ADDR = "floxxygen@gmail.com";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -126,9 +136,76 @@ public class FirebaseActivity extends AppCompatActivity {
         }
     }
 
+    /**
+     * Sends an email to the given address.
+     * The email shall contain a randomly generated verification hash,
+     * and the user will be required to enter this hash if he/she wishes
+     * to unlock Floxx's full functionality.
+     *
+     * Uses Amazon's AWS SES service to actually send the email.
+     * @param address the address to send to
+     */
+    private String sendConfirmationEmail(String address) {
+        // Initialize the Amazon Cognito credentials provider
+        CognitoCachingCredentialsProvider credentialsProvider = new CognitoCachingCredentialsProvider(
+                getApplicationContext(),
+                "us-east-1:58399437-27a6-4227-85fe-5b6592cf90e6",
+                Regions.US_EAST_1
+        );
+
+        AmazonSimpleEmailServiceClient client = new AmazonSimpleEmailServiceClient(credentialsProvider);
+
+        // Create all of the content for the email
+        Destination destination = new Destination().withToAddresses(address);
+        Content subject = new Content("Floxx Verification Request");
+
+        String confirmationCode = generateConfirmationCode();
+        Content textBody = new Content("Hello lovely user!\n\n"
+                + "Thanks for downloading Floxx. It's going to be a blast, I promise. And don't worry – "
+                + "you can always turn off location updates if you're worried about your privacy.\n\n"
+                + "To get started, open up the app and verify your email address by entering the "
+                + "following code: " + confirmationCode + ". After that, you should be good "
+                + "to go. Also, if you're looking for someone who is single and ready to mingle, "
+                + "hit up Richard Gao.\n\nHave a good one (and don't forget to Floxx!),\nThe Floxx crew");
+
+        Body body = new Body().withText(textBody);
+        Message message = new Message().withSubject(subject).withBody(body);
+        SendEmailRequest request = new SendEmailRequest(FLOXX_EMAIL_ADDR, destination, message);
+
+        try {
+            SendEmailResult result =  client.sendEmail(request);
+            Log.i("FA – sCE", result.toString());
+            return confirmationCode;
+        } catch (Exception e) {
+            Log.w("FA – sCE", "Email not sent: " + e.getMessage());
+            // We SHOULD have more handling in here, to resend if the internet died or something
+            // But...
+
+            return null; // ...we could just do this instead
+        }
+    }
+
+    /**
+     * Creates a randomly generated hash to be used as a verification code.
+     * We can make this fancier later, if we want.
+     * @return a confirmation code
+     */
+    private String generateConfirmationCode() {
+        return Long.toHexString(Double.doubleToLongBits(Math.random()));
+    }
+
     private void finishRegistration() {
-        // TODO: Send confirmation email to REMAIL
+        // Send confirmation email to REMAIL
         // User should not be fully registered until he/she confirms
+        String confirmationCode = sendConfirmationEmail(remail);
+        if (confirmationCode != null) {
+            // Haha if the email fails we'll just let them be a user automatically
+
+            // TODO: Set user status to "unconfirmed", save confirmation code to Firebase
+            // TODO: Redirect to the confirmation entry screen
+            // TODO: Check for confirmed status during redirect (test against the one in Firebase)
+            // TODO: This isn't the most secure thing huh
+        }
 
         String email = ruser + "@gmail.com"; // this doesn't need to change (- Owen 5/30)
         Log.i(email, "should be registering this");

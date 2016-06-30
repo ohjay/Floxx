@@ -1,14 +1,12 @@
 ----------------
 TODO (ESSENTIAL)
 ----------------
-1. Send email confirmations during registration. [2 hrs]
-   - [S1] Send an email containing a unique code/hash (using Amazon SES?)
+1. Send email confirmations during registration. [1.5 hrs]
    - [S1] Set user's status to "unconfirmed"
    - [S2] Redirect unconfirmed users to a "confirm code" entry screen when they log in
-   - [S2] In this way, force the user to enter the code when he/she comes back to the app
-   - [S2] If the code verifies, set the user to "active" or something, and grant user portal access
+   - [S3] If the code verifies, set the user to "active" or something, and grant user portal access
 
-// Total: 2 hrs
+// Total: 1.5 hrs
 * Time estimates = (Owen's original call) x 2
 
 --------------------------
