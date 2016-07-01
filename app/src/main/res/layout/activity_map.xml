@@ -51,8 +51,9 @@
         android:layout_height="wrap_content"
         android:orientation="vertical"
         android:id="@+id/lb_container"
-        android:layout_gravity="center_horizontal"
-        android:layout_marginBottom="40dp">
+        android:layout_gravity="end|top"
+        android:layout_marginTop="40dp"
+        android:layout_marginEnd="-1dip">
     </LinearLayout>
 
     <View

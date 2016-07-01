@@ -323,7 +323,7 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback,
             }
         });
 
-        // TODO (OJ?): If this works, we should probably migrate all locn updates to this service
+        // If this works, we should probably migrate all locn updates to this service
         ComponentName mServiceComponent = new ComponentName(this, LocationUpdateService.class);
         PersistableBundle bundle = new PersistableBundle();
         bundle.putString("uid", uid);
