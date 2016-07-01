@@ -1,9 +1,8 @@
 --------------------------
 TODO (BUG REPORTS / MINOR)
 --------------------------
-1. Bug report: crash when creating a group and running the map for the first time (after confirming that you'll allow Floxx to "access this device's location").
-2. Look at the TODOs in MapActivity.
-3. Look through (/clean up) all code. For example, turn standard output into logs.
-4. Fill in the README.
+1. Look at the TODOs in MapActivity.
+2. Look through (/clean up) all code. For example, turn standard output into logs.
+3. Fill in the README.
 
-// Total: 2 hrs
+// Total: 1.5 hrs

@@ -22,7 +22,6 @@ import android.support.annotation.NonNull;
 import android.support.multidex.MultiDex;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentActivity;
-import android.support.v4.content.ContextCompat;
 import android.util.Log;
 import android.util.TypedValue;
 import android.view.MotionEvent;
@@ -196,7 +195,10 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback,
     }
 
     protected void onStop() {
-        mGoogleApiClient.disconnect();
+        if (mGoogleApiClient.isConnected()) {
+            LocationServices.FusedLocationApi.removeLocationUpdates(mGoogleApiClient, this);
+            mGoogleApiClient.disconnect();
+        }
         super.onStop();
     }
 
@@ -249,7 +251,6 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback,
                 .setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY)
                 .setInterval(10 * 1000)        // 10 seconds, in milliseconds
                 .setFastestInterval(1000); // 1 second, in milliseconds
-        setUpMapIfNeeded();
 
         final Firebase ref = new Firebase("https://floxx.firebaseio.com/");
         for (final String ouid : others.keySet()) {
@@ -371,16 +372,8 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback,
     @Override
     protected void onResume() {
         super.onResume();
-        mGoogleApiClient.connect();
-        setUpMapIfNeeded();
-    }
-
-    @Override
-    protected void onPause() {
-        super.onPause();
-        if (mGoogleApiClient.isConnected()) {
-            LocationServices.FusedLocationApi.removeLocationUpdates(mGoogleApiClient, this);
-            mGoogleApiClient.disconnect();
+        if (!mGoogleApiClient.isConnected()) {
+            mGoogleApiClient.connect();
         }
     }
 
@@ -396,6 +389,8 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback,
 
     @Override
     public void onConnected(Bundle connectionHint) {
+        setUpMapIfNeeded();
+
         Log.i(TAG, "Location services connected.");
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
                 != PackageManager.PERMISSION_GRANTED
@@ -404,14 +399,8 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback,
             ActivityCompat.requestPermissions(this,
                     new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
                     FINE_REQ_CODE);
-
-            ActivityCompat.requestPermissions(this,
-                    new String[]{Manifest.permission.ACCESS_COARSE_LOCATION},
-                    COARSE_REQ_CODE);
             return;
         }
-
-        startLocationUpdates();
 
         mLastLocation = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
         if (mLastLocation == null) {
@@ -511,7 +500,6 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback,
     //================================================================================
     // - setUpMap
     // - setUpMapIfNeeded
-    // - startLocationUpdates
     // - attachBaseContext
     // - addTransportOptionsToUI (adds buttons for different transport modes)
     //================================================================================
@@ -542,35 +530,9 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback,
             mapFragment.getMapAsync(this);
             // Check if we were successful in obtaining the map
             if (mMap != null) {
-                if (ContextCompat.checkSelfPermission(this,
-                        Manifest.permission.ACCESS_FINE_LOCATION)
-                        == PackageManager.PERMISSION_GRANTED) {
-                    mMap.setMyLocationEnabled(true);
-                } else {
-                    // Show rationale and request permission
-                    ActivityCompat.requestPermissions(this,
-                            new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
-                            FINE_REQ_CODE);
-
-                    ActivityCompat.requestPermissions(this,
-                            new String[]{Manifest.permission.ACCESS_COARSE_LOCATION},
-                            COARSE_REQ_CODE);
-                }
-
                 setUpMap();
             }
         }
-    }
-
-    protected void startLocationUpdates() {
-        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
-                != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this,
-                Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            return;
-        }
-
-        LocationServices.FusedLocationApi.requestLocationUpdates(
-                mGoogleApiClient, mLocationRequest, this);
     }
 
     @Override
@@ -716,7 +678,8 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback,
 
             if (!etaExists) {
                 TextView etatv = (TextView) findViewById(R.id.eta_text);
-                etatv.setText("Computing ETA. Please wait...");
+                String etaMsg = "Computing ETA. Please wait...";
+                etatv.setText(etaMsg);
             }
         } else {
             meetingMarker.setPosition(new LatLng(latitude, longitude));
@@ -888,24 +851,26 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback,
             etatv.setText(etaMsg);
             etaExists = true;
 
-            Button leaveButton = new Button(MapActivity.this);
-            leaveButton.setText("Leave");
+            if (!leaveButtonExists) {
+                Button leaveButton = new Button(MapActivity.this);
+                leaveButton.setText("Leave");
 
-            LinearLayout ll = (LinearLayout) findViewById(R.id.lb_container);
-            LinearLayout.LayoutParams lp =
-                    new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT,
-                            LinearLayout.LayoutParams.WRAP_CONTENT);
-            ll.addView(leaveButton, lp);
+                LinearLayout ll = (LinearLayout) findViewById(R.id.lb_container);
+                LinearLayout.LayoutParams lp =
+                        new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT,
+                                LinearLayout.LayoutParams.WRAP_CONTENT);
+                ll.addView(leaveButton, lp);
 
-            leaveButton.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    Firebase ref = new Firebase("https://floxx.firebaseio.com/");
-                    Utility.leave(meetupId, ref, ref.getAuth().getUid());
-                    finish();
-                }
-            });
-            leaveButtonExists = true;
+                leaveButton.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        Firebase ref = new Firebase("https://floxx.firebaseio.com/");
+                        Utility.leave(meetupId, ref, ref.getAuth().getUid());
+                        finish();
+                    }
+                });
+                leaveButtonExists = true;
+            }
         } else {
             if (leaveButtonExists) {
                 ((LinearLayout) findViewById(R.id.lb_container)).removeAllViews();
