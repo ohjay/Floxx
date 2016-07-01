@@ -2,6 +2,7 @@ package co.floxx.floxx;
 
 import android.content.Intent;
 import android.graphics.Typeface;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v4.content.ContextCompat;
@@ -12,6 +13,9 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.amazonaws.auth.CognitoCachingCredentialsProvider;
+import com.amazonaws.mobileconnectors.cognito.CognitoSyncManager;
+import com.amazonaws.mobileconnectors.cognito.Dataset;
+import com.amazonaws.mobileconnectors.cognito.DefaultSyncCallback;
 import com.amazonaws.regions.Regions;
 import com.amazonaws.services.simpleemail.AmazonSimpleEmailServiceClient;
 import com.amazonaws.services.simpleemail.model.Body;
@@ -30,6 +34,7 @@ import com.github.silvestrpredko.dotprogressbar.DotProgressBar;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class FirebaseActivity extends AppCompatActivity {
@@ -39,6 +44,10 @@ public class FirebaseActivity extends AppCompatActivity {
     private boolean emailChecked;
     Firebase ref;
     private static final String FLOXX_EMAIL_ADDR = "floxxygen@gmail.com";
+    protected CognitoCachingCredentialsProvider credentialsProvider;
+    private boolean sendConfirm;
+    private static final int WAIT_TIME = 386;
+    private String confirmationCode;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -125,8 +134,16 @@ public class FirebaseActivity extends AppCompatActivity {
                 }
                 @Override
                 public void onAuthenticationError(FirebaseError firebaseError) {
-                    Toast toast = Toast.makeText(FirebaseActivity.this,
-                            firebaseError.getMessage().replace("email address", "username"),
+                    String firebaseMsg = firebaseError.getMessage();
+                    if (firebaseMsg.startsWith("There was an exception while connecting "
+                            + "to the authentication server")) {
+                        firebaseMsg = "No internet connection. Please check your Wi-Fi "
+                                + "or mobile network connection and try again.";
+                    } else {
+                        firebaseMsg = firebaseMsg.replace("email address", "username");
+                    }
+
+                    Toast toast = Toast.makeText(FirebaseActivity.this, firebaseMsg,
                             Toast.LENGTH_LONG);
                     toast.setGravity(Gravity.TOP|Gravity.CENTER_HORIZONTAL, 0, 30);
                     toast.show();
@@ -134,6 +151,58 @@ public class FirebaseActivity extends AppCompatActivity {
                 }
             });
         }
+    }
+
+    /**
+     * Apparently this can't happen in the main thread.
+     */
+    private class SendEmailTask extends AsyncTask<String, Void, Void> {
+        protected Void doInBackground(String... strings) {
+            credentialsProvider.refresh();
+            AmazonSimpleEmailServiceClient client = new AmazonSimpleEmailServiceClient(credentialsProvider);
+
+            // Create all of the content for the email
+            Destination destination = new Destination().withToAddresses(strings[0]);
+            Content subject = new Content("Floxx Verification Request");
+
+            confirmationCode = generateConfirmationCode().toUpperCase();
+            Content textBody = new Content("Hello lovely user!\n\n"
+                    + "Thanks for downloading Floxx. It's going to be a blast, I promise. And don't worry – "
+                    + "you can always turn off location updates if you're worried about your privacy.\n\n"
+                    + "To get started, open up the app and verify your email address by entering the "
+                    + "following code: " + confirmationCode + ". After that, you should be good "
+                    + "to go. Also, if you're looking for someone who is single and ready to mingle, "
+                    + "hit up Richard Gao.\n\nHave a good one (and don't forget to Floxx!),\nThe Floxx crew");
+
+            Body body = new Body().withText(textBody);
+            Message message = new Message().withSubject(subject).withBody(body);
+            SendEmailRequest request = new SendEmailRequest(FLOXX_EMAIL_ADDR, destination, message);
+
+            try {
+                SendEmailResult result =  client.sendEmail(request);
+                Log.i("FA – SET", result.toString());
+            } catch (Exception e) {
+                Log.w("FA – SET", "Email not sent: " + e);
+                // We SHOULD have more handling in here, to resend if the internet died or something
+                // But...
+
+                confirmationCode = null; // ...we could just do this instead
+            }
+
+            sendConfirm = true;
+            return null;
+        }
+    }
+
+    private void waitForSendConfirm() {
+        new Handler().postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                if (!sendConfirm) {
+                    waitForSendConfirm();
+                }
+            }
+        }, WAIT_TIME);
     }
 
     /**
@@ -147,42 +216,26 @@ public class FirebaseActivity extends AppCompatActivity {
      */
     private String sendConfirmationEmail(String address) {
         // Initialize the Amazon Cognito credentials provider
-        CognitoCachingCredentialsProvider credentialsProvider = new CognitoCachingCredentialsProvider(
+        credentialsProvider = new CognitoCachingCredentialsProvider(
                 getApplicationContext(),
                 "us-east-1:58399437-27a6-4227-85fe-5b6592cf90e6",
                 Regions.US_EAST_1
         );
 
-        AmazonSimpleEmailServiceClient client = new AmazonSimpleEmailServiceClient(credentialsProvider);
+        CognitoSyncManager syncClient = new CognitoSyncManager(
+                getApplicationContext(), Regions.US_EAST_1, credentialsProvider);
+        Dataset dataset = syncClient.openOrCreateDataset("floxxset");
+        dataset.put(address, "email tbs");
+        dataset.synchronize(new DefaultSyncCallback() {
+            @Override
+            public void onSuccess(Dataset dataset, List newRecords) {
+                // Hooray... now let me send emails okay?
+            }
+        });
 
-        // Create all of the content for the email
-        Destination destination = new Destination().withToAddresses(address);
-        Content subject = new Content("Floxx Verification Request");
-
-        String confirmationCode = generateConfirmationCode();
-        Content textBody = new Content("Hello lovely user!\n\n"
-                + "Thanks for downloading Floxx. It's going to be a blast, I promise. And don't worry – "
-                + "you can always turn off location updates if you're worried about your privacy.\n\n"
-                + "To get started, open up the app and verify your email address by entering the "
-                + "following code: " + confirmationCode + ". After that, you should be good "
-                + "to go. Also, if you're looking for someone who is single and ready to mingle, "
-                + "hit up Richard Gao.\n\nHave a good one (and don't forget to Floxx!),\nThe Floxx crew");
-
-        Body body = new Body().withText(textBody);
-        Message message = new Message().withSubject(subject).withBody(body);
-        SendEmailRequest request = new SendEmailRequest(FLOXX_EMAIL_ADDR, destination, message);
-
-        try {
-            SendEmailResult result =  client.sendEmail(request);
-            Log.i("FA – sCE", result.toString());
-            return confirmationCode;
-        } catch (Exception e) {
-            Log.w("FA – sCE", "Email not sent: " + e.getMessage());
-            // We SHOULD have more handling in here, to resend if the internet died or something
-            // But...
-
-            return null; // ...we could just do this instead
-        }
+        new SendEmailTask().execute(address);
+        waitForSendConfirm();
+        return confirmationCode;
     }
 
     /**
@@ -195,28 +248,20 @@ public class FirebaseActivity extends AppCompatActivity {
     }
 
     private void finishRegistration() {
-        // Send confirmation email to REMAIL
-        // User should not be fully registered until he/she confirms
-        String confirmationCode = sendConfirmationEmail(remail);
-        if (confirmationCode != null) {
-            // Haha if the email fails we'll just let them be a user automatically
-
-            // TODO: Set user status to "unconfirmed", save confirmation code to Firebase
-            // TODO: Redirect to the confirmation entry screen
-            // TODO: Check for confirmed status during redirect (test against the one in Firebase)
-            // TODO: This isn't the most secure thing huh
-        }
-
         String email = ruser + "@gmail.com"; // this doesn't need to change (- Owen 5/30)
         Log.i(email, "should be registering this");
         ref.createUser(email, rpass, new Firebase.ValueResultHandler<Map<String, Object>>() {
             @Override
             public void onSuccess(Map<String, Object> result) {
+                // Send confirmation email to REMAIL
+                // User should not be fully registered until he/she confirms
+                String confirmationCode = sendConfirmationEmail(remail);
+
                 uid = result.get("uid").toString();
                 System.out.println("Successfully created user account with uid: " + uid);
                 Toast toast = Toast.makeText(FirebaseActivity.this, "You were able to register!",
                         Toast.LENGTH_LONG);
-                toast.setGravity(Gravity.BOTTOM|Gravity.CENTER_HORIZONTAL, 0, 10);
+                toast.setGravity(Gravity.TOP|Gravity.CENTER_HORIZONTAL, 0, 30);
                 toast.show();
 
                 // Add the username and UID to Firebase
@@ -256,7 +301,19 @@ public class FirebaseActivity extends AppCompatActivity {
                 // Default the user's location permissions to "on" (sorry Tony)
                 ref.child("permissions").child(uid).child("location").setValue("on");
 
-                Intermediary.firebaseToFullscreen = true;
+                if (confirmationCode != null) {
+                    ref.child("status " + uid).setValue("unconfirmed");
+                    ref.child("vcode " + uid).setValue(confirmationCode);
+
+                    Intent intent = new Intent(FirebaseActivity.this, ConfirmationActivity.class);
+                    intent.putExtra("vcode", confirmationCode);
+                    intent.putExtra("username", ruser);
+                    startActivity(intent);
+                } else {
+                    // If the email fails we'll just let them be confirmed
+                    Intermediary.firebaseToFullscreen = true;
+                }
+
                 finish();
             }
 
@@ -287,11 +344,31 @@ public class FirebaseActivity extends AppCompatActivity {
         }, 500);
     }
 
-    /**
-     * Starts either the map activity or the friend list activity,
-     * depending on whether the user is already in a meetup.
-     */
-    private void redirectAuthenticatedUser() {
+    private void startConfirmationActivity() {
+        Query vcodeRef = ref.child("vcode " + uid);
+        vcodeRef.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                if (dataSnapshot.exists()) {
+                    Intent intent = new Intent(FirebaseActivity.this, ConfirmationActivity.class);
+                    intent.putExtra("vcode", dataSnapshot.getValue().toString());
+                    intent.putExtra("username", euser);
+                    startActivity(intent);
+                } else {
+                    // Aw heck, the user can be confirmed
+                    ref.child("status " + uid).setValue("active");
+                    startUserPortal();
+                }
+            }
+
+            @Override
+            public void onCancelled(FirebaseError firebaseError) {
+                Log.w("FA – sCA", "Read failed: " + firebaseError.getMessage());
+            }
+        });
+    }
+
+    private void startUserPortal() {
         Query ongoingRef = ref.child("ongoing");
         ongoingRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
@@ -308,7 +385,35 @@ public class FirebaseActivity extends AppCompatActivity {
             }
 
             @Override
-            public void onCancelled(FirebaseError firebaseError) {}
+            public void onCancelled(FirebaseError firebaseError) {
+                Log.w("FA – sUP", "Read failed: " + firebaseError.getMessage());
+            }
+        });
+    }
+
+    /**
+     * Starts either the confirmation activity or the user portal,
+     * depending on whether the user is confirmed or not.
+     */
+    private void redirectAuthenticatedUser() {
+        Query statusRef = ref.child("status " + uid);
+        statusRef.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                if (dataSnapshot.exists()
+                        && "unconfirmed".equals(dataSnapshot.getValue().toString())) {
+                    // The user is unconfirmed; get the vcode and go to the conf activity
+                    startConfirmationActivity();
+                } else {
+                    // We'll say the user is confirmed
+                    startUserPortal();
+                }
+            }
+
+            @Override
+            public void onCancelled(FirebaseError firebaseError) {
+                Log.w("FA – rAU", "Read failed: " + firebaseError.getMessage());
+            }
         });
     }
 
