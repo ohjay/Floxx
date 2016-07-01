@@ -40,6 +40,7 @@ public class FriendListActivity extends AppCompatActivity {
     private boolean participantsUpdated;
     private static final int GOLD = Color.parseColor("#ffde00");
     private boolean recentCreation;
+    private ArrayList<String> friends;
 
     @Override
     protected void onResume() {
@@ -185,7 +186,7 @@ public class FriendListActivity extends AppCompatActivity {
             @Override
             public void run() {
                 if (participantsUpdated) {
-                    return;
+                    finishLayoutSetup();
                 } else {
                     blockForParticipants();
                 }
@@ -275,71 +276,14 @@ public class FriendListActivity extends AppCompatActivity {
     private void resetFriendList() {
         updateMeetupParticipants();
 
-        final LinearLayout ll = (LinearLayout) findViewById(R.id.button_container);
-        final LayoutParams lp = new LayoutParams(LayoutParams.MATCH_PARENT,
-                LayoutParams.WRAP_CONTENT);
-
         Query friendsRef = ref.child("users").child(uid);
         friendsRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot snapshot) {
                 Object result = snapshot.child("friends").getValue();
                 if (result != null) {
-                    ArrayList<String> friends = (ArrayList<String>) result;
+                    friends = (ArrayList<String>) result;
                     blockForParticipants();
-                    boolean noFriends = true;
-
-                    for (final String fuid : friends) {
-                        if (meetupParticipants.contains(fuid)) {
-                            continue;
-                        }
-
-                        noFriends = false;
-
-                        final Button b = new Button(thisList);
-                        Query nameQRef = ref.child("uids").orderByValue().equalTo(fuid);
-                        nameQRef.addListenerForSingleValueEvent(new ValueEventListener() {
-                            @Override
-                            public void onDataChange(DataSnapshot dataSnapshot) {
-                                for (DataSnapshot child : dataSnapshot.getChildren()) {
-                                    b.setText(child.getKey());
-                                    ll.addView(b, lp);
-
-                                    b.setOnClickListener(new View.OnClickListener() {
-                                        public void onClick(View view) {
-                                            if (selected.contains(fuid)) {
-                                                selected.remove(fuid);
-                                                b.getBackground().clearColorFilter();
-                                            } else {
-                                                selected.add(fuid);
-                                                b.getBackground().setColorFilter(GOLD,
-                                                        PorterDuff.Mode.DARKEN);
-                                            }
-                                        }
-                                    });
-                                }
-                            }
-
-                            @Override
-                            public void onCancelled(FirebaseError firebaseError) {}
-                        });
-                    }
-
-                    if (noFriends) {
-                        TextView noFriendsText = new TextView(thisList);
-                        String msg = "<i>You have no available friends.</i>";
-                        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
-                            noFriendsText.setText(Html.fromHtml(msg, Html.FROM_HTML_MODE_LEGACY));
-                        } else {
-                            noFriendsText.setText(Html.fromHtml(msg));
-                        }
-                        noFriendsText.setTextColor(Color.LTGRAY);
-                        noFriendsText.setTextSize(TypedValue.COMPLEX_UNIT_SP, 18);
-
-                        ll.setHorizontalGravity(Gravity.CENTER);
-                        ll.addView(noFriendsText, new LayoutParams(LayoutParams.WRAP_CONTENT,
-                                LayoutParams.WRAP_CONTENT));
-                    }
                 }
             }
 
@@ -348,6 +292,65 @@ public class FriendListActivity extends AppCompatActivity {
                 System.out.println("[resetFriendList] Read failed: " + firebaseError.getMessage());
             }
         });
+    }
+
+    private void finishLayoutSetup() {
+        final LinearLayout ll = (LinearLayout) findViewById(R.id.button_container);
+        final LayoutParams lp = new LayoutParams(LayoutParams.MATCH_PARENT,
+                LayoutParams.WRAP_CONTENT);
+
+        boolean noFriends = true;
+        for (final String fuid : friends) {
+            if (meetupParticipants.contains(fuid)) {
+                continue;
+            }
+
+            noFriends = false;
+
+            final Button b = new Button(thisList);
+            Query nameQRef = ref.child("uids").orderByValue().equalTo(fuid);
+            nameQRef.addListenerForSingleValueEvent(new ValueEventListener() {
+                @Override
+                public void onDataChange(DataSnapshot dataSnapshot) {
+                    for (DataSnapshot child : dataSnapshot.getChildren()) {
+                        b.setText(child.getKey());
+                        ll.addView(b, lp);
+
+                        b.setOnClickListener(new View.OnClickListener() {
+                            public void onClick(View view) {
+                                if (selected.contains(fuid)) {
+                                    selected.remove(fuid);
+                                    b.getBackground().clearColorFilter();
+                                } else {
+                                    selected.add(fuid);
+                                    b.getBackground().setColorFilter(GOLD,
+                                            PorterDuff.Mode.DARKEN);
+                                }
+                            }
+                        });
+                    }
+                }
+
+                @Override
+                public void onCancelled(FirebaseError firebaseError) {}
+            });
+        }
+
+        if (noFriends) {
+            TextView noFriendsText = new TextView(thisList);
+            String msg = "<i>You have no available friends.</i>";
+            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
+                noFriendsText.setText(Html.fromHtml(msg, Html.FROM_HTML_MODE_LEGACY));
+            } else {
+                noFriendsText.setText(Html.fromHtml(msg));
+            }
+            noFriendsText.setTextColor(Color.LTGRAY);
+            noFriendsText.setTextSize(TypedValue.COMPLEX_UNIT_SP, 18);
+
+            ll.setHorizontalGravity(Gravity.CENTER);
+            ll.addView(noFriendsText, new LayoutParams(LayoutParams.WRAP_CONTENT,
+                    LayoutParams.WRAP_CONTENT));
+        }
     }
 
     private void resetMeetupInvitations() {
