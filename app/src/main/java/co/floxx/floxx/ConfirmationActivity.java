@@ -22,7 +22,7 @@ public class ConfirmationActivity extends AppCompatActivity {
     @Override
     public void onBackPressed() {
         super.onBackPressed();
-        new Firebase("https://floxx.firebaseio.com/").unauth();
+        Intermediary.confToFullscreen = true;
     }
 
     @Override
@@ -46,7 +46,7 @@ public class ConfirmationActivity extends AppCompatActivity {
                     ref.child("status " + uid).setValue("active");
                     startUserPortal(ref, uid, username);
                 } else {
-                    // Log.wtf...
+                    // Log.wtf man...
                     String msg = "Sorry, that wasn't right. Check your email again for the code!";
                     Toast.makeText(ConfirmationActivity.this, msg, Toast.LENGTH_LONG).show();
                 }

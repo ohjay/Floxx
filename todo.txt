@@ -1,13 +1,3 @@
-----------------
-TODO (ESSENTIAL)
-----------------
-1. Send email confirmations during registration. [1.5 hrs]
-   - [S1] Redirect unconfirmed users to a "confirm code" entry screen when they log in
-   - [S2] If the code verifies, set the user to "active" or something, and grant user portal access
-
-// Total: 1.5 hrs
-* Time estimates = (Owen's original call) x 2
-
 --------------------------
 TODO (BUG REPORTS / MINOR)
 --------------------------
@@ -16,6 +6,5 @@ TODO (BUG REPORTS / MINOR)
 3. Look at the TODOs scattered across our codebase.
 4. Look through (/clean up) all code. For example, turn standard output into logs.
 5. Fill in the README.
-6. Reword toasts for login/registration without internet access.
 
 // Total: 2 hrs

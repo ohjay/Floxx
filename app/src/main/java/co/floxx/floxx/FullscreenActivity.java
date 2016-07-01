@@ -23,6 +23,17 @@ public class FullscreenActivity extends AppCompatActivity {
         super.onResume();
         ((EditText) findViewById(R.id.enter_username)).setText("");
         ((EditText) findViewById(R.id.enter_password)).setText("");
+
+        // These should not be set anymore
+        if (Intermediary.confToFullscreen) {
+            Intermediary.confToFullscreen = false;
+        }
+        if (Intermediary.userPortalToFullscreen) {
+            Intermediary.userPortalToFullscreen = false;
+        }
+        if (Intermediary.firebaseToFullscreen) {
+            Intermediary.firebaseToFullscreen = false;
+        }
     }
 
     @Override

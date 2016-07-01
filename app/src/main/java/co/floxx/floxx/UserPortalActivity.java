@@ -113,6 +113,7 @@ public class UserPortalActivity extends AppCompatActivity {
         // Log this fool out
         super.onBackPressed();
         new Firebase("https://floxx.firebaseio.com/").unauth();
+        Intermediary.userPortalToFullscreen = true;
     }
 
     @Override

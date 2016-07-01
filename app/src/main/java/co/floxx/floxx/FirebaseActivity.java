@@ -45,9 +45,19 @@ public class FirebaseActivity extends AppCompatActivity {
     Firebase ref;
     private static final String FLOXX_EMAIL_ADDR = "floxxygen@gmail.com";
     protected CognitoCachingCredentialsProvider credentialsProvider;
-    private boolean sendConfirm;
+    private boolean sendConfirm, registrationFinished;
     private static final int WAIT_TIME = 386;
     private String confirmationCode;
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+
+        if (Intermediary.userPortalToFullscreen) {
+            Intermediary.userPortalToFullscreen = false;
+            finish();
+        }
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -166,13 +176,16 @@ public class FirebaseActivity extends AppCompatActivity {
             Content subject = new Content("Floxx Verification Request");
 
             confirmationCode = generateConfirmationCode().toUpperCase();
+            confirmationCode = confirmationCode.substring(0, Math.min(7, confirmationCode.length()));
+
             Content textBody = new Content("Hello lovely user!\n\n"
-                    + "Thanks for downloading Floxx. It's going to be a blast, I promise. And don't worry – "
-                    + "you can always turn off location updates if you're worried about your privacy.\n\n"
-                    + "To get started, open up the app and verify your email address by entering the "
-                    + "following code: " + confirmationCode + ". After that, you should be good "
-                    + "to go. Also, if you're looking for someone who is single and ready to mingle, "
-                    + "hit up Richard Gao.\n\nHave a good one (and don't forget to Floxx!),\nThe Floxx crew");
+                    + "Thanks for downloading Floxx. It's going to be a blast, I promise. "
+                    + "And don't worry – you can always turn off location updates if you're "
+                    + "worried about your privacy.\n\nTo get started, open up the app and verify "
+                    + "your email address by entering the following code: " + confirmationCode
+                    + ". After that, you should be good to go. Also, if you're looking for someone "
+                    + "who is single and ready to mingle, hit up Richard Gao.\n\nHave a good one "
+                    + "(and don't forget to Floxx!),\nThe Floxx crew");
 
             Body body = new Body().withText(textBody);
             Message message = new Message().withSubject(subject).withBody(body);
@@ -198,8 +211,10 @@ public class FirebaseActivity extends AppCompatActivity {
         new Handler().postDelayed(new Runnable() {
             @Override
             public void run() {
-                if (!sendConfirm) {
+                if (!sendConfirm || !registrationFinished) {
                     waitForSendConfirm();
+                } else {
+                    redirectRegisteredUser();
                 }
             }
         }, WAIT_TIME);
@@ -214,7 +229,7 @@ public class FirebaseActivity extends AppCompatActivity {
      * Uses Amazon's AWS SES service to actually send the email.
      * @param address the address to send to
      */
-    private String sendConfirmationEmail(String address) {
+    private void sendConfirmationEmail(String address) {
         // Initialize the Amazon Cognito credentials provider
         credentialsProvider = new CognitoCachingCredentialsProvider(
                 getApplicationContext(),
@@ -235,7 +250,6 @@ public class FirebaseActivity extends AppCompatActivity {
 
         new SendEmailTask().execute(address);
         waitForSendConfirm();
-        return confirmationCode;
     }
 
     /**
@@ -250,19 +264,16 @@ public class FirebaseActivity extends AppCompatActivity {
     private void finishRegistration() {
         String email = ruser + "@gmail.com"; // this doesn't need to change (- Owen 5/30)
         Log.i(email, "should be registering this");
+        registrationFinished = false;
+
         ref.createUser(email, rpass, new Firebase.ValueResultHandler<Map<String, Object>>() {
             @Override
             public void onSuccess(Map<String, Object> result) {
                 // Send confirmation email to REMAIL
                 // User should not be fully registered until he/she confirms
-                String confirmationCode = sendConfirmationEmail(remail);
+                sendConfirmationEmail(remail);
 
-                uid = result.get("uid").toString();
-                System.out.println("Successfully created user account with uid: " + uid);
-                Toast toast = Toast.makeText(FirebaseActivity.this, "You were able to register!",
-                        Toast.LENGTH_LONG);
-                toast.setGravity(Gravity.TOP|Gravity.CENTER_HORIZONTAL, 0, 30);
-                toast.show();
+                uid = result.get("uid").toString(); // what would we do without this? :)
 
                 // Add the username and UID to Firebase
                 Map<String, Object> uidMap = new HashMap<String, Object>();
@@ -300,21 +311,7 @@ public class FirebaseActivity extends AppCompatActivity {
 
                 // Default the user's location permissions to "on" (sorry Tony)
                 ref.child("permissions").child(uid).child("location").setValue("on");
-
-                if (confirmationCode != null) {
-                    ref.child("status " + uid).setValue("unconfirmed");
-                    ref.child("vcode " + uid).setValue(confirmationCode);
-
-                    Intent intent = new Intent(FirebaseActivity.this, ConfirmationActivity.class);
-                    intent.putExtra("vcode", confirmationCode);
-                    intent.putExtra("username", ruser);
-                    startActivity(intent);
-                } else {
-                    // If the email fails we'll just let them be confirmed
-                    Intermediary.firebaseToFullscreen = true;
-                }
-
-                finish();
+                registrationFinished = true;
             }
 
             @Override
@@ -329,6 +326,38 @@ public class FirebaseActivity extends AppCompatActivity {
                 finish();
             }
         });
+    }
+
+    /**
+     * Redirects a newly registered user.
+     * They will go to either the confirmation screen or the splash screen.
+     */
+    private void redirectRegisteredUser() {
+        if (confirmationCode != null) {
+            Toast toast = Toast.makeText(FirebaseActivity.this, "You were able to register! "
+                    + "A confirmation code has been sent to your email. Enter this code "
+                    + "in order to access Floxx's full functionality.", Toast.LENGTH_LONG);
+            toast.setGravity(Gravity.BOTTOM|Gravity.CENTER_HORIZONTAL, 0, 30);
+            toast.show();
+
+            ref.child("status " + uid).setValue("unconfirmed");
+            ref.child("vcode " + uid).setValue(confirmationCode);
+
+            Intent intent = new Intent(FirebaseActivity.this, ConfirmationActivity.class);
+            intent.putExtra("vcode", confirmationCode);
+            intent.putExtra("username", ruser);
+            startActivity(intent);
+        } else {
+            // If the email fails we'll just let them be confirmed
+            Intermediary.firebaseToFullscreen = true;
+            System.out.println("Successfully created user account with uid: " + uid);
+            Toast toast = Toast.makeText(FirebaseActivity.this, "You were able to register!",
+                    Toast.LENGTH_LONG);
+            toast.setGravity(Gravity.TOP|Gravity.CENTER_HORIZONTAL, 0, 30);
+            toast.show();
+        }
+
+        finish();
     }
 
     private void blockUntilEmailChecked() {
@@ -354,6 +383,7 @@ public class FirebaseActivity extends AppCompatActivity {
                     intent.putExtra("vcode", dataSnapshot.getValue().toString());
                     intent.putExtra("username", euser);
                     startActivity(intent);
+                    finish();
                 } else {
                     // Aw heck, the user can be confirmed
                     ref.child("status " + uid).setValue("active");

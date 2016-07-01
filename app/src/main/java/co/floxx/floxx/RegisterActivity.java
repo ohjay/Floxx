@@ -20,6 +20,9 @@ public class RegisterActivity extends AppCompatActivity {
         if (Intermediary.firebaseToFullscreen) {
             Intermediary.firebaseToFullscreen = false;
             finish();
+        } else if (Intermediary.confToFullscreen) {
+            Intermediary.confToFullscreen = false;
+            finish();
         }
     }
 
