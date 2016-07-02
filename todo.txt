@@ -3,6 +3,9 @@ TODO (BUG REPORTS / MINOR)
 --------------------------
 1. Look at the TODOs in MapActivity.
 2. Look through (/clean up) all code. For example, turn standard output into logs.
-3. Fill in the README.
+3. Bug report: crash when sending verification emails (to kentbeston@gmail).
+4. Bug report: sometimes the friend list doesn't get loaded when you open the FRI page for the first time.
+5. Bug report: when you open the map, it starts in Africa.
+6. Bug report: Location services don't seem to be able to connect sometimes. Doesn't find a location for YOU, and doesn't show ETA/distance info for others (people who were already in the meetup) either.
 
-// Total: 1.5 hrs
+// Total: 2 hrs

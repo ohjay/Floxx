@@ -497,6 +497,7 @@ public class RequestsActivity extends AppCompatActivity {
     private void populateFriendList() {
         // Populate the current friends area
         final LinearLayout cfLayout = (LinearLayout) findViewById(R.id.curr_friends_container);
+        TextView[] firstFriends = new TextView[] { null, null };
         for (final String friend : currentFriends) {
             final TextView friendText = new TextView(context);
             friendText.setTextSize(19);
@@ -504,8 +505,25 @@ public class RequestsActivity extends AppCompatActivity {
             friendText.setText(friend);
             friendText.setTextColor(Color.LTGRAY);
 
-            // Add the name and buttons to the layout
-            cfLayout.addView(friendText, new LinearLayout.LayoutParams(
+            if (firstFriends[1] == null) {
+                firstFriends[1] = friendText;
+            } else if (firstFriends[0] == null) {
+                firstFriends[0] = friendText;
+            } else {
+                // Add the name to the layout
+                cfLayout.addView(friendText, new LinearLayout.LayoutParams(
+                        LinearLayout.LayoutParams.WRAP_CONTENT,
+                        LinearLayout.LayoutParams.WRAP_CONTENT));
+            }
+        }
+
+        // Just to shuffle the list a little
+        for (TextView firstFriend : firstFriends) {
+            if (firstFriend == null) {
+                break;
+            }
+
+            cfLayout.addView(firstFriend, new LinearLayout.LayoutParams(
                     LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT));
         }
     }
