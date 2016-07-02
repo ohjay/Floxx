@@ -78,6 +78,7 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback,
     private final static int CONNECTION_FAILURE_RESOLUTION_REQUEST = 9000;
     private final static int FINE_REQ_CODE = 13;
     private final static int COARSE_REQ_CODE = 14;
+    private final static String API_KEY = "AIzaSyDnzHm1G2f-PpBdNf9OIu1dFg3x5lIz2wM";
     private boolean initialZoom = true;
     private LocationRequest mLocationRequest;
     private GoogleMap mMap;
@@ -96,6 +97,8 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback,
     private Button selectedTransportButton;
     private String currTransportMode = "driving";
     private boolean etaExists;
+    private final static double METERS_PER_MILE = 1609.34;
+    private HashSet<String> hiddenUsers = new HashSet<String>();
 
     /**
      * Whether or not the system UI should be auto-hidden after
@@ -249,7 +252,7 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback,
                 .build();
         mLocationRequest = LocationRequest.create()
                 .setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY)
-                .setInterval(10 * 1000)        // 10 seconds, in milliseconds
+                .setInterval(10 * 1000) // 10 seconds, in milliseconds
                 .setFastestInterval(1000); // 1 second, in milliseconds
 
         final Firebase ref = new Firebase("https://floxx.firebaseio.com/");
@@ -371,7 +374,12 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback,
         mMap = googleMap;
         if (mMap != null) {
             mMap.setMapType(GoogleMap.MAP_TYPE_HYBRID);
-            mMap.setPadding(0, 0, 0, findViewById(R.id.rectangleView).getHeight());
+            if (hiddenDisplayCount == 0) {
+                mMap.setPadding(0, 0, 0, findViewById(R.id.rectangleView).getHeight());
+            } else {
+                mMap.setPadding(0, 0, 0, findViewById(R.id.rectangleView).getHeight()
+                        + findViewById(R.id.hidden_rect).getHeight());
+            }
 
             setUpMap();
             mMap.setOnMapClickListener(this);
@@ -382,12 +390,13 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback,
     @Override
     public void onMapClick(LatLng point) {
         if (meetingMarker != null) { return; } // only ONE of these on the map!!
-        MarkerOptions mmo = new MarkerOptions().position(point).title("Meeting Pt.").draggable(true);
+        MarkerOptions mmo = new MarkerOptions().position(point).title("Meeting Point").draggable(true);
         meetingMarker = mMap.addMarker(mmo); // create the almighty meeting marker
 
         if (!etaExists) {
             TextView etatv = (TextView) findViewById(R.id.eta_text);
-            etatv.setText("Computing ETA. Please wait...");
+            String etaMsg = "Computing ETA. Please wait...";
+            etatv.setText(etaMsg);
         }
 
         computeETA();
@@ -706,7 +715,7 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback,
     private void updateMeetingMarker(double latitude, double longitude) {
         if (meetingMarker == null) {
             MarkerOptions mmo = new MarkerOptions().position(new LatLng(latitude, longitude))
-                    .title("Meeting Pt.").draggable(true);
+                    .title("Meeting Point").draggable(true);
             meetingMarker = mMap.addMarker(mmo); // create the meeting marker
 
             if (!etaExists) {
@@ -726,11 +735,11 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback,
             LatLng meetingPos = meetingMarker.getPosition();
             LatLng yourPosition = marker.getPosition();
 
-            // TODO (Owen): add API key and request "Maps-official" travel time
-            // TODO: also integrate transport mode [currTransportMode]
-            new DirQueryTask().execute("http://maps.googleapis.com/maps/api/directions/json?origin="
+            // "Maps-official" travel time
+            new DirQueryTask().execute("https://maps.googleapis.com/maps/api/directions/json?origin="
                     + yourPosition.latitude + "," + yourPosition.longitude + "&destination="
-                    + meetingPos.latitude + "," + meetingPos.longitude + "&mode=driving&sensor=false",
+                    + meetingPos.latitude + "," + meetingPos.longitude + "&mode="
+                    + currTransportMode + "&key=" + API_KEY,
                     uid);
         }
     }
@@ -797,17 +806,34 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback,
         }
     }
 
+    /**
+     * Okay well technically it's a quadruple now.
+     * But it USED to be a pair.
+     */
     class Pair {
-        String id, queryRes;
+        String id, endAddress;
+        int distance, duration;
 
-        public Pair(String id, String queryRes) {
+        public Pair(String id, int distance, int duration, String endAddress) {
             this.id = id; // by ID, we mean UID
-            this.queryRes = queryRes;
+            this.distance = distance;
+            this.duration = duration;
+            this.endAddress = endAddress;
         }
     }
 
     class DirQueryTask extends AsyncTask<String, Void, Pair> {
         private Exception exception;
+
+        private String getEndAddress(JSONObject steps) {
+            try {
+                return steps.getString("end_address");
+            } catch (NullPointerException | ClassCastException | JSONException e) {
+                Log.w("DQT", e);
+            }
+
+            return null;
+        }
 
         protected Pair doInBackground(String... urls) {
             StringBuilder stringBuilder = new StringBuilder();
@@ -833,12 +859,17 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback,
             JSONObject jsonObject;
             try {
                 jsonObject = new JSONObject(stringBuilder.toString());
+
+                // This jsonObject is amazing
                 JSONArray array = jsonObject.getJSONArray("routes");
                 JSONObject routes = array.getJSONObject(0);
                 JSONArray legs = routes.getJSONArray("legs");
                 JSONObject steps = legs.getJSONObject(0);
-                JSONObject distance = steps.getJSONObject("distance");
-                return new Pair(urls[1], distance.getString("text"));
+
+                String endAddress = getEndAddress(steps);
+                int distance = steps.getJSONObject("distance").getInt("value");
+                int duration = steps.getJSONObject("duration").getInt("value");
+                return new Pair(urls[1], distance, duration, endAddress);
             } catch (JSONException e) {
                 this.exception = e;
                 return null;
@@ -847,15 +878,24 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback,
 
         protected void onPostExecute(Pair p) {
             if (this.exception == null) {
-                double miDist = Double.parseDouble(p.queryRes.replaceAll("[^0-9\\.]", ""));
-                int eta = (int) (miDist / 0.45);
-                // ^TODO: fix this. Currently saving API calls by assuming everyone travels @ 27 mph
+                double miDist = ((double) p.distance) / METERS_PER_MILE;
+                miDist = Math.round(miDist * 10) / 10.0;
+                int eta = p.duration / 60;
 
                 // Publish ETA to database
                 ArrayList<Double> etaInfo = new ArrayList<Double>();
                 etaInfo.add((double) eta); etaInfo.add(miDist);
                 Firebase ref = new Firebase("https://floxx.firebaseio.com/");
                 ref.child(meetupId).child(p.id).setValue(etaInfo);
+
+                if (p.endAddress != null) {
+                    int commaIndex = p.endAddress.indexOf(',');
+                    if (commaIndex > -1) {
+                        meetingMarker.setSnippet(p.endAddress.substring(0, commaIndex));
+                    } else {
+                        meetingMarker.setSnippet(p.endAddress);
+                    }
+                }
 
                 handleNewETA(p.id, eta, miDist);
             }
@@ -998,16 +1038,30 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback,
                 LinearLayout.LayoutParams.MATCH_PARENT,
                 LinearLayout.LayoutParams.WRAP_CONTENT);
 
-        hiddenDisplayCount += (isHidden) ? 1 : -1;
+        if (isHidden && !hiddenUsers.contains(uid)) {
+            hiddenDisplayCount++;
+            hiddenUsers.add(uid);
+        } else if (!isHidden && hiddenUsers.contains(uid)) {
+            hiddenDisplayCount--;
+            hiddenUsers.remove(uid);
+        }
+
         if (hiddenDisplayCount == 0) {
             // Hide the hidden users display
             ScrollView sv = (ScrollView) findViewById(R.id.hidden_rect);
             sv.getLayoutParams().width = 0;
+            if (mMap != null) {
+                mMap.setPadding(0, 0, 0, findViewById(R.id.rectangleView).getHeight());
+            }
         } else if (hiddenDisplayCount == 1 && isHidden) {
             // Show the hidden users display
             ScrollView sv = (ScrollView) findViewById(R.id.hidden_rect);
             sv.getLayoutParams().width =
                     ScrollView.LayoutParams.WRAP_CONTENT;
+            if (mMap != null) {
+                mMap.setPadding(0, 0, 0, findViewById(R.id.rectangleView).getHeight()
+                        + findViewById(R.id.hidden_rect).getHeight());
+            }
         }
 
         if (isHidden) {

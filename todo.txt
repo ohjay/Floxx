@@ -1,7 +1,6 @@
 --------------------------
 TODO (BUG REPORTS / MINOR)
 --------------------------
-1. Look at the TODOs in MapActivity.
-2. Look through (/clean up) all code.
+1. Look through (/clean up) all code.
 
-// Total: 1 hr
+// Total: 0.5 hrs
