@@ -274,7 +274,9 @@ public class RequestsActivity extends AppCompatActivity {
                                 }
 
                                 @Override
-                                public void onCancelled(FirebaseError firebaseError) {}
+                                public void onCancelled(FirebaseError firebaseError) {
+                                    Log.w("cS0", "Read failed: " + firebaseError.getMessage());
+                                }
                             });
                         }
                     }
@@ -316,7 +318,9 @@ public class RequestsActivity extends AppCompatActivity {
                             }
 
                             @Override
-                            public void onCancelled(FirebaseError firebaseError) {}
+                            public void onCancelled(FirebaseError firebaseError) {
+                                Log.w("cS1", "Read failed: " + firebaseError.getMessage());
+                            }
                         });
                     }
                 } else {

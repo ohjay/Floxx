@@ -9,6 +9,7 @@ import android.graphics.Typeface;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.text.Html;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.LinearLayout;
@@ -51,7 +52,7 @@ public class MeetupPortalActivity extends AppCompatActivity {
 
             @Override
             public void onCancelled(FirebaseError firebaseError) {
-                System.out.println("[MPA – onResume] Read failed: " + firebaseError.getMessage());
+                Log.w("MPA – onResume", "Read failed: " + firebaseError.getMessage());
             }
         };
 

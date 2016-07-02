@@ -8,6 +8,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
 import android.text.Html;
+import android.util.Log;
 import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.View;
@@ -143,7 +144,7 @@ public class FriendListActivity extends AppCompatActivity {
 
             @Override
             public void onCancelled(FirebaseError firebaseError) {
-                System.out.println(firebaseError.getMessage());
+                Log.w("acceptMI", "Read failed: " + firebaseError.getMessage());
             }
         });
 
@@ -174,7 +175,9 @@ public class FriendListActivity extends AppCompatActivity {
             }
 
             @Override
-            public void onCancelled(FirebaseError firebaseError) {}
+            public void onCancelled(FirebaseError firebaseError) {
+                Log.w("updateMP", "Read failed: " + firebaseError.getMessage());
+            }
         });
     }
 
@@ -230,7 +233,7 @@ public class FriendListActivity extends AppCompatActivity {
 
                 @Override
                 public void onCancelled(FirebaseError firebaseError) {
-                    System.out.println(firebaseError.getMessage());
+                    Log.w("switchToMap", "Read failed: " + firebaseError.getMessage());
                 }
             });
         }
@@ -251,7 +254,7 @@ public class FriendListActivity extends AppCompatActivity {
 
             @Override
             public void onCancelled(FirebaseError error) {
-                System.out.println("[FriendListActivity] Read error: " + error.getMessage());
+                Log.w("initializeNames", "Read error: " + error.getMessage());
             }
         });
     }
@@ -289,7 +292,7 @@ public class FriendListActivity extends AppCompatActivity {
 
             @Override
             public void onCancelled(FirebaseError firebaseError) {
-                System.out.println("[resetFriendList] Read failed: " + firebaseError.getMessage());
+                Log.w("resetFriendList", "Read failed: " + firebaseError.getMessage());
             }
         });
     }
@@ -332,7 +335,9 @@ public class FriendListActivity extends AppCompatActivity {
                 }
 
                 @Override
-                public void onCancelled(FirebaseError firebaseError) {}
+                public void onCancelled(FirebaseError firebaseError) {
+                    Log.w("finishLS", "Read failed: " + firebaseError.getMessage());
+                }
             });
         }
 
@@ -405,7 +410,7 @@ public class FriendListActivity extends AppCompatActivity {
 
             @Override
             public void onCancelled(FirebaseError firebaseError) {
-                System.out.println(firebaseError.getMessage());
+                Log.w("FLA", "Read failed: " + firebaseError.getMessage());
             }
         });
     }

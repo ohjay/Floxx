@@ -307,7 +307,7 @@ public class UserPortalActivity extends AppCompatActivity {
 
             @Override
             public void onCancelled(FirebaseError error) {
-                System.out.println("[UserPortalActivity] Read failed: " + error.getMessage());
+                Log.w("UPA", "Read failed: " + error.getMessage());
             }
         });
     }

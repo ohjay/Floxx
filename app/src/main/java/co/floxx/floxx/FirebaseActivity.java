@@ -139,7 +139,7 @@ public class FirebaseActivity extends AppCompatActivity {
                 @Override
                 public void onAuthenticated(AuthData authData) {
                     uid = authData.getUid();
-                    System.out.println("User ID: " + uid + ", Provider: " + authData.getProvider());
+                    Log.i("FA", "User ID: " + uid + ", Provider: " + authData.getProvider());
                     redirectAuthenticatedUser();
                 }
                 @Override
@@ -300,7 +300,7 @@ public class FirebaseActivity extends AppCompatActivity {
 
                     @Override
                     public void onCancelled(FirebaseError firebaseError) {
-                        // We can do something here if we want
+                        Log.w("createUser", "Read failed: " + firebaseError.getMessage());
                     }
                 });
 
@@ -350,7 +350,7 @@ public class FirebaseActivity extends AppCompatActivity {
         } else {
             // If the email fails we'll just let them be confirmed
             Intermediary.firebaseToFullscreen = true;
-            System.out.println("Successfully created user account with uid: " + uid);
+            Log.i("FA", "Successfully created user account with uid: " + uid);
             Toast toast = Toast.makeText(FirebaseActivity.this, "You were able to register!",
                     Toast.LENGTH_LONG);
             toast.setGravity(Gravity.TOP|Gravity.CENTER_HORIZONTAL, 0, 30);

@@ -272,7 +272,7 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback,
 
             @Override
             public void onCancelled(FirebaseError e) {
-                System.out.println("Read failed: " + e.getMessage());
+                Log.w("FA – onCreate", "Read failed: " + e.getMessage());
             }
         });
 
@@ -302,7 +302,7 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback,
 
             @Override
             public void onCancelled(FirebaseError e) {
-                System.out.println("Read failed: " + e.getMessage());
+                Log.w("MA – onCreate", "Read failed: " + e.getMessage());
             }
         });
 
@@ -329,7 +329,7 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback,
 
             @Override
             public void onCancelled(FirebaseError firebaseError) {
-                System.out.println("[getMarkerColor] Read failed: " + firebaseError.getMessage());
+                Log.w("getMarkerColor", "Read failed: " + firebaseError.getMessage());
             }
         });
 
@@ -744,7 +744,9 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback,
             }
 
             @Override
-            public void onCancelled(FirebaseError firebaseError) {}
+            public void onCancelled(FirebaseError firebaseError) {
+                Log.w("setOMF", "Read failed: " + firebaseError.getMessage());
+            }
         });
 
         // Set a listener on the other guy, so we can see when his location changes
@@ -757,7 +759,7 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback,
 
             @Override
             public void onCancelled(FirebaseError firebaseError) {
-                System.out.println("[Map Activity] Read failed: " + firebaseError.getMessage());
+                Log.w("MapActivity", "Read failed: " + firebaseError.getMessage());
             }
         });
     }
@@ -985,7 +987,7 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback,
 
             @Override
             public void onCancelled(FirebaseError e) {
-                System.out.println("[setPermissionListener] Read failed: " + e.getMessage());
+                Log.w("setPermissionListener", "Read failed: " + e.getMessage());
             }
         });
     }

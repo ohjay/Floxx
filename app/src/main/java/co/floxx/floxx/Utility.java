@@ -1,5 +1,7 @@
 package co.floxx.floxx;
 
+import android.util.Log;
+
 import com.firebase.client.DataSnapshot;
 import com.firebase.client.Firebase;
 import com.firebase.client.FirebaseError;
@@ -68,7 +70,7 @@ public class Utility {
 
             @Override
             public void onCancelled(FirebaseError firebaseError) {
-                System.out.println("[saveLatLng] Read failed: " + firebaseError.getMessage());
+                Log.w("saveLatLng", "Read failed: " + firebaseError.getMessage());
             }
         });
     }
@@ -91,7 +93,7 @@ public class Utility {
 
             @Override
             public void onCancelled(FirebaseError firebaseError) {
-                System.out.println("[saveColor] Read failed: " + firebaseError.getMessage());
+                Log.w("saveColor", "Read failed: " + firebaseError.getMessage());
             }
         });
     }
@@ -116,7 +118,7 @@ public class Utility {
 
             @Override
             public void onCancelled(FirebaseError firebaseError) {
-                System.out.println("[MeetupPortalActivity] Error: " + firebaseError.getMessage());
+                Log.w("MeetupPortalActivity", "Error: " + firebaseError.getMessage());
             }
         });
     }
