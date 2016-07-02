@@ -7,7 +7,6 @@
     <string name="google_app_id">310379858463</string>
 
     <string name="title_activity_map">MapActivity</string>
-    <string name="dummy_button">Dummy Button</string>
     <string name="standby">&#8230;Please stand by&#8230;</string>
     <string name="group_creation_header">Create a Group</string>
     <string name="search_users">(&#8230;search for someone!)</string>
@@ -31,8 +30,6 @@
     <string name="registration_link">Don\'t have an account? Register now!</string>
     <string name="login_link">Sign in</string>
     <string name="register_subtext">Welcome to Floxx!</string>
-    <string name="register_desc">You don\'t have a Floxx account!? Don\'t worry, we\'ll fix that
-        in no time. Just fill in the fields below and hit the button.</string>
     <string name="firebase_msg">&#8230;Connecting&#8230;</string>
 
     <string name="up_header">User Portal</string>
@@ -46,4 +43,6 @@
     <string name="conf_label">Enter your confirmation code.</string>
     <string name="conf_submit">Submit</string>
     <string name="conf_out">Sign out</string>
+    <string name="register_desc">You don\'t have a Floxx account!? Don\'t worry, we\'ll fix that
+        in no time. Just fill in the fields below and hit the button.</string>
 </resources>

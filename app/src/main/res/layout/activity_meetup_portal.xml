@@ -90,4 +90,5 @@
         android:layout_centerHorizontal="true"
         android:layout_below="@id/leave_button"
         android:layout_marginTop="-3dip" />
+    
 </RelativeLayout>

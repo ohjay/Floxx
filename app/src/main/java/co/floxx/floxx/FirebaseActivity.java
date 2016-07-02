@@ -536,10 +536,6 @@ public class FirebaseActivity extends AppCompatActivity {
      * @return true if the email is of a legitimate form
      */
     public static boolean isEmailValid(CharSequence target) {
-        if (target == null) {
-            return false;
-        }
-
-        return android.util.Patterns.EMAIL_ADDRESS.matcher(target).matches();
+        return (target != null && android.util.Patterns.EMAIL_ADDRESS.matcher(target).matches());
     }
 }

@@ -1,6 +1,0 @@
---------------------------
-TODO (BUG REPORTS / MINOR)
---------------------------
-1. Look through (/clean up) all code.
-
-// Total: 0.5 hrs
