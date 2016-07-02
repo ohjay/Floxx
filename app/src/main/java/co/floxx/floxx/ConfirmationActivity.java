@@ -57,6 +57,7 @@ public class ConfirmationActivity extends AppCompatActivity {
         signOutButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                Intermediary.confToFullscreen = true;
                 new Firebase("https://floxx.firebaseio.com/").unauth();
                 finish();
             }

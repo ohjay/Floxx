@@ -287,6 +287,8 @@ public class RequestsActivity extends AppCompatActivity {
             });
         }
 
+        numFriends++; // to guarantee friend list loading... watch this
+
         // Grab all of the user's current friends
         currentFriends = new HashSet<String>(); // clear the set to start with
         Query queryRef = ref.child("users").orderByKey().equalTo(currUser);
@@ -296,7 +298,7 @@ public class RequestsActivity extends AppCompatActivity {
                 Object result = dataSnapshot.child(currUser).child("friends").getValue();
                 if (result != null) {
                     ArrayList<String> friends = (ArrayList<String>) result;
-                    numFriends += friends.size();
+                    numFriends += friends.size() - 1;
 
                     for (final String fuid : friends) {
                         Query nameQRef = ref.child("uids").orderByValue().equalTo(fuid);
@@ -317,6 +319,8 @@ public class RequestsActivity extends AppCompatActivity {
                             public void onCancelled(FirebaseError firebaseError) {}
                         });
                     }
+                } else {
+                    numFriends--;
                 }
             }
 
@@ -518,7 +522,8 @@ public class RequestsActivity extends AppCompatActivity {
         }
 
         // Just to shuffle the list a little
-        for (TextView firstFriend : firstFriends) {
+        for (int i = 1; i >= 0; --i) {
+            TextView firstFriend = firstFriends[i];
             if (firstFriend == null) {
                 break;
             }

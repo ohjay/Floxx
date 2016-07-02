@@ -43,7 +43,7 @@
     <string name="up_back">Back to user portal</string>
     <string name="invitations">Invitations</string>
     <string name="am_subtext">Last chance to back out, man</string>
-    <string name="conf_label">Enter your confirmation code here.</string>
+    <string name="conf_label">Enter your confirmation code.</string>
     <string name="conf_submit">Submit</string>
     <string name="conf_out">Sign out</string>
 </resources>

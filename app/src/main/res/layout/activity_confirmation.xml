@@ -35,7 +35,7 @@
         android:layout_marginBottom="20dp" />
 
     <TextView
-        android:layout_width="fill_parent"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textSize="18sp"
         android:id="@+id/conf_label"
@@ -44,33 +44,39 @@
         android:textColor="#fff"
         android:labelFor="@+id/conf_entry"
         android:text="@string/conf_label"
-        android:layout_above="@id/conf_entry" />
+        android:layout_above="@id/conf_entry"
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="2dp" />
 
-    <Button
+    <LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="@string/conf_submit"
-        android:id="@+id/conf_submit"
-        android:backgroundTint="@color/borange"
+        android:orientation="horizontal"
         android:layout_below="@id/conf_entry"
-        android:layout_centerHorizontal="true"
-        android:textSize="16sp"
-        android:paddingLeft="10dp"
-        android:paddingRight="10dp"
-        android:paddingTop="5dp"
-        android:paddingBottom="5dp" />
+        android:layout_centerHorizontal="true">
 
-    <Button
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/conf_out"
-        android:id="@+id/conf_out"
-        android:layout_below="@id/conf_submit"
-        android:layout_centerHorizontal="true"
-        android:layout_marginTop="-5dip"
-        android:textSize="16sp"
-        android:paddingLeft="10dp"
-        android:paddingRight="10dp"
-        android:paddingTop="5dp"
-        android:paddingBottom="5dp" />
+        <Button
+            android:layout_width="100dp"
+            android:layout_height="wrap_content"
+            android:text="@string/conf_submit"
+            android:id="@+id/conf_submit"
+            android:backgroundTint="#000"
+            android:paddingLeft="10dp"
+            android:paddingRight="10dp"
+            android:paddingTop="5dp"
+            android:paddingBottom="5dp"
+            android:textColor="#fff" />
+
+        <Button
+            android:layout_width="100dp"
+            android:layout_height="wrap_content"
+            android:text="@string/conf_out"
+            android:id="@+id/conf_out"
+            android:backgroundTint="#000"
+            android:paddingLeft="10dp"
+            android:paddingRight="10dp"
+            android:paddingTop="5dp"
+            android:paddingBottom="5dp"
+            android:textColor="#fff" />
+    </LinearLayout>
 </RelativeLayout>
