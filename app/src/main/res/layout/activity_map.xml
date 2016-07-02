@@ -75,7 +75,7 @@
         android:id="@+id/hidden_rect"
         android:layout_gravity="end|bottom"
         android:layout_width="0dp"
-        android:layout_height="40dp"
+        android:layout_height="70dp"
         android:layout_marginBottom="40dp"
         android:background="@drawable/transrect">
 
@@ -83,12 +83,18 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:id="@+id/hidden_users">
+            android:id="@+id/hidden_users"
+            android:paddingStart="6dp"
+            android:paddingEnd="6dp"
+            android:paddingTop="3dp"
+            android:paddingBottom="3dp">
 
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:text="@string/hidden_title" />
+                android:text="@string/hidden_title"
+                android:textStyle="bold"
+                android:textColor="@color/white" />
         </LinearLayout>
     </ScrollView>
 

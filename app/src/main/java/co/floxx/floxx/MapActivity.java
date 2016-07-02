@@ -306,7 +306,7 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback,
             }
         });
 
-        // Try and get the user's marker color
+        // Try and get the user's marker color and initial location
         Query queryRef = ref.child("locns").child(uid);
         queryRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
@@ -315,11 +315,38 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback,
                 if (color != null) {
                     markerColor = "#" + Integer.toHexString(color.intValue());
                 }
+
+                Double lat = (Double) snapshot.child("latitude").getValue();
+                Double lon = (Double) snapshot.child("longitude").getValue();
+                if (lat != null && lon != null && mMap != null && marker == null) {
+                    LatLng latLng = new LatLng(lat, lon);
+                    marker = mMap.addMarker(new MarkerOptions().position(latLng).title("You")
+                            .icon(getBitmapDescriptor(markerColor)));
+                    marker.showInfoWindow();
+                    mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, 13));
+                }
             }
 
             @Override
             public void onCancelled(FirebaseError firebaseError) {
                 System.out.println("[getMarkerColor] Read failed: " + firebaseError.getMessage());
+            }
+        });
+
+        // Try and get the user's initial ETA information
+        Query etaQuery = ref.child(meetupId).child(uid);
+        etaQuery.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                ArrayList<Double> etaInfo = (ArrayList<Double>) dataSnapshot.getValue();
+                if (etaInfo != null) {
+                    handleNewETA(uid, etaInfo.get(0).intValue(), etaInfo.get(1));
+                }
+            }
+
+            @Override
+            public void onCancelled(FirebaseError firebaseError) {
+                Log.w("MA – onCreate", "Read failed: " + firebaseError.getMessage());
             }
         });
 
@@ -355,7 +382,7 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback,
     @Override
     public void onMapClick(LatLng point) {
         if (meetingMarker != null) { return; } // only ONE of these on the map!!
-        MarkerOptions mmo = new MarkerOptions().position(point).title("meet here!").draggable(true);
+        MarkerOptions mmo = new MarkerOptions().position(point).title("Meeting Pt.").draggable(true);
         meetingMarker = mMap.addMarker(mmo); // create the almighty meeting marker
 
         if (!etaExists) {
@@ -512,9 +539,15 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback,
                 Location location =
                         locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
                 if (marker != null) { marker.remove(); }
-                marker = mMap.addMarker(new MarkerOptions().position(new LatLng(location.getLatitude(),
-                        location.getLongitude())).title("You").icon(getBitmapDescriptor(markerColor)));
+                LatLng latLng = new LatLng(location.getLatitude(), location.getLongitude());
+                marker = mMap.addMarker(new MarkerOptions().position(latLng).title("You")
+                        .icon(getBitmapDescriptor(markerColor)));
                 marker.showInfoWindow();
+
+                if (initialZoom) {
+                    mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, 13));
+                    initialZoom = false;
+                }
             } catch (SecurityException e) {
                 e.printStackTrace(); // lol
             }
@@ -673,7 +706,7 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback,
     private void updateMeetingMarker(double latitude, double longitude) {
         if (meetingMarker == null) {
             MarkerOptions mmo = new MarkerOptions().position(new LatLng(latitude, longitude))
-                    .title("meet here!").draggable(true);
+                    .title("Meeting Pt.").draggable(true);
             meetingMarker = mMap.addMarker(mmo); // create the meeting marker
 
             if (!etaExists) {
@@ -984,6 +1017,8 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback,
             String colorHex = markerColors.get(uid);
             if (colorHex != null) {
                 tv.setTextColor(Color.parseColor(colorHex));
+            } else {
+                tv.setTextColor(Color.LTGRAY);
             }
 
             ll.addView(tv, lp);

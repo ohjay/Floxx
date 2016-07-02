@@ -3,7 +3,5 @@ TODO (BUG REPORTS / MINOR)
 --------------------------
 1. Look at the TODOs in MapActivity.
 2. Look through (/clean up) all code. For example, turn standard output into logs.
-3. Bug report: when you open the map, it starts in Africa.
-4. Bug report: Location services don't seem to be able to connect sometimes. Doesn't find a location for YOU, and doesn't show ETA/distance info for others (people who were already in the meetup) either.
 
-// Total: 2 hrs
+// Total: 1 hr
