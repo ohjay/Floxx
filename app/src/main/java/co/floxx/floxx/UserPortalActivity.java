@@ -20,6 +20,7 @@ import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.firebase.client.AuthData;
 import com.firebase.client.DataSnapshot;
 import com.firebase.client.Firebase;
 import com.firebase.client.FirebaseError;
@@ -46,6 +47,16 @@ public class UserPortalActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
+
+        if (ref == null) {
+            ref = new Firebase("https://floxx.firebaseio.com/");
+        }
+        AuthData auth = ref.getAuth();
+        if (auth == null) {
+            finish();
+            return; // no anons allowed
+        }
+
         grabLocnPermissions(currentUser);
         final ImageButton finalButton =
                 (ImageButton) findViewById(R.id.final_button); // it's final get it??

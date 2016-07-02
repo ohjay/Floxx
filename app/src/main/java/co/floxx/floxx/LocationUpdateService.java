@@ -69,7 +69,7 @@ public class LocationUpdateService extends JobService implements LocationListene
                     break;
                 }
 
-                Thread.sleep(3500);
+                Thread.sleep(2500);
             } catch (InterruptedException e) {
                 Thread.currentThread().interrupt();
             }

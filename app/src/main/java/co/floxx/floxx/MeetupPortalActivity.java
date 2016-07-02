@@ -35,8 +35,8 @@ public class MeetupPortalActivity extends AppCompatActivity {
         if (auth == null) {
             // Not supposed to be here!
             // Possibly MP1 -> FL -> map -> (X map) -> (X FL) -> MP2 -> (X MP2) = MP1
+            // ^ Update (7/02): this is outdated but it looks cool so I'm keeping it
 
-            startActivity(new Intent(this, FullscreenActivity.class));
             finish(); return; // get the heck back to the login screen
         }
 

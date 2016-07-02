@@ -1,6 +1,15 @@
 <resources>
     <string name="app_name">Floxx</string>
 
+    <string name="register_username_prompt">Enter a desired username</string>
+    <string name="register_email_prompt">Enter an email address</string>
+    <string name="register_password_prompt">Enter a desired password</string>
+    <string name="confirm_pw_prompt">Confirm your password</string>
+    <string name="register_button">Create account</string>
+    <string name="portal_greeting">Meetup Portal</string>
+    <string name="eta_default">Waiting for a meeting marker to be placed&#8230;</string>
+    <string name="leave_content">Leave meetup</string>
+
     <string name="main_button">Floxx now, Floxx forever</string>
     <string name="main_content">Floxx</string>
     <string name="register_header">Registration</string>
@@ -13,15 +22,6 @@
     <string name="reqs_header">Friends</string>
     <string name="search_header">Add Friends</string>
     <string name="received_header">Pending Friend Requests</string>
-
-    <string name="register_username_prompt">Enter a desired username</string>
-    <string name="register_email_prompt">Enter an email address</string>
-    <string name="register_password_prompt">Enter a desired password</string>
-    <string name="confirm_pw_prompt">Confirm your password</string>
-    <string name="register_button">Create account</string>
-    <string name="portal_greeting">Meetup Portal</string>
-    <string name="eta_default">Waiting for a meeting marker to be placed&#8230;</string>
-    <string name="leave_content">Leave meetup</string>
 
     <string name="hidden_title">Hidden Users</string>
     <string name="creation_confirm">Go to map</string>
@@ -43,6 +43,7 @@
     <string name="conf_label">Enter your confirmation code.</string>
     <string name="conf_submit">Submit</string>
     <string name="conf_out">Sign out</string>
-    <string name="register_desc">You don\'t have a Floxx account!? Don\'t worry, we\'ll fix that
-        in no time. Just fill in the fields below and hit the button.</string>
+    <string name="register_desc">You don\'t have a Floxx account!?
+        Don\'t worry, we\'ll fix that in no time. Just fill in the fields
+        below and hit the button.</string>
 </resources>

@@ -17,9 +17,9 @@ Floxx is the Android app that will give you this information. Cohesively, it's a
 (Generally in that order.) Its vast array of features also includes a Tea Era button, the ability to toggle location services, and personalization for map markers.
 
 ## Installation
-You can install Floxx by loading the signed APK below. When the link is clicked, your system should automatically start downloading the file. Since you'll need to get the APK onto your Android phone, either open the link from a mobile web browser or save it on your computer and then transfer it from there. Once you've got the file, all you need to do is open it (probably via some file management app) and follow the instructions.
+You can install Floxx by loading the signed APK below. When the link is clicked, your system should automatically start downloading the file. Since you'll need to get the APK onto your Android phone, either open the link from a mobile web browser or save it on your computer and then transfer it from there. Once you've got the file, launch it – probably via some file management app – and follow the instructions.
 
-[Download Floxx Now! No Viruses Attached!](app/app-debug.apk?raw=true)
+[Floxx APK v1.0 [19.3 MB]](app/app-release.apk?raw=true)
 
 ## Usage
 To do anything really, you'll first need to create an in-app account. Once you've done that, you're free to explore the wonderful world of Floxx.
