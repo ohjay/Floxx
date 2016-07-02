@@ -69,7 +69,7 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * An example full-screen activity that shows and hides the system UI (i.e.
+ * An awesome full-screen activity that shows and hides the system UI (i.e.
  * status bar and navigation/system bar) with user interaction.
  */
 public class MapActivity extends FragmentActivity implements OnMapReadyCallback,
