@@ -23,6 +23,9 @@ public class RegisterActivity extends AppCompatActivity {
         } else if (Intermediary.confToFullscreen) {
             Intermediary.confToFullscreen = false;
             finish();
+        } else if (Intermediary.userPortalToFullscreen) {
+            Intermediary.userPortalToFullscreen = false;
+            finish();
         }
     }
 

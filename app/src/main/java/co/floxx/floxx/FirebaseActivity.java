@@ -13,9 +13,6 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.amazonaws.auth.CognitoCachingCredentialsProvider;
-import com.amazonaws.mobileconnectors.cognito.CognitoSyncManager;
-import com.amazonaws.mobileconnectors.cognito.Dataset;
-import com.amazonaws.mobileconnectors.cognito.DefaultSyncCallback;
 import com.amazonaws.regions.Regions;
 import com.amazonaws.services.simpleemail.AmazonSimpleEmailServiceClient;
 import com.amazonaws.services.simpleemail.model.Body;
@@ -34,7 +31,6 @@ import com.github.silvestrpredko.dotprogressbar.DotProgressBar;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 public class FirebaseActivity extends AppCompatActivity {
@@ -142,6 +138,7 @@ public class FirebaseActivity extends AppCompatActivity {
                     Log.i("FA", "User ID: " + uid + ", Provider: " + authData.getProvider());
                     redirectAuthenticatedUser();
                 }
+
                 @Override
                 public void onAuthenticationError(FirebaseError firebaseError) {
                     String firebaseMsg = firebaseError.getMessage();
@@ -168,7 +165,6 @@ public class FirebaseActivity extends AppCompatActivity {
      */
     private class SendEmailTask extends AsyncTask<String, Void, Void> {
         protected Void doInBackground(String... strings) {
-            credentialsProvider.refresh();
             AmazonSimpleEmailServiceClient client = new AmazonSimpleEmailServiceClient(credentialsProvider);
 
             // Create all of the content for the email
@@ -236,17 +232,6 @@ public class FirebaseActivity extends AppCompatActivity {
                 "us-east-1:58399437-27a6-4227-85fe-5b6592cf90e6",
                 Regions.US_EAST_1
         );
-
-        CognitoSyncManager syncClient = new CognitoSyncManager(
-                getApplicationContext(), Regions.US_EAST_1, credentialsProvider);
-        Dataset dataset = syncClient.openOrCreateDataset("floxxset");
-        dataset.put(address, "email tbs");
-        dataset.synchronize(new DefaultSyncCallback() {
-            @Override
-            public void onSuccess(Dataset dataset, List newRecords) {
-                // Hooray... now let me send emails okay?
-            }
-        });
 
         new SendEmailTask().execute(address);
         waitForSendConfirm();
@@ -343,10 +328,34 @@ public class FirebaseActivity extends AppCompatActivity {
             ref.child("status " + uid).setValue("unconfirmed");
             ref.child("vcode " + uid).setValue(confirmationCode);
 
-            Intent intent = new Intent(FirebaseActivity.this, ConfirmationActivity.class);
-            intent.putExtra("vcode", confirmationCode);
-            intent.putExtra("username", ruser);
-            startActivity(intent);
+            ref.authWithPassword(ruser + "@gmail.com", rpass, new Firebase.AuthResultHandler() {
+                @Override
+                public void onAuthenticated(AuthData authData) {
+                    Intent intent = new Intent(FirebaseActivity.this, ConfirmationActivity.class);
+                    intent.putExtra("vcode", confirmationCode);
+                    intent.putExtra("username", ruser);
+                    startActivity(intent);
+                    finish();
+                }
+
+                @Override
+                public void onAuthenticationError(FirebaseError firebaseError) {
+                    String firebaseMsg = firebaseError.getMessage();
+                    if (firebaseMsg.startsWith("There was an exception while connecting "
+                            + "to the authentication server")) {
+                        firebaseMsg = "No internet connection. Please check your Wi-Fi "
+                                + "or mobile network connection and try again.";
+                    } else {
+                        firebaseMsg = firebaseMsg.replace("email address", "username");
+                    }
+
+                    Toast toast = Toast.makeText(FirebaseActivity.this, firebaseMsg,
+                            Toast.LENGTH_LONG);
+                    toast.setGravity(Gravity.TOP|Gravity.CENTER_HORIZONTAL, 0, 30);
+                    toast.show();
+                    finish();
+                }
+            });
         } else {
             // If the email fails we'll just let them be confirmed
             Intermediary.firebaseToFullscreen = true;
@@ -355,9 +364,8 @@ public class FirebaseActivity extends AppCompatActivity {
                     Toast.LENGTH_LONG);
             toast.setGravity(Gravity.TOP|Gravity.CENTER_HORIZONTAL, 0, 30);
             toast.show();
+            finish();
         }
-
-        finish();
     }
 
     private void blockUntilEmailChecked() {

@@ -2,6 +2,7 @@ package co.floxx.floxx;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
+import android.app.ActionBar;
 import android.app.job.JobInfo;
 import android.app.job.JobScheduler;
 import android.content.ComponentName;
@@ -26,6 +27,7 @@ import android.util.Log;
 import android.util.TypedValue;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.Window;
 import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
@@ -219,6 +221,21 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback,
             }
         }
         meetupId = intent.getStringExtra("meetup id");
+
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
+                != PackageManager.PERMISSION_GRANTED
+                && ActivityCompat.checkSelfPermission(this,
+                Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(this,
+                    new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
+                    FINE_REQ_CODE);
+        }
+
+        getWindow().requestFeature(Window.FEATURE_ACTION_BAR);
+        ActionBar actionBar = getActionBar();
+        if (actionBar != null) {
+            actionBar.hide();
+        }
 
         setContentView(R.layout.activity_map);
 
@@ -432,9 +449,6 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback,
                 != PackageManager.PERMISSION_GRANTED
                 && ActivityCompat.checkSelfPermission(this,
                 Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            ActivityCompat.requestPermissions(this,
-                    new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
-                    FINE_REQ_CODE);
             return;
         }
 
@@ -458,11 +472,13 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback,
 
         switch (requestCode) {
             case FINE_REQ_CODE: {
-                mMap.setMyLocationEnabled(true);
                 mLastLocation = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
                 if (mLastLocation == null) {
-                    LocationServices.FusedLocationApi.requestLocationUpdates(mGoogleApiClient,
-                            mLocationRequest, this);
+                    if (mLocationRequest != null && mGoogleApiClient != null
+                            && mGoogleApiClient.isConnected()) {
+                        LocationServices.FusedLocationApi.requestLocationUpdates(mGoogleApiClient,
+                                mLocationRequest, this);
+                    }
                 } else {
                     handleNewLocation(mLastLocation);
                 }
@@ -470,11 +486,13 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback,
             }
 
             case COARSE_REQ_CODE: {
-                mMap.setMyLocationEnabled(true);
                 mLastLocation = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
                 if (mLastLocation == null) {
-                    LocationServices.FusedLocationApi.requestLocationUpdates(mGoogleApiClient,
-                            mLocationRequest, this);
+                    if (mLocationRequest != null && mGoogleApiClient != null
+                            && mGoogleApiClient.isConnected()) {
+                        LocationServices.FusedLocationApi.requestLocationUpdates(mGoogleApiClient,
+                                mLocationRequest, this);
+                    }
                 } else {
                     handleNewLocation(mLastLocation);
                 }

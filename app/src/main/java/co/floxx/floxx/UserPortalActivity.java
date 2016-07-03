@@ -188,6 +188,7 @@ public class UserPortalActivity extends AppCompatActivity {
                 broadcastIntent.setAction("co.floxx.floxx.ACTION_LOGOUT");
                 sendBroadcast(broadcastIntent);
                 ref.unauth();
+                Intermediary.userPortalToFullscreen = true;
                 finish();
             }
         });

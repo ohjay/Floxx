@@ -67,11 +67,12 @@
         <activity
             android:name=".MeetupPortalActivity"
             android:screenOrientation="portrait" />
+        <activity
+            android:name=".ConfirmationActivity"
+            android:screenOrientation="portrait" />
 
         <service
             android:name=".LocationUpdateService"
             android:permission="android.permission.BIND_JOB_SERVICE" />
-
-        <activity android:name=".ConfirmationActivity" />
     </application>
 </manifest>
